@@ -1,0 +1,166 @@
+"use client"
+
+import Link from "next/link"
+import { useCallback, useEffect, useState } from "react"
+
+import { useLocale } from "@/components/i18n/locale-provider"
+import type { AfishaItemManual } from "@/lib/cms/home/types"
+import {
+  mapEventApiRowsToAfisha,
+  type ApiEventRow,
+} from "@/lib/cms/home/map-from-public-api"
+import { formatAfishaTimeLine } from "@/lib/events/home-afisha-card"
+import { L, pickDbField, pickLocalized } from "@/lib/i18n/app-locale"
+import { fetchPublishedEventsHome } from "@/services/api"
+
+type Props = {
+  kicker: string
+  kickerKz?: string | null
+  title: string
+  titleKz?: string | null
+  initialItems: AfishaItemManual[]
+  hasStatsAbove: boolean
+  clientRefresh?: {
+    enabled: boolean
+    intervalSec: number
+    limit: number
+  }
+}
+
+export function HomeEventsBlock({
+  kicker,
+  kickerKz,
+  title,
+  titleKz,
+  initialItems,
+  hasStatsAbove,
+  clientRefresh,
+}: Props) {
+  const { locale } = useLocale()
+  const t = (v: Parameters<typeof pickLocalized>[0]) => pickLocalized(v, locale)
+  /**
+   * SSR отдаёт `initialItems` — это базовый источник правды.
+   * Клиентский polling — только улучшение и не должен очищать блок после hydration.
+   */
+  const [items, setItems] = useState<AfishaItemManual[] | null>(null)
+  const shownItems = items ?? initialItems
+
+  const fetchEvents = useCallback(async () => {
+    if (!clientRefresh?.enabled) return
+    const lim = clientRefresh.limit
+    const res = await fetchPublishedEventsHome(lim, locale)
+    if (!res.ok) return
+    const data = (await res.json()) as ApiEventRow[]
+    if (!Array.isArray(data)) return
+    const mapped = mapEventApiRowsToAfisha(data)
+    // Не затираем SSR-данные пустым ответом — иначе блок "мигает" и исчезает.
+    if (mapped.length === 0) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("[home] /api/events returned empty array; keep previous items")
+      }
+      return
+    }
+    setItems(mapped)
+  }, [clientRefresh, locale])
+
+  useEffect(() => {
+    if (!clientRefresh?.enabled) return
+    void fetchEvents()
+  }, [clientRefresh, fetchEvents])
+
+  useEffect(() => {
+    if (!clientRefresh?.enabled) return
+    const sec = Math.max(
+      10,
+      Math.min(3600, clientRefresh.intervalSec || 60)
+    )
+    const id = window.setInterval(fetchEvents, sec * 1000)
+    return () => window.clearInterval(id)
+  }, [clientRefresh, fetchEvents])
+
+  if (shownItems.length === 0) return null
+
+  return (
+    <section
+      className={`py-24 px-8 overflow-hidden bg-surface-container-low ${
+        hasStatsAbove ? "" : "relative -mt-16 z-30"
+      }`}
+    >
+      <div className="max-w-[1440px] mx-auto">
+        <div className="flex justify-between items-end mb-12 gap-4">
+          <div className="min-w-0">
+            <span className="text-[#00236f] font-bold tracking-widest uppercase text-xs mb-2 block">
+              {pickDbField(kicker, kickerKz ?? null, locale)}
+            </span>
+            <h2 className="text-4xl font-black text-on-surface tracking-tight break-words whitespace-normal">
+              {pickDbField(title, titleKz ?? null, locale)}
+            </h2>
+          </div>
+          <Link
+            className="text-[#00236f] font-bold hover:underline flex shrink-0 items-center gap-2"
+            href="/events"
+          >
+            {t(L("Все мероприятия", "Барлық іс-шаралар"))}{" "}
+            <span className="material-symbols-outlined">arrow_right_alt</span>
+          </Link>
+        </div>
+        <div className="scroll-smooth flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory no-scrollbar">
+          {shownItems.map((ev, idx) => {
+            const evTitle = pickDbField(ev.title, ev.titleKz ?? null, locale)
+            const evExcerpt = pickDbField(ev.excerpt, ev.excerptKz ?? null, locale)
+            const timeLineShown = formatAfishaTimeLine(
+              ev.rawTimeDisplay,
+              ev.startsAtIso,
+              locale,
+              ev.rawTimeDisplayKz
+            )
+            return (
+            <div
+              key={`${ev.ctaHref}-${idx}`}
+              className="flex-none w-[320px] shrink-0 snap-start flex flex-col gap-4"
+            >
+              <div className="w-[320px] shrink-0 rounded-xl overflow-hidden shadow-2xl group">
+                <div className="relative w-full aspect-[9/16]">
+                  <img
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    src={ev.posterUrl}
+                  />
+                </div>
+              </div>
+              <div className="w-[320px] shrink-0 rounded-xl bg-surface-container-lowest p-8 shadow-[0_10px_30px_-5px_rgba(25,28,30,0.08)] flex flex-col flex-1">
+                <div className="mb-4">
+                  <span className="text-4xl font-black leading-none block text-on-surface">
+                    {ev.dayNum}
+                  </span>
+                  <span className="text-sm font-bold uppercase tracking-widest text-[#00236f]">
+                    {timeLineShown}
+                  </span>
+                </div>
+                <h3 className="text-2xl font-black mb-3 leading-tight line-clamp-2 text-on-surface break-words whitespace-normal">
+                  {evTitle}
+                </h3>
+                <p className="text-on-surface-variant text-sm mb-6 line-clamp-2 break-words whitespace-normal">
+                  {evExcerpt}
+                </p>
+                <div className="mt-auto">
+                  <Link
+                    className="bg-[#00236f] text-white py-3 px-6 rounded-md font-bold text-xs w-fit uppercase tracking-tighter hover:bg-[#00236f]/90 transition-all inline-block"
+                    href={ev.ctaHref}
+                  >
+                    {pickDbField(
+                      ev.ctaLabel,
+                      ev.ctaLabelKz ?? null,
+                      locale
+                    )}
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )
+          })}
+        </div>
+      </div>
+    </section>
+  )
+}

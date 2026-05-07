@@ -1,0 +1,11 @@
+# Скопируйте в .env в корне frontend/web (рядом с package.json):
+DATABASE_URL="file:./dev.db"
+
+# Вход в /admin (в production обязательно смените):
+# SESSION_SECRET — не короче 32 символов
+SESSION_SECRET="замените-на-случайную-строку-32-символа-минимум"
+ADMIN_EMAIL="admin@library.local"
+ADMIN_PASSWORD="сильный-пароль"
+
+# Локально, если переменные не заданы: email admin@library.local, пароль admin,
+# для JWT в dev используется встроенный секрет (см. src/lib/auth/session.ts).

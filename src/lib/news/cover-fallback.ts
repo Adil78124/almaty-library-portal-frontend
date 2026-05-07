@@ -1,0 +1,3 @@
+/** Тот же fallback, что на странице статьи (`/news/[slug]`), если нет обложки. */
+export const NEWS_COVER_FALLBACK =
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuBShuOMgY6kHuzFpSeZBV1A_9wR89n65zMP24fkd6pmPZVB5GD4bqL89gZjprp6-VHtL0Zr5psqVgWp0IUzCpU4ofTk_g4FyJzCJ28BPfaqhOHSBNoL8Aso6bXF1BJXbIoljNhP43P9lIZCd1wfuaMg2NBrasOWq2T0TemB95yLPsO6xmhWyVkQItOdzrbp1Rx-wAjZTywVKlNebgUNkzO1is3oWQWMM-Y1M13NzkVwL0Xh55l2eeXQRzJf97-xoL14khH42jDXUI6Q"
