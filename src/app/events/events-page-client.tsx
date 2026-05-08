@@ -218,17 +218,17 @@ export default function EventsPageClient({ hero, events, newsTeasers }: Props) {
             {cat}
           </div>
         </div>
-        <div className="p-8 flex-1 flex flex-col">
+        <div className="p-4 sm:p-6 md:p-8 flex-1 flex flex-col min-w-0">
           <div className="flex items-center text-secondary text-sm font-semibold mb-3">
             <span className="material-symbols-outlined text-sm mr-2">
               calendar_today
             </span>
-            <span>{when || t(L("—", "—"))}</span>
+            <span className="break-words">{when || t(L("—", "—"))}</span>
           </div>
-          <h3 className="text-xl font-bold text-on-surface mb-4 group-hover:text-primary transition-colors leading-tight">
+          <h3 className="text-lg sm:text-xl font-bold text-on-surface mb-4 group-hover:text-primary transition-colors leading-tight break-words">
             {cardTitle}
           </h3>
-          <p className="text-on-surface-variant text-sm leading-relaxed mb-6 flex-1">
+          <p className="text-on-surface-variant text-sm leading-relaxed mb-6 flex-1 break-words">
             {cardExcerpt}
           </p>
           <Link
@@ -244,7 +244,7 @@ export default function EventsPageClient({ hero, events, newsTeasers }: Props) {
 
   return (
     <>
-      <section className="relative left-1/2 right-1/2 mb-10 flex h-[360px] w-screen -ml-[50vw] -mr-[50vw] items-center overflow-hidden">
+      <section className="relative mb-8 sm:mb-10 flex min-h-[260px] sm:min-h-[300px] md:h-[360px] w-[calc(100%+2rem)] max-w-none -mx-4 sm:w-[calc(100%+3rem)] sm:-mx-6 lg:w-[calc(100%+4rem)] lg:-mx-8 items-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
             className="w-full h-full object-cover"
@@ -258,8 +258,8 @@ export default function EventsPageClient({ hero, events, newsTeasers }: Props) {
           <div className="absolute inset-0 bg-primary/80 mix-blend-multiply"></div>
           <div className="absolute inset-0 bg-gradient-to-r from-primary to-transparent opacity-90"></div>
         </div>
-        <div className="relative z-10 max-w-screen-2xl mx-auto px-8 w-full">
-          <nav className="flex items-center space-x-2 text-on-primary/70 text-sm mb-6 uppercase tracking-widest font-medium">
+        <div className="relative z-10 w-full px-4 sm:px-6 lg:px-8">
+          <nav className="flex flex-wrap items-center gap-x-2 gap-y-1 text-on-primary/70 text-sm mb-4 sm:mb-6 uppercase tracking-widest font-medium">
             <Link className="hover:text-on-primary" href="/">
               {t(L("Главная", "Басты бет"))}
             </Link>
@@ -274,10 +274,10 @@ export default function EventsPageClient({ hero, events, newsTeasers }: Props) {
               )}
             </span>
           </nav>
-          <h1 className="text-5xl md:text-6xl font-bold text-on-primary tracking-tighter mb-4 max-w-3xl">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-on-primary tracking-tighter mb-4 max-w-3xl break-words">
             {pickDbField(hero.title, hero.titleKz ?? null, locale)}
           </h1>
-          <p className="text-xl text-on-primary/80 max-w-2xl font-light leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-on-primary/80 max-w-2xl font-light leading-relaxed break-words">
             {pickDbField(hero.lead, hero.leadKz ?? null, locale)}
           </p>
         </div>
@@ -312,7 +312,7 @@ export default function EventsPageClient({ hero, events, newsTeasers }: Props) {
                 </button>
               </div>
             </div>
-            <div className="grid grid-cols-7 gap-2 text-center text-sm">
+            <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center text-xs sm:text-sm">
               {wkShortLabels.map((d, i) => (
                 <div
                   key={`cal-wd-${i}`}
@@ -326,7 +326,7 @@ export default function EventsPageClient({ hero, events, newsTeasers }: Props) {
                   return (
                     <div
                       key={`e-${i}`}
-                      className="h-11 rounded-lg bg-surface-container-lowest/40"
+                      className="min-h-[2.5rem] h-9 sm:h-11 rounded-lg bg-surface-container-lowest/40"
                     />
                   )
                 }
@@ -339,7 +339,7 @@ export default function EventsPageClient({ hero, events, newsTeasers }: Props) {
                     type="button"
                     onClick={() => onDayClick(day)}
                     className={[
-                      "h-11 rounded-lg flex flex-col items-center justify-center gap-0.5 transition-colors",
+                      "min-h-[2.5rem] h-9 sm:h-11 rounded-lg flex flex-col items-center justify-center gap-0.5 transition-colors",
                       selected
                         ? "bg-primary text-on-primary font-bold ring-2 ring-primary/40"
                         : "bg-surface-container-lowest hover:bg-surface-container font-medium",

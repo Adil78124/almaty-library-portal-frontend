@@ -82,29 +82,29 @@ export function HomeEventsBlock({
 
   return (
     <section
-      className={`py-24 px-8 overflow-hidden bg-surface-container-low ${
+      className={`py-16 sm:py-20 md:py-24 px-4 sm:px-6 lg:px-8 overflow-x-hidden bg-surface-container-low ${
         hasStatsAbove ? "" : "relative -mt-16 z-30"
       }`}
     >
-      <div className="max-w-[1440px] mx-auto">
-        <div className="flex justify-between items-end mb-12 gap-4">
+      <div className="max-w-[1440px] mx-auto min-w-0">
+        <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-end mb-8 sm:mb-12">
           <div className="min-w-0">
             <span className="text-[#00236f] font-bold tracking-widest uppercase text-xs mb-2 block">
               {pickDbField(kicker, kickerKz ?? null, locale)}
             </span>
-            <h2 className="text-4xl font-black text-on-surface tracking-tight break-words whitespace-normal">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-on-surface tracking-tight break-words whitespace-normal">
               {pickDbField(title, titleKz ?? null, locale)}
             </h2>
           </div>
           <Link
-            className="text-[#00236f] font-bold hover:underline flex shrink-0 items-center gap-2"
+            className="text-[#00236f] font-bold hover:underline flex shrink-0 items-center gap-2 w-fit"
             href="/events"
           >
             {t(L("Все мероприятия", "Барлық іс-шаралар"))}{" "}
             <span className="material-symbols-outlined">arrow_right_alt</span>
           </Link>
         </div>
-        <div className="scroll-smooth flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory no-scrollbar">
+        <div className="scroll-smooth flex gap-4 sm:gap-6 overflow-x-auto overflow-y-hidden pb-8 snap-x snap-mandatory no-scrollbar -mx-1 px-1 max-w-full">
           {shownItems.map((ev, idx) => {
             const evTitle = pickDbField(ev.title, ev.titleKz ?? null, locale)
             const evExcerpt = pickDbField(ev.excerpt, ev.excerptKz ?? null, locale)
@@ -117,9 +117,9 @@ export function HomeEventsBlock({
             return (
             <div
               key={`${ev.ctaHref}-${idx}`}
-              className="flex-none w-[320px] shrink-0 snap-start flex flex-col gap-4"
+              className="flex-none w-[min(100%,calc(100vw-2.5rem))] max-w-[320px] shrink-0 snap-start flex flex-col gap-4"
             >
-              <div className="w-[320px] shrink-0 rounded-xl overflow-hidden shadow-2xl group">
+              <div className="w-full max-w-[320px] shrink-0 rounded-xl overflow-hidden shadow-2xl group">
                 <div className="relative w-full aspect-[9/16]">
                   <img
                     alt=""
@@ -128,16 +128,16 @@ export function HomeEventsBlock({
                   />
                 </div>
               </div>
-              <div className="w-[320px] shrink-0 rounded-xl bg-surface-container-lowest p-8 shadow-[0_10px_30px_-5px_rgba(25,28,30,0.08)] flex flex-col flex-1">
+              <div className="w-full max-w-[320px] shrink-0 rounded-xl bg-surface-container-lowest p-5 sm:p-6 md:p-8 shadow-[0_10px_30px_-5px_rgba(25,28,30,0.08)] flex flex-col flex-1 min-w-0">
                 <div className="mb-4">
-                  <span className="text-4xl font-black leading-none block text-on-surface">
+                  <span className="text-3xl sm:text-4xl font-black leading-none block text-on-surface">
                     {ev.dayNum}
                   </span>
-                  <span className="text-sm font-bold uppercase tracking-widest text-[#00236f]">
+                  <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-[#00236f] break-words">
                     {timeLineShown}
                   </span>
                 </div>
-                <h3 className="text-2xl font-black mb-3 leading-tight line-clamp-2 text-on-surface break-words whitespace-normal">
+                <h3 className="text-xl sm:text-2xl font-black mb-3 leading-tight line-clamp-2 text-on-surface break-words whitespace-normal">
                   {evTitle}
                 </h3>
                 <p className="text-on-surface-variant text-sm mb-6 line-clamp-2 break-words whitespace-normal">

@@ -43,8 +43,8 @@ export function BranchesPagePublic({ hero, branches, network }: Props) {
 
   return (
     <>
-      <main className="pt-20">
-        <section className="relative flex h-[400px] w-full items-center overflow-hidden">
+      <main className="pt-20 overflow-x-hidden min-w-0">
+        <section className="relative flex min-h-[280px] sm:min-h-[340px] md:h-[400px] w-full max-w-full items-center overflow-hidden py-10 md:py-0">
           <div className="absolute inset-0 z-0">
             <img
               alt={pickDbField(
@@ -57,7 +57,7 @@ export function BranchesPagePublic({ hero, branches, network }: Props) {
             />
             <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/70 to-transparent" />
           </div>
-          <div className="relative z-20 mx-auto w-full max-w-screen-2xl px-8 text-white">
+          <div className="relative z-20 mx-auto w-full max-w-screen-2xl px-4 sm:px-6 lg:px-8 text-white min-w-0">
             <nav className="mb-6 flex flex-wrap items-center gap-y-1 space-x-2 text-sm font-medium opacity-90">
               <Link className="hover:underline" href="/">
                 {t(L("Главная", "Басты бет"))}
@@ -71,17 +71,17 @@ export function BranchesPagePublic({ hero, branches, network }: Props) {
                 )}
               </span>
             </nav>
-            <h1 className="mb-4 max-w-3xl text-5xl font-extrabold leading-tight tracking-tighter md:text-6xl">
+            <h1 className="mb-3 sm:mb-4 max-w-3xl text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tighter break-words">
               {pickDbField(hero.title, hero.titleKz ?? null, locale)}
             </h1>
-            <p className="max-w-2xl text-lg font-light leading-relaxed text-primary-fixed md:text-xl">
+            <p className="max-w-2xl text-base sm:text-lg font-light leading-relaxed text-primary-fixed md:text-xl break-words">
               {pickDbField(hero.lead, hero.leadKz ?? null, locale)}
             </p>
           </div>
         </section>
 
-        <section className="bg-surface px-8 pb-24 pt-12">
-          <div className="mx-auto max-w-screen-2xl">
+        <section className="bg-surface px-4 sm:px-6 lg:px-8 pb-16 sm:pb-24 pt-10 sm:pt-12">
+          <div className="mx-auto max-w-screen-2xl min-w-0">
             {branches.length === 0 ? (
               <p className="text-on-surface-variant rounded-xl border border-dashed p-10 text-center">
                 {t(
@@ -92,7 +92,7 @@ export function BranchesPagePublic({ hero, branches, network }: Props) {
                 )}
               </p>
             ) : (
-              <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-6 sm:gap-8 sm:grid-cols-2 xl:grid-cols-3">
                 {branches.map((b) => {
                   const name = pickDbField(b.titleRu, b.titleKz ?? null, locale)
                   const city = pickDbField(
@@ -171,13 +171,13 @@ export function BranchesPagePublic({ hero, branches, network }: Props) {
           </div>
         </section>
 
-        <section className="bg-surface-container-low px-8 py-24">
-          <div className="mx-auto grid max-w-screen-2xl grid-cols-1 items-center gap-20 lg:grid-cols-2">
-            <div>
-              <h2 className="mb-8 text-4xl font-extrabold tracking-tight text-primary">
+        <section className="bg-surface-container-low px-4 sm:px-6 lg:px-8 py-16 sm:py-20 md:py-24 overflow-x-hidden">
+          <div className="mx-auto grid max-w-screen-2xl grid-cols-1 items-center gap-12 lg:gap-20 lg:grid-cols-2 min-w-0">
+            <div className="min-w-0">
+              <h2 className="mb-6 sm:mb-8 text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-primary break-words">
                 {networkTitle}
               </h2>
-              <p className="mb-12 text-lg leading-relaxed text-on-surface-variant">
+              <p className="mb-8 sm:mb-12 text-base sm:text-lg leading-relaxed text-on-surface-variant break-words">
                 {networkLead}
               </p>
               <div className="space-y-4 text-on-surface-variant">

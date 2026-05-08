@@ -79,25 +79,25 @@ export function HomeLatestNewsBlock({
   if (shownItems.length === 0) return null
 
   return (
-    <section className="py-24 px-8 max-w-[1440px] mx-auto">
-      <div className="flex flex-wrap justify-between items-end gap-4 mb-12">
+    <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 lg:px-8 max-w-[1440px] mx-auto min-w-0 overflow-x-hidden">
+      <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:justify-between sm:items-end mb-8 sm:mb-12">
         <div className="min-w-0">
           <span className="text-primary font-bold tracking-widest uppercase text-xs mb-2 block">
             {pickDbField(kicker, kickerKz ?? null, locale)}
           </span>
-          <h2 className="text-4xl font-black text-on-surface tracking-tight break-words whitespace-normal">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-on-surface tracking-tight break-words whitespace-normal">
             {pickDbField(title, titleKz ?? null, locale)}
           </h2>
         </div>
         <Link
-          className="text-primary font-bold hover:underline flex shrink-0 items-center gap-2"
+          className="text-primary font-bold hover:underline flex shrink-0 items-center gap-2 w-fit"
           href="/news"
         >
           {t(L("Все новости", "Барлық жаңалықтар"))}{" "}
           <span className="material-symbols-outlined">arrow_right_alt</span>
         </Link>
       </div>
-      <div className="scroll-smooth flex flex-nowrap gap-8 overflow-x-auto pb-4 snap-x snap-mandatory [-webkit-overflow-scrolling:touch]">
+      <div className="scroll-smooth flex flex-nowrap gap-4 sm:gap-8 overflow-x-auto overflow-y-hidden pb-4 snap-x snap-mandatory [-webkit-overflow-scrolling:touch] max-w-full -mx-1 px-1">
         {shownItems.map((article, i) => {
           const cardTitle = pickDbField(
             article.title,
@@ -112,9 +112,9 @@ export function HomeLatestNewsBlock({
           return (
             <article
               key={`${article.href}-${i}`}
-              className="flex w-[min(100%,320px)] shrink-0 snap-start flex-col overflow-hidden rounded-md bg-surface-container-lowest transition-shadow hover:shadow-xl group"
+              className="flex w-[min(100%,calc(100vw-2.5rem))] max-w-[320px] shrink-0 snap-start flex-col overflow-hidden rounded-md bg-surface-container-lowest transition-shadow hover:shadow-xl group"
             >
-              <div className="relative h-64 shrink-0 overflow-hidden">
+              <div className="relative h-52 sm:h-64 shrink-0 overflow-hidden">
                 <img
                   alt=""
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -124,7 +124,7 @@ export function HomeLatestNewsBlock({
                   {article.dateLabel}
                 </div>
               </div>
-              <div className="flex flex-grow flex-col p-8">
+              <div className="flex flex-grow flex-col p-5 sm:p-6 md:p-8 min-w-0">
                 <h3 className="text-xl font-bold text-on-surface mb-4 leading-tight transition-colors group-hover:text-primary line-clamp-3 break-words whitespace-normal">
                   {cardTitle}
                 </h3>

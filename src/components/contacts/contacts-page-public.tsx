@@ -7,8 +7,25 @@ import { useMemo } from "react"
 import { SocialLinksRow } from "@/components/social/social-links-row"
 import { useLocale } from "@/components/i18n/locale-provider"
 import { L, pickDbField, pickLocalized } from "@/lib/i18n/app-locale"
-import { telHref } from "@/lib/site-contact-fallbacks"
+import { SITE_CONTACT_FALLBACK, telHref } from "@/lib/site-contact-fallbacks"
 import { formatWorkingHoursGrouped } from "@/lib/working-hours"
+
+/**
+ * Здание АОУБ: г. Алматы, ул. С. Татибекова, 27 (Nominatim / OpenStreetMap).
+ * Используется для встраиваемой карты с фиксированным маркером.
+ */
+const LIBRARY_MAP = {
+  lat: 43.280988,
+  lon: 76.971145,
+} as const
+
+function openStreetMapEmbedSrc(): string {
+  const { lat, lon } = LIBRARY_MAP
+  const dLon = 0.0048
+  const dLat = 0.0032
+  const bbox = `${lon - dLon},${lat - dLat},${lon + dLon},${lat + dLat}`
+  return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat}%2C${lon}`
+}
 
 export type ContactsPagePayload = {
   address: string
@@ -30,6 +47,14 @@ export function ContactsPagePublic({ data }: { data: ContactsPagePayload }) {
     [data.workingHoursRaw, locale]
   )
   const addressLine = pickDbField(data.address, data.addressKz, locale)
+  const mapSearchQuery = (
+    addressLine ||
+    pickDbField(
+      SITE_CONTACT_FALLBACK.address,
+      SITE_CONTACT_FALLBACK.addressKz,
+      locale
+    )
+  ).trim()
   const sanitary = pickDbField(
     data.sanitaryRu ?? "",
     data.sanitaryKz,
@@ -37,8 +62,8 @@ export function ContactsPagePublic({ data }: { data: ContactsPagePayload }) {
   )
 
   return (
-    <main className="min-h-screen pt-24">
-      <section className="relative flex h-[400px] w-full items-center overflow-hidden">
+    <main className="min-h-screen pt-24 overflow-x-hidden">
+      <section className="relative flex min-h-[280px] sm:min-h-[340px] md:h-[400px] w-full max-w-full items-center overflow-hidden py-10 md:py-0">
         <div className="absolute inset-0 z-0">
           <img
             className="h-full w-full object-cover"
@@ -47,8 +72,8 @@ export function ContactsPagePublic({ data }: { data: ContactsPagePayload }) {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/70 to-transparent" />
         </div>
-        <div className="relative z-10 mx-auto w-full max-w-screen-2xl px-12 text-white">
-          <nav className="mb-6 flex items-center gap-2 text-sm font-medium text-blue-100/80">
+        <div className="relative z-10 mx-auto w-full max-w-screen-2xl px-4 sm:px-6 lg:px-10 text-white min-w-0">
+          <nav className="mb-4 sm:mb-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-medium text-blue-100/80">
             <Link className="transition-colors hover:text-white" href="/">
               {t(L("Главная", "Басты бет"))}
             </Link>
@@ -57,10 +82,10 @@ export function ContactsPagePublic({ data }: { data: ContactsPagePayload }) {
             </span>
             <span>{t(L("Контакты", "Байланыс"))}</span>
           </nav>
-          <h1 className="-ml-1 mb-4 text-6xl font-extrabold tracking-tighter">
+          <h1 className="mb-3 sm:mb-4 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tighter break-words">
             {t(L("Контакты", "Байланыс"))}
           </h1>
-          <p className="max-w-2xl text-xl leading-relaxed text-blue-50/90">
+          <p className="max-w-2xl text-base sm:text-lg md:text-xl leading-relaxed text-blue-50/90 break-words">
             {t(
               L(
                 "Свяжитесь с библиотекой для получения информации и консультаций по любым вопросам использования наших ресурсов.",
@@ -71,35 +96,35 @@ export function ContactsPagePublic({ data }: { data: ContactsPagePayload }) {
         </div>
       </section>
 
-      <section className="mx-auto max-w-screen-2xl px-12 py-24">
-        <div className="grid grid-cols-12 gap-16">
-          <div className="col-span-12 flex flex-col gap-12 md:col-span-5">
-            <div className="space-y-8">
-              <div className="group flex items-start gap-6">
-                <div className="rounded-xl bg-primary-fixed p-4 text-primary transition-all group-hover:bg-primary group-hover:text-white">
+      <section className="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-10 py-16 sm:py-20 md:py-24 min-w-0 overflow-x-hidden">
+        <div className="grid grid-cols-1 gap-10 sm:gap-12 lg:grid-cols-12 lg:gap-10 xl:gap-14">
+          <div className="min-w-0 lg:col-span-5">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-1">
+              <div className="group flex min-w-0 items-start gap-4 sm:gap-5">
+                <div className="shrink-0 rounded-xl bg-primary-fixed p-3.5 text-primary transition-all group-hover:bg-primary group-hover:text-white sm:p-4">
                   <span className="material-symbols-outlined text-2xl">
                     location_on
                   </span>
                 </div>
-                <div className="flex flex-col">
-                  <span className="mb-1 text-xs font-bold uppercase tracking-widest text-slate-400">
+                <div className="min-w-0 flex-1 overflow-hidden">
+                  <span className="mb-1 block text-xs font-bold uppercase tracking-widest text-slate-400">
                     {t(L("Наш адрес", "Біздің мекенжай"))}
                   </span>
-                  <span className="text-xl font-semibold text-on-surface">
+                  <span className="block text-base font-semibold text-on-surface break-words sm:text-lg md:text-xl">
                     {addressLine}
                   </span>
                 </div>
               </div>
-              <div className="group flex items-start gap-6">
-                <div className="rounded-xl bg-primary-fixed p-4 text-primary transition-all group-hover:bg-primary group-hover:text-white">
+              <div className="group flex min-w-0 items-start gap-4 sm:gap-5">
+                <div className="shrink-0 rounded-xl bg-primary-fixed p-3.5 text-primary transition-all group-hover:bg-primary group-hover:text-white sm:p-4">
                   <span className="material-symbols-outlined text-2xl">call</span>
                 </div>
-                <div className="flex flex-col gap-2">
-                  <span className="mb-1 text-xs font-bold uppercase tracking-widest text-slate-400">
+                <div className="min-w-0 flex-1 overflow-hidden flex flex-col gap-2">
+                  <span className="text-xs font-bold uppercase tracking-widest text-slate-400">
                     {t(L("Телефон для справок", "Анықтама телефоны"))}
                   </span>
                   <a
-                    className="text-xl font-semibold text-on-surface transition-colors hover:text-primary"
+                    className="w-fit max-w-full break-words text-lg font-semibold text-on-surface transition-colors hover:text-primary sm:text-xl"
                     href={telHref(data.phone)}
                   >
                     {data.phone}
@@ -110,7 +135,7 @@ export function ContactsPagePublic({ data }: { data: ContactsPagePayload }) {
                         {t(L("Дополнительный телефон", "Қосымша телефон"))}
                       </span>
                       <a
-                        className="text-lg font-semibold text-on-surface transition-colors hover:text-primary"
+                        className="w-fit max-w-full break-words text-base font-semibold text-on-surface transition-colors hover:text-primary sm:text-lg"
                         href={telHref(data.phoneSecondary)}
                       >
                         {data.phoneSecondary}
@@ -119,48 +144,48 @@ export function ContactsPagePublic({ data }: { data: ContactsPagePayload }) {
                   ) : null}
                 </div>
               </div>
-              <div className="group flex items-start gap-6">
-                <div className="rounded-xl bg-primary-fixed p-4 text-primary transition-all group-hover:bg-primary group-hover:text-white">
+              <div className="group flex min-w-0 items-start gap-4 sm:gap-5">
+                <div className="shrink-0 rounded-xl bg-primary-fixed p-3.5 text-primary transition-all group-hover:bg-primary group-hover:text-white sm:p-4">
                   <span className="material-symbols-outlined text-2xl">mail</span>
                 </div>
-                <div className="flex flex-col">
-                  <span className="mb-1 text-xs font-bold uppercase tracking-widest text-slate-400">
+                <div className="min-w-0 flex-1 overflow-hidden">
+                  <span className="mb-1 block text-xs font-bold uppercase tracking-widest text-slate-400">
                     {t(L("Электронная почта", "Электрондық пошта"))}
                   </span>
                   <a
-                    className="text-xl font-semibold text-on-surface transition-colors hover:text-primary"
+                    className="block w-fit max-w-full break-all text-base font-semibold text-on-surface underline-offset-2 transition-colors hover:text-primary hover:underline sm:text-lg md:text-xl"
                     href={`mailto:${data.email}`}
                   >
                     {data.email}
                   </a>
                 </div>
               </div>
-              <div className="group flex items-start gap-6">
-                <div className="rounded-xl bg-primary-fixed p-4 text-primary transition-all group-hover:bg-primary group-hover:text-white">
+              <div className="group flex min-w-0 items-start gap-4 sm:gap-5 sm:col-span-2 lg:col-span-1">
+                <div className="shrink-0 rounded-xl bg-primary-fixed p-3.5 text-primary transition-all group-hover:bg-primary group-hover:text-white sm:p-4">
                   <span className="material-symbols-outlined text-2xl">
                     schedule
                   </span>
                 </div>
-                <div className="flex flex-col">
-                  <span className="mb-1 text-xs font-bold uppercase tracking-widest text-slate-400">
+                <div className="min-w-0 flex-1 overflow-hidden">
+                  <span className="mb-1 block text-xs font-bold uppercase tracking-widest text-slate-400">
                     {t(L("Режим работы", "Жұмыс режимі"))}
                   </span>
-                  <div className="space-y-2">
+                  <div className="space-y-2.5">
                     {hourLines.map((line, idx) => (
                       <div
                         key={`${line.rangeLabel}-${line.timeLabel}-${idx}`}
-                        className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1"
+                        className="flex flex-col gap-0.5 border-b border-slate-100/90 pb-2 last:border-b-0 last:pb-0 sm:flex-row sm:items-start sm:justify-between sm:gap-3"
                       >
-                        <span className="font-semibold text-on-surface">
+                        <span className="min-w-0 shrink-0 font-semibold text-on-surface break-words sm:max-w-[46%]">
                           {line.rangeLabel}
                         </span>
                         <span
-                          className={
-                            line.timeLabel ===
-                            t(L("выходной", "демалыс"))
+                          className={[
+                            "min-w-0 font-medium break-words sm:max-w-[52%] sm:text-right",
+                            line.timeLabel === t(L("выходной", "демалыс"))
                               ? "text-slate-500"
-                              : "font-medium text-on-surface"
-                          }
+                              : "text-on-surface",
+                          ].join(" ")}
                         >
                           {line.timeLabel}
                         </span>
@@ -169,7 +194,7 @@ export function ContactsPagePublic({ data }: { data: ContactsPagePayload }) {
                   </div>
                   {sanitary.trim() ? (
                     <div className="mt-4 space-y-2 border-t border-slate-200/80 pt-4 text-sm text-slate-600">
-                      <p>
+                      <p className="break-words">
                         <span className="font-semibold text-on-surface">
                           {t(L("Санитарный день:", "Санитарлық күн:"))}{" "}
                         </span>
@@ -181,60 +206,76 @@ export function ContactsPagePublic({ data }: { data: ContactsPagePayload }) {
               </div>
             </div>
 
-            {data.socialLinks.length > 0 && (
-              <div className="space-y-4 border-t border-slate-200/60 pt-10">
+            {data.socialLinks.length > 0 ? (
+              <div className="mt-10 space-y-4 border-t border-slate-200/60 pt-8 min-w-0 sm:col-span-2 lg:col-span-1">
                 <h2 className="text-xs font-bold uppercase tracking-widest text-slate-400">
                   {t(L("Мы в соцсетях", "Әлеуметтік желілерде"))}
                 </h2>
-                <SocialLinksRow items={data.socialLinks} variant="contacts" />
+                <div className="min-w-0">
+                  <SocialLinksRow items={data.socialLinks} variant="contacts" />
+                </div>
               </div>
-            )}
+            ) : null}
           </div>
 
-          <div className="col-span-12 md:col-span-7">
-            <div className="relative h-[540px] w-full overflow-hidden rounded-xl border border-slate-200/50 bg-surface-container shadow-sm">
-              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubic-grid.png')] opacity-40 grayscale" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="max-w-sm rounded-xl border border-slate-100 bg-white p-8 text-center shadow-xl">
-                  <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-primary-container text-white">
-                    <span className="material-symbols-outlined text-3xl">map</span>
-                  </div>
-                  <h3 className="mb-2 text-lg font-bold">
-                    {t(L("Интерактивная карта", "Интерактивті карта"))}
-                  </h3>
-                  <p className="mb-6 text-sm text-slate-600">
-                    {t(
-                      L(
-                        "Используйте карту для построения оптимального маршрута до библиотеки.",
-                        "Кітапханаға ең қолайлы маршрутты карта арқылы құраңыз."
-                      )
-                    )}
-                  </p>
-                  <img
-                    className="mb-4 h-32 w-full rounded-lg object-cover opacity-80"
-                    alt=""
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-4BcLGz74mhlJ4Coth4R73SwnM4jRKc_aKMnetlecqiujk70BqPuwzzZ9FJYrkEUmfxOhpTP1NyvvyG0rEVktvAVcY5P2vHn-tQLsVe2UCwso-4xNADsaZ3nWYKeI4FVGARC4FgVAAQQUeN6YNfYnps94BgDHAXNaYsjXaa3PU176BFACnaAt160WRfre3Nw9_TPeJkZzgEzjD_YCFR5nNeKUnEgQIiyvj5xaCKu_zRPniXHQA-d0awMXgqVh1-ounklVUmsvtT5s"
-                  />
-                  <button
-                    type="button"
-                    className="w-full rounded-md bg-primary py-3 text-sm font-bold text-white"
-                  >
-                    {t(L("Открыть в 2ГИС", "2ГИС-те ашу"))}
-                  </button>
-                </div>
+          <div className="min-w-0 lg:col-span-7">
+            <div className="flex flex-col gap-3">
+              <div
+                className={[
+                  "relative w-full max-w-full overflow-hidden rounded-xl border border-slate-200/50 bg-surface-container shadow-sm",
+                  /* Мобила — ниже, планшет/ноут — среднее, десктоп — выше; без конфликта aspect + max-height */
+                  "aspect-[5/7] min-h-[200px]",
+                  "sm:aspect-video sm:min-h-[220px]",
+                  "md:aspect-[16/10] md:min-h-[280px]",
+                  "lg:aspect-auto lg:h-[min(72vh,560px)] lg:min-h-[400px]",
+                ].join(" ")}
+              >
+                <iframe
+                  title={t(
+                    L(
+                      "Карта: Алматинская областная универсальная библиотека",
+                      "Карта: Алматы облыстық әмбебап кітапханасы"
+                    )
+                  )}
+                  className="absolute inset-0 h-full w-full border-0"
+                  src={openStreetMapEmbedSrc()}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-center text-xs text-slate-600 sm:text-sm">
+                <a
+                  className="font-semibold text-primary underline-offset-2 hover:underline break-words"
+                  href={`https://www.openstreetmap.org/?mlat=${LIBRARY_MAP.lat}&mlon=${LIBRARY_MAP.lon}#map=17/${LIBRARY_MAP.lat}/${LIBRARY_MAP.lon}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  OpenStreetMap
+                </a>
+                <span className="text-slate-300" aria-hidden>
+                  ·
+                </span>
+                <a
+                  className="font-semibold text-primary underline-offset-2 hover:underline break-words"
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapSearchQuery)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Google Maps
+                </a>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="border-t border-slate-200/30 bg-surface-container-low py-24">
-        <div className="mx-auto max-w-screen-2xl px-12 text-center">
-          <div className="mx-auto max-w-3xl space-y-8">
-            <h2 className="text-3xl font-bold tracking-tight text-primary">
+      <section className="border-t border-slate-200/30 bg-surface-container-low py-16 sm:py-20 md:py-24 overflow-x-hidden">
+        <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-10 text-center min-w-0">
+          <div className="mx-auto max-w-3xl space-y-6 sm:space-y-8">
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-primary break-words px-2">
               {t(L("Возникли вопросы?", "Сұрақтарыңыз бар ма?"))}
             </h2>
-            <p className="text-lg leading-relaxed text-slate-600">
+            <p className="text-base sm:text-lg leading-relaxed text-slate-600 break-words px-2">
               {t(
                 L(
                   "Наши специалисты готовы ответить на ваши вопросы и помочь в работе с библиотечными ресурсами, подборе литературы или регистрации в электронной базе.",
@@ -242,9 +283,9 @@ export function ContactsPagePublic({ data }: { data: ContactsPagePayload }) {
                 )
               )}
             </p>
-            <div className="flex justify-center pt-4">
+            <div className="flex justify-center pt-4 px-2">
               <a
-                className="flex items-center gap-3 rounded-md bg-primary px-10 py-4 font-bold text-white transition-all hover:bg-primary-container hover:shadow-lg"
+                className="inline-flex items-center justify-center gap-3 rounded-md bg-primary px-6 sm:px-10 py-3 sm:py-4 font-bold text-white transition-all hover:bg-primary-container hover:shadow-lg max-w-full text-center"
                 href={`mailto:${data.email}`}
               >
                 <span className="material-symbols-outlined">send</span>

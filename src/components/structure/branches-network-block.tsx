@@ -24,9 +24,13 @@ export function BranchesNetworkBlock({ network }: { network: BranchesNetworkData
   }
 
   return (
-    <section className="rounded-xl border border-outline-variant/20 bg-surface-container-lowest p-8">
-      <h2 className="text-3xl font-bold tracking-tight text-primary">{title}</h2>
-      <p className="mt-4 text-lg leading-relaxed text-on-surface-variant">{lead}</p>
+    <section className="rounded-xl border border-outline-variant/20 bg-surface-container-lowest p-5 sm:p-6 md:p-8 min-w-0 overflow-x-hidden">
+      <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-primary break-words">
+        {title}
+      </h2>
+      <p className="mt-3 sm:mt-4 text-base sm:text-lg leading-relaxed text-on-surface-variant break-words">
+        {lead}
+      </p>
       <div className="mt-6 space-y-4 text-on-surface-variant">
         {paragraphs.map((p, idx) => (
           <p key={idx} className="text-base leading-relaxed">

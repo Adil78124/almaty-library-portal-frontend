@@ -42,7 +42,7 @@ export function NewsArticlePublic({ article, others }: Props) {
 
   return (
     <>
-      <section className="max-w-5xl mx-auto px-8 pt-24 pb-4">
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-4 min-w-0">
         <nav className="flex items-center gap-2 text-on-surface-variant text-sm font-label tracking-wide flex-wrap">
           <Link className="hover:text-primary transition-colors" href="/">
             {home}
@@ -58,9 +58,9 @@ export function NewsArticlePublic({ article, others }: Props) {
         </nav>
       </section>
 
-      <article className="max-w-5xl mx-auto px-8 mb-16">
-        <div className="mb-12">
-          <h1 className="text-4xl font-black text-on-surface leading-tight mb-4">
+      <article className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 sm:mb-16 min-w-0">
+        <div className="mb-8 sm:mb-12">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-on-surface leading-tight mb-3 sm:mb-4 break-words">
             {title}
           </h1>
           <div className="flex flex-wrap items-center gap-6 text-on-surface-variant text-sm">
@@ -81,8 +81,8 @@ export function NewsArticlePublic({ article, others }: Props) {
               src={article.coverImageUrl ?? NEWS_COVER_FALLBACK}
             />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_250px] gap-12 items-start">
-            <div className="space-y-6 text-on-surface leading-relaxed text-lg font-body">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_min(100%,280px)] gap-8 sm:gap-12 items-start">
+            <div className="space-y-6 text-on-surface leading-relaxed text-base sm:text-lg font-body min-w-0 break-words">
               {excerpt ? (
                 <p className="font-medium text-xl text-on-surface-variant">
                   {excerpt}
@@ -93,7 +93,7 @@ export function NewsArticlePublic({ article, others }: Props) {
               ))}
             </div>
             {article.location || article.curator ? (
-              <aside className="sticky top-24 space-y-8">
+              <aside className="lg:sticky lg:top-24 xl:top-28 space-y-8 min-w-0">
                 <div className="p-6 bg-surface-container-low rounded-md">
                   <h3 className="text-sm font-bold text-primary uppercase tracking-wider mb-4">
                     {detailsTitle}
@@ -127,10 +127,12 @@ export function NewsArticlePublic({ article, others }: Props) {
         </div>
       </article>
 
-      <section className="bg-surface-container-low py-16">
-        <div className="max-w-7xl mx-auto px-8">
-          <div className="flex justify-between items-end mb-10 gap-4 flex-wrap">
-            <h2 className="text-3xl font-bold text-on-surface">{otherTitle}</h2>
+      <section className="bg-surface-container-low py-12 sm:py-16 overflow-x-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-w-0">
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-end mb-8 sm:mb-10">
+            <h2 className="text-2xl sm:text-3xl font-bold text-on-surface break-words">
+              {otherTitle}
+            </h2>
             <Link
               className="text-primary font-semibold flex items-center gap-2 hover:translate-x-1 transition-transform"
               href="/news"
@@ -139,7 +141,7 @@ export function NewsArticlePublic({ article, others }: Props) {
               <span className="material-symbols-outlined">arrow_right_alt</span>
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
             {others.map((rec) => {
               const recTitle = rec.title
               return (
@@ -158,7 +160,7 @@ export function NewsArticlePublic({ article, others }: Props) {
                     <span className="text-xs font-bold text-secondary mb-3">
                       {formatNewsListDate(rec.publishedAt, locale).toUpperCase()}
                     </span>
-                    <h3 className="text-xl font-bold leading-tight mb-4 group-hover:text-primary transition-colors">
+                    <h3 className="text-lg sm:text-xl font-bold leading-tight mb-4 group-hover:text-primary transition-colors break-words">
                       {recTitle}
                     </h3>
                     <div className="mt-auto">

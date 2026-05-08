@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useEffect, useMemo, useState } from "react"
 
 import { useLocale } from "@/components/i18n/locale-provider"
-import type { ResolvedHome } from "@/lib/cms/home/types"
+import type { ELibraryBook, ResolvedHome } from "@/lib/cms/home/types"
 import { L, pickDbField, pickLocalized } from "@/lib/i18n/app-locale"
 import { localHistoryPublicPath } from "@/lib/local-history/public-path"
 import { HomeCountersScript } from "@/app/home-counters-script"
@@ -146,7 +146,7 @@ export function HomePageView({ data }: Props) {
           }
         })
     }
-    return data.eLibrary.books.map((b: any) => ({
+    return data.eLibrary.books.map((b: ELibraryBook) => ({
       ...b,
       href: "",
     }))
@@ -183,9 +183,9 @@ export function HomePageView({ data }: Props) {
     Boolean((data.quote.authorKz ?? "").trim())
 
   return (
-    <div className="bg-surface text-on-surface flex flex-col min-h-screen">
+    <div className="bg-surface text-on-surface flex flex-col min-h-screen overflow-x-hidden">
       <main className="pt-16">
-        <section className="relative min-h-[600px] flex items-start pt-28 pb-24 overflow-hidden">
+        <section className="relative min-h-[min(100vh,620px)] sm:min-h-[520px] md:min-h-[580px] lg:min-h-[600px] flex items-start pt-20 sm:pt-24 md:pt-28 pb-16 sm:pb-20 md:pb-24 overflow-hidden">
           <div className="absolute inset-0 z-0">
             <div className="absolute inset-0 bg-gradient-to-r from-[#00236f]/90 to-[#0058be]/40 z-10"></div>
             <img
@@ -200,16 +200,16 @@ export function HomePageView({ data }: Props) {
           </div>
 
           <div className="relative z-20 w-full flex flex-col text-white">
-            <div className="max-w-[1440px] mx-auto px-8 w-full">
-              <div className="max-w-3xl">
-                <h1 className="text-6xl font-black tracking-tight mb-6 leading-tight break-words whitespace-normal">
+            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 w-full min-w-0">
+              <div className="max-w-3xl min-w-0">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-4 sm:mb-6 leading-tight break-words whitespace-normal">
                   {pickDbField(
                     data.hero.titleLine1,
                     data.hero.titleLine1Kz ?? null,
                     locale
                   )}{" "}
                   <br />
-                  <span className="break-words sm:whitespace-nowrap">
+                  <span className="break-words md:whitespace-normal lg:whitespace-nowrap">
                     {pickDbField(
                       data.hero.titleLine2,
                       data.hero.titleLine2Kz ?? null,
@@ -219,7 +219,7 @@ export function HomePageView({ data }: Props) {
                 </h1>
 
                 {data.hero.subtitle ? (
-                  <p className="text-lg text-white/90 font-medium mb-4 max-w-2xl leading-relaxed break-words whitespace-normal">
+                  <p className="text-base sm:text-lg text-white/90 font-medium mb-4 max-w-2xl leading-relaxed break-words whitespace-normal">
                     {pickDbField(
                       data.hero.subtitle ?? "",
                       data.hero.subtitleKz ?? null,
@@ -229,7 +229,7 @@ export function HomePageView({ data }: Props) {
                 ) : null}
 
                 {hasQuote ? (
-                  <p className="text-xl text-white/80 font-light mb-10 leading-relaxed break-words whitespace-normal">
+                  <p className="text-base sm:text-lg md:text-xl text-white/80 font-light mb-8 sm:mb-10 leading-relaxed break-words whitespace-normal">
                     {pickDbField(
                       data.quote.text ?? "",
                       data.quote.textKz ?? null,
@@ -248,7 +248,7 @@ export function HomePageView({ data }: Props) {
             </div>
 
             {hasTicker ? (
-              <div className="relative z-20 w-full overflow-hidden border-y border-white/20 py-4 mt-12">
+              <div className="relative z-20 w-full max-w-full overflow-hidden border-y border-white/20 py-3 sm:py-4 mt-8 sm:mt-12">
                 <div className="flex w-max animate-marquee gap-12">
                   <span className="text-sm font-medium tracking-widest uppercase whitespace-nowrap">
                     {tickerLine}
@@ -263,17 +263,17 @@ export function HomePageView({ data }: Props) {
         </section>
 
         {hasStats ? (
-          <section className="relative -mt-16 z-30 px-8">
-            <div className="max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <section className="relative -mt-12 sm:-mt-16 z-30 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-[1440px] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 min-w-0">
               {data.statistics.cards.map((card, i) => (
                 <div
                   key={`${card.label}-${i}`}
-                  className="bg-surface-container-lowest p-8 rounded-md shadow-[0_10px_30px_-5px_rgba(25,28,30,0.08)] group hover:bg-primary transition-all duration-300"
+                  className="bg-surface-container-lowest p-5 sm:p-6 md:p-8 rounded-md shadow-[0_10px_30px_-5px_rgba(25,28,30,0.08)] group hover:bg-primary transition-all duration-300 min-w-0"
                 >
-                  <span className="material-symbols-outlined text-4xl text-primary mb-4 group-hover:text-white transition-colors">
+                  <span className="material-symbols-outlined text-3xl sm:text-4xl text-primary mb-3 sm:mb-4 group-hover:text-white transition-colors">
                     {card.iconName}
                   </span>
-                  <div className="text-4xl font-black text-on-surface mb-1 group-hover:text-white break-words">
+                  <div className="text-2xl sm:text-3xl md:text-4xl font-black text-on-surface mb-1 group-hover:text-white break-words">
                     {pickDbField(
                       card.valueText,
                       card.valueTextKz ?? null,
@@ -301,10 +301,10 @@ export function HomePageView({ data }: Props) {
         />
 
         {hasELib ? (
-        <section className="py-24 bg-white relative overflow-hidden">
-          <div className="max-w-[1440px] mx-auto px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-black text-on-surface tracking-tight mb-4 break-words whitespace-normal">
+        <section className="py-16 sm:py-20 md:py-24 bg-white relative overflow-x-hidden">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 min-w-0">
+            <div className="text-center mb-10 sm:mb-16">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-on-surface tracking-tight mb-3 sm:mb-4 break-words whitespace-normal">
                 {pickDbField(
                   data.eLibrary.title,
                   data.eLibrary.titleKz ?? null,
@@ -320,7 +320,7 @@ export function HomePageView({ data }: Props) {
               </p>
             </div>
             <div className="relative">
-              <div className="scroll-smooth flex flex-nowrap gap-8 overflow-x-auto pb-12 px-4 no-scrollbar">
+              <div className="scroll-smooth flex flex-nowrap gap-4 sm:gap-8 overflow-x-auto overflow-y-hidden pb-12 px-1 sm:px-4 no-scrollbar max-w-full">
                 {eLibShowcaseBooks.map((book, i) => {
                   const title = pickDbField(book.title, book.titleKz ?? null, locale)
                   const author = pickDbField(book.author, book.authorKz ?? null, locale)
@@ -352,7 +352,7 @@ export function HomePageView({ data }: Props) {
                   return href ? (
                     <a
                       key={`${book.title}-${i}`}
-                      className="w-48 shrink-0 flex-none group cursor-pointer"
+                      className="w-[min(11rem,calc(100vw-3rem))] sm:w-44 md:w-48 shrink-0 flex-none group cursor-pointer"
                       href={outboundHref(href)}
                       {...(outbound
                         ? { target: "_blank", rel: "noopener noreferrer" }
@@ -363,7 +363,7 @@ export function HomePageView({ data }: Props) {
                   ) : (
                     <div
                       key={`${book.title}-${i}`}
-                      className="w-48 shrink-0 flex-none group"
+                      className="w-[min(11rem,calc(100vw-3rem))] sm:w-44 md:w-48 shrink-0 flex-none group"
                     >
                       {card}
                     </div>
@@ -372,9 +372,9 @@ export function HomePageView({ data }: Props) {
               </div>
               <div className="h-1 w-full bg-primary-fixed-dim absolute bottom-8 left-0 opacity-20"></div>
             </div>
-            <div className="mt-12 text-center">
+            <div className="mt-8 sm:mt-12 text-center px-2">
               <Link
-                className="bg-primary text-white px-10 py-5 rounded-md font-black uppercase tracking-tighter text-sm hover:bg-primary-container active:scale-95 transition-all"
+                className="inline-flex justify-center bg-primary text-white px-6 sm:px-10 py-4 sm:py-5 rounded-md font-black uppercase tracking-tighter text-xs sm:text-sm hover:bg-primary-container active:scale-95 transition-all max-w-full text-center"
                 href={data.eLibrary.buttonHref}
               >
                 {pickDbField(
@@ -399,10 +399,10 @@ export function HomePageView({ data }: Props) {
         />
 
         {hasArrivals ? (
-        <section className="py-24 bg-surface-container-low">
-          <div className="max-w-[1440px] mx-auto px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-black text-on-surface tracking-tight mb-4 uppercase break-words whitespace-normal">
+        <section className="py-16 sm:py-20 md:py-24 bg-surface-container-low overflow-x-hidden">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 min-w-0">
+            <div className="text-center mb-10 sm:mb-16">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-on-surface tracking-tight mb-3 sm:mb-4 uppercase break-words whitespace-normal">
                 {pickDbField(
                   data.newArrivals.title,
                   data.newArrivals.titleKz ?? null,
@@ -417,7 +417,7 @@ export function HomePageView({ data }: Props) {
                 )}
               </p>
             </div>
-            <div className="scroll-smooth flex flex-nowrap gap-8 overflow-x-auto pb-4 [-webkit-overflow-scrolling:touch]">
+            <div className="scroll-smooth flex flex-nowrap gap-4 sm:gap-8 overflow-x-auto overflow-y-hidden pb-4 [-webkit-overflow-scrolling:touch] max-w-full -mx-1 px-1">
               {data.newArrivals.books.map((book, i) => {
                 const href = book.detailHref?.trim() || "#"
                 const resolvedHref = outboundHref(href)
@@ -460,11 +460,11 @@ export function HomePageView({ data }: Props) {
         {hasLocalHistory ? (
         <section
           id="local-history"
-          className="py-24 px-8 bg-surface-container scroll-mt-20"
+          className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 lg:px-8 bg-surface-container scroll-mt-20 overflow-x-hidden"
         >
-          <div className="max-w-[1440px] mx-auto">
-            <div className="mb-16 text-center">
-              <h2 className="text-4xl font-black uppercase tracking-tight text-on-surface break-words whitespace-normal">
+          <div className="max-w-[1440px] mx-auto min-w-0">
+            <div className="mb-10 sm:mb-16 text-center">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tight text-on-surface break-words whitespace-normal">
                 {pickDbField(
                   data.localHistory.title,
                   data.localHistory.titleKz ?? null,
@@ -482,11 +482,11 @@ export function HomePageView({ data }: Props) {
               ) : null}
             </div>
 
-            <div className="scroll-smooth flex flex-nowrap gap-8 overflow-x-auto pb-4 [-webkit-overflow-scrolling:touch]">
+            <div className="scroll-smooth flex flex-nowrap gap-4 sm:gap-8 overflow-x-auto overflow-y-hidden pb-4 [-webkit-overflow-scrolling:touch] max-w-full -mx-1 px-1">
               {data.localHistory.cards.map((c, i) => (
                 <div
                   key={c.id ?? `${c.name}-${i}`}
-                  className="flex min-h-[380px] w-[min(100%,280px)] shrink-0 flex-none flex-col rounded-md border-b-4 border-transparent bg-surface-container-lowest p-6 text-center transition-all group hover:border-primary"
+                  className="flex min-h-[320px] sm:min-h-[380px] w-[min(100%,calc(100vw-2.5rem))] max-w-[280px] shrink-0 flex-none flex-col rounded-md border-b-4 border-transparent bg-surface-container-lowest p-5 sm:p-6 text-center transition-all group hover:border-primary"
                 >
                   <div
                     className={`w-32 h-32 mx-auto rounded-full overflow-hidden mb-6 grayscale group-hover:grayscale-0 transition-all duration-500 ring-4 ring-surface ring-offset-2 shrink-0 ${!c.portraitUrl ? "bg-surface-container" : ""}`}
@@ -526,10 +526,10 @@ export function HomePageView({ data }: Props) {
         ) : null}
 
         {hasGallery ? (
-        <section className="py-16 px-8">
-          <div className="max-w-[1440px] mx-auto">
-            <div className="mb-10 flex flex-col items-center justify-center gap-3 text-center">
-              <h2 className="text-3xl font-black text-on-surface tracking-tight uppercase break-words whitespace-normal">
+        <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
+          <div className="max-w-[1440px] mx-auto min-w-0">
+            <div className="mb-8 sm:mb-10 flex flex-col items-center justify-center gap-3 text-center">
+              <h2 className="text-2xl sm:text-3xl font-black text-on-surface tracking-tight uppercase break-words whitespace-normal">
                 {pickDbField(
                   data.mediaGallery.title,
                   data.mediaGallery.titleKz ?? null,
@@ -537,9 +537,9 @@ export function HomePageView({ data }: Props) {
                 )}
               </h2>
             </div>
-            <div className="flex flex-col lg:flex-row gap-6 lg:items-center">
+            <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch">
               {/* Left (1) */}
-              <div className="lg:w-[420px] xl:w-[520px] flex items-center justify-center">
+              <div className="w-full lg:w-[min(100%,420px)] xl:w-[min(100%,520px)] lg:shrink-0 flex items-center justify-center mx-auto lg:mx-0">
                 {mainVideo ? (
                   <div className="relative w-full overflow-hidden rounded-md shadow-lg">
                     <button
@@ -584,7 +584,7 @@ export function HomePageView({ data }: Props) {
               </div>
 
               {/* Right grid (2-5) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 flex-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 flex-1 min-w-0">
                 {([2, 3, 4, 5] as const).map((pos) => {
                   const v = galleryByPos.get(pos) ?? null
                   return v ? (
@@ -642,9 +642,9 @@ export function HomePageView({ data }: Props) {
         ) : null}
 
         {hasUsefulLinks ? (
-        <section className="py-20 px-8 bg-surface">
-          <div className="max-w-[1440px] mx-auto">
-            <div className="text-center mb-12">
+        <section className="py-14 sm:py-20 px-4 sm:px-6 lg:px-8 bg-surface overflow-x-hidden">
+          <div className="max-w-[1440px] mx-auto min-w-0">
+            <div className="text-center mb-8 sm:mb-12">
               <span className="text-primary font-bold tracking-widest uppercase text-xs mb-2 block">
                 {pickDbField(
                   data.usefulLinks.kicker,
@@ -652,7 +652,7 @@ export function HomePageView({ data }: Props) {
                   locale
                 )}
               </span>
-              <h2 className="text-4xl font-black text-on-surface tracking-tight uppercase break-words whitespace-normal">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-on-surface tracking-tight uppercase break-words whitespace-normal">
                 {pickDbField(
                   data.usefulLinks.title,
                   data.usefulLinks.titleKz ?? null,
@@ -661,11 +661,11 @@ export function HomePageView({ data }: Props) {
               </h2>
             </div>
 
-            <div className="scroll-smooth flex flex-nowrap gap-6 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch]">
+            <div className="scroll-smooth flex flex-nowrap gap-4 sm:gap-6 overflow-x-auto overflow-y-hidden pb-2 [-webkit-overflow-scrolling:touch] max-w-full -mx-1 px-1">
               {data.usefulLinks.links.map((link, i) => (
                 <a
                   key={`${link.href}-${i}`}
-                  className="group flex min-h-[210px] w-[min(100%,260px)] shrink-0 flex-none flex-col items-center justify-center rounded-md border border-outline-variant/20 bg-surface-container-lowest p-6 text-center shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl"
+                  className="group flex min-h-[210px] w-[min(100%,calc(100vw-2.5rem))] max-w-[260px] shrink-0 flex-none flex-col items-center justify-center rounded-md border border-outline-variant/20 bg-surface-container-lowest p-5 sm:p-6 text-center shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl"
                   href={outboundHref(link.href)}
                   target="_blank"
                   rel="noopener noreferrer"

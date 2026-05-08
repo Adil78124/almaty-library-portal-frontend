@@ -31,8 +31,8 @@ export function StaffGrid({ staff }: { staff: StaffApiItem[] }) {
 
   return (
     <section className="space-y-6">
-      <div className="flex items-end justify-between gap-4">
-        <h2 className="text-3xl font-bold tracking-tight text-primary">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4 min-w-0">
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-primary break-words">
           {t(L("Руководители районных библиотек", "Аудандық кітапханалар директорлары"))}
         </h2>
       </div>

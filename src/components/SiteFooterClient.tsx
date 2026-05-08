@@ -33,23 +33,23 @@ export function SiteFooterClient({ data, socialLinks }: Props) {
   )
 
   return (
-    <footer className="bg-[#00236f] text-white py-20 px-8">
-      <div className="max-w-[1440px] mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-          <div className="flex flex-col gap-6">
-            <Link href="/" className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-white flex items-center justify-center rounded-md text-primary flex-none">
+    <footer className="bg-[#00236f] text-white py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
+      <div className="max-w-[1440px] mx-auto min-w-0">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 sm:gap-12 mb-12 sm:mb-16">
+          <div className="flex flex-col gap-6 min-w-0 sm:col-span-2 lg:col-span-1">
+            <Link href="/" className="flex items-start gap-3 sm:gap-4 min-w-0">
+              <div className="w-10 h-10 bg-white flex items-center justify-center rounded-md text-primary flex-none shrink-0">
                 <img
                   alt={t(L("Логотип библиотеки", "Кітапхананың елтаңбасы"))}
                   className="w-full h-full object-contain"
                   src="/images/logo.png"
                 />
               </div>
-              <div className="flex flex-col justify-center">
-                <span className="text-sm font-black tracking-tighter uppercase leading-none">
+              <div className="flex flex-col justify-center min-w-0">
+                <span className="text-sm font-black tracking-tighter uppercase leading-snug break-words">
                   {t(data.orgShort)}
                 </span>
-                <span className="text-[9px] font-bold leading-tight mt-0.5 opacity-80">
+                <span className="text-[9px] font-bold leading-snug mt-0.5 opacity-80 break-words">
                   {t(data.orgLong)}
                 </span>
               </div>
@@ -92,7 +92,7 @@ export function SiteFooterClient({ data, socialLinks }: Props) {
                   className="flex justify-between gap-4"
                 >
                   <span className="shrink-0">{line.rangeLabel}</span>
-                  <span className="text-right font-bold text-white whitespace-nowrap">
+                  <span className="text-right font-bold text-white break-words sm:whitespace-nowrap sm:text-right max-w-[55%] sm:max-w-none">
                     {line.timeLabel}
                   </span>
                 </li>
@@ -146,9 +146,9 @@ export function SiteFooterClient({ data, socialLinks }: Props) {
           </div>
         </div>
 
-        <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6 text-white/50 text-xs">
-          <span>{t(data.copyright)}</span>
-          <div className="flex gap-8">
+        <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6 text-white/50 text-xs text-center md:text-left">
+          <span className="break-words max-w-full">{t(data.copyright)}</span>
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 sm:gap-8">
             <a className="hover:text-white" href={data.privacyUrl || "#"}>
               {t(PRIVACY)}
             </a>

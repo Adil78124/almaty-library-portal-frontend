@@ -48,14 +48,14 @@ export function BranchDetailPageClient({
   const aboutParagraphs = paras.slice(1).map((p) => p.trim()).filter(Boolean)
 
   return (
-    <div className="bg-surface font-body text-on-surface antialiased">
-      <main>
-        <section className="relative flex min-h-[400px] items-center overflow-hidden bg-primary">
+    <div className="bg-surface font-body text-on-surface antialiased overflow-x-hidden">
+      <main className="min-w-0">
+        <section className="relative flex min-h-[min(100vh,480px)] sm:min-h-[400px] items-center overflow-hidden bg-primary py-12 sm:py-0">
           <div className="absolute inset-0 opacity-40 mix-blend-overlay">
             <img alt="" className="h-full w-full object-cover" src={heroImg} />
           </div>
           <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary-container/60" />
-          <div className="relative z-10 mx-auto w-full max-w-[1440px] px-8 py-20">
+          <div className="relative z-10 mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-8 py-14 sm:py-20 min-w-0">
             <nav className="mb-8 flex flex-wrap gap-y-1 text-sm font-medium tracking-wide text-on-primary-container/80">
               <Link className="transition-colors hover:text-white" href="/">
                 {t(L("Главная", "Басты бет"))}
@@ -67,19 +67,19 @@ export function BranchDetailPageClient({
               <span className="mx-3 opacity-50">/</span>
               <span className="text-white">{name}</span>
             </nav>
-            <h1 className="mb-6 max-w-4xl text-5xl font-extrabold tracking-tighter text-white md:text-6xl">
+            <h1 className="mb-4 sm:mb-6 max-w-4xl text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tighter text-white break-words">
               {name}
             </h1>
             {subtitle.trim() ? (
-              <p className="max-w-2xl text-xl font-light leading-relaxed text-on-primary-container md:text-2xl">
+              <p className="max-w-2xl text-base sm:text-lg md:text-xl font-light leading-relaxed text-on-primary-container lg:text-2xl break-words">
                 {subtitle}
               </p>
             ) : null}
           </div>
         </section>
 
-        <section className="bg-surface py-20">
-          <div className="mx-auto max-w-[1440px] px-8">
+        <section className="bg-surface py-12 sm:py-16 md:py-20">
+          <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8 min-w-0">
             <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12">
               <div className="space-y-8 lg:col-span-8">
                 <div className="group relative">
@@ -96,7 +96,7 @@ export function BranchDetailPageClient({
                   </div>
                 ) : null}
               </div>
-              <div className="sticky top-28 lg:col-span-4">
+              <div className="lg:sticky lg:top-24 xl:top-28 lg:col-span-4">
                 <div className="space-y-8 rounded-xl bg-surface-container-lowest p-8 shadow-[0_10px_30px_-5px_rgba(25,28,30,0.06)]">
                   <h3 className="text-xl font-bold tracking-tight text-primary">
                     {t(L("Контактная информация", "Байланыс ақпараты"))}

@@ -63,8 +63,8 @@ export default async function EventsPage() {
 
   return (
     <div className="bg-surface font-body text-on-surface antialiased">
-      <main className="pt-16 pb-20">
-        <div className="max-w-screen-2xl mx-auto px-8">
+      <main className="pt-16 pb-12 sm:pb-20">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 min-w-0">
           <EventsPageClient hero={hero} events={events} newsTeasers={newsTeasers} />
         </div>
       </main>

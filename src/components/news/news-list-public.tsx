@@ -34,7 +34,7 @@ export function NewsListPublic({ hero, items }: Props) {
 
   return (
     <>
-      <section className="relative left-1/2 right-1/2 flex h-[360px] w-screen -ml-[50vw] -mr-[50vw] items-center overflow-hidden">
+      <section className="relative flex min-h-[260px] sm:min-h-[300px] md:h-[360px] w-full max-w-full items-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
             className="h-full w-full object-cover"
@@ -48,8 +48,8 @@ export function NewsListPublic({ hero, items }: Props) {
           {/* Один слой градиента (как на других страницах), чтобы не “забивать” картинку сплошным цветом */}
           <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/70 to-transparent" />
         </div>
-        <div className="relative z-10 mx-auto w-full max-w-screen-2xl px-8">
-          <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm font-medium uppercase tracking-widest text-on-primary/70">
+        <div className="relative z-10 mx-auto w-full max-w-screen-2xl px-4 sm:px-6 lg:px-8">
+          <nav className="mb-4 sm:mb-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-medium uppercase tracking-widest text-on-primary/70">
             <Link className="hover:text-on-primary" href="/">
               {home}
             </Link>
@@ -58,20 +58,20 @@ export function NewsListPublic({ hero, items }: Props) {
             </span>
             <span className="text-on-primary">{breadcrumb}</span>
           </nav>
-          <h1 className="mb-4 max-w-3xl text-4xl font-black tracking-tight text-on-primary md:text-5xl lg:text-6xl">
+          <h1 className="mb-4 max-w-3xl text-3xl font-black tracking-tight text-on-primary sm:text-4xl md:text-5xl lg:text-6xl break-words">
             {title}
           </h1>
-          <p className="max-w-2xl text-lg font-light leading-relaxed text-on-primary/80 md:text-xl">
+          <p className="max-w-2xl text-base sm:text-lg font-light leading-relaxed text-on-primary/80 md:text-xl break-words">
             {lead}
           </p>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-8 pb-16 pt-12">
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16 pt-8 sm:pt-12 min-w-0">
         {items.length === 0 ? (
           <p className="text-on-surface-variant">{empty}</p>
         ) : (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
             {items.map((a) => {
               const cardTitle = a.title
               const cardExcerpt =
@@ -92,7 +92,7 @@ export function NewsListPublic({ hero, items }: Props) {
                     <span className="mb-3 text-xs font-bold text-secondary">
                       {formatNewsListDate(a.publishedAt, locale).toUpperCase()}
                     </span>
-                    <h3 className="mb-3 text-xl font-bold leading-tight transition-colors group-hover:text-primary">
+                    <h3 className="mb-3 text-xl font-bold leading-tight transition-colors group-hover:text-primary break-words">
                       {cardTitle}
                     </h3>
                     {cardExcerpt ? (

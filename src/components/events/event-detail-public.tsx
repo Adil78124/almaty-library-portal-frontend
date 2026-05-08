@@ -32,9 +32,9 @@ export function EventDetailPublic({ data }: Props) {
   const posterSrc = data.posterUrl?.trim() || EVENT_POSTER_FALLBACK
 
   return (
-    <div className="bg-surface font-body text-on-surface antialiased">
-      <main className="flex-grow">
-        <section className="relative h-[450px] flex items-end pb-16 overflow-hidden">
+    <div className="bg-surface font-body text-on-surface antialiased overflow-x-hidden">
+      <main className="flex-grow min-w-0">
+        <section className="relative min-h-[min(85vh,520px)] sm:min-h-[450px] md:h-[450px] flex items-end pb-10 sm:pb-14 md:pb-16 overflow-hidden">
           <div className="absolute inset-0 z-0">
             <img
               alt={title}
@@ -43,7 +43,7 @@ export function EventDetailPublic({ data }: Props) {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/40 to-transparent"></div>
           </div>
-          <div className="relative z-10 max-w-screen-2xl mx-auto px-8 w-full">
+          <div className="relative z-10 max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 w-full min-w-0">
             <nav className="flex mb-6 text-on-primary-container/70 text-sm font-label tracking-wide uppercase flex-wrap gap-y-1">
               <Link className="hover:text-white transition-colors" href="/">
                 {t(L("Главная", "Басты бет"))}
@@ -57,17 +57,17 @@ export function EventDetailPublic({ data }: Props) {
                 {title}
               </span>
             </nav>
-            <h1 className="text-5xl md:text-6xl font-black text-white tracking-tighter mb-4 max-w-4xl leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tighter mb-3 sm:mb-4 max-w-4xl leading-tight break-words">
               {title}
             </h1>
-            <p className="text-xl text-on-primary-container max-w-2xl font-light leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-on-primary-container max-w-2xl font-light leading-relaxed break-words">
               {excerpt}
             </p>
           </div>
         </section>
 
-        <section className="max-w-screen-2xl mx-auto px-8 py-20">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+        <section className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 min-w-0">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
             <div className="lg:col-span-8">
               <div className="rounded-xl overflow-hidden mb-10 shadow-lg">
                 <img
@@ -84,7 +84,7 @@ export function EventDetailPublic({ data }: Props) {
             </div>
 
             <div className="lg:col-span-4">
-              <div className="sticky top-28 bg-surface-container-lowest rounded-xl p-8 shadow-[0_10px_30px_-5px_rgba(25,28,30,0.08)] border border-outline-variant/10">
+              <div className="lg:sticky lg:top-24 xl:top-28 bg-surface-container-lowest rounded-xl p-5 sm:p-6 md:p-8 shadow-[0_10px_30px_-5px_rgba(25,28,30,0.08)] border border-outline-variant/10 min-w-0">
                 <h3 className="text-xl font-bold text-primary mb-6">
                   {t(L("Детали встречи", "Кездесу мәліметтері"))}
                 </h3>

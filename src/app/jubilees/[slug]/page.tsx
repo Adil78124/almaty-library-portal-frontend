@@ -69,10 +69,10 @@ export default async function JubileeDetailPage({
   const bio = t(L(item.bioRu, item.bioKz ?? ""))
 
   return (
-    <div className="antialiased">
-      <main className="pt-20">
-        <section className="bg-surface px-8 py-10">
-          <div className="mx-auto max-w-5xl">
+    <div className="antialiased overflow-x-hidden">
+      <main className="pt-20 min-w-0">
+        <section className="bg-surface px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+          <div className="mx-auto max-w-5xl min-w-0">
             <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm font-label tracking-wide uppercase text-on-surface/70">
               <Link className="hover:text-on-surface" href="/">
                 {t(L("Главная", "Басты бет"))}
@@ -85,14 +85,14 @@ export default async function JubileeDetailPage({
               <span className="text-on-surface">{title}</span>
             </nav>
 
-            <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-on-surface">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-on-surface break-words">
               {title}
             </h1>
           </div>
         </section>
 
-        <section className="bg-surface px-8 pb-16">
-          <div className="mx-auto max-w-5xl">
+        <section className="bg-surface px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
+          <div className="mx-auto max-w-5xl min-w-0">
             <div className="mt-8 overflow-hidden rounded-2xl border border-outline-variant bg-white">
               <div className="relative bg-surface-container-low">
                 {item.imageUrl ? (
@@ -111,7 +111,7 @@ export default async function JubileeDetailPage({
               </div>
 
               <div className="p-6 md:p-10">
-                <div className="text-[15px] md:text-[16px] leading-7 md:leading-8 text-on-surface/85 whitespace-pre-line">
+                <div className="text-sm sm:text-[15px] md:text-[16px] leading-7 md:leading-8 text-on-surface/85 whitespace-pre-line break-words">
                   {bio}
                 </div>
               </div>

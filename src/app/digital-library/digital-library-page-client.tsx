@@ -102,10 +102,10 @@ export default function DigitalLibraryPageClient({ cms }: Props) {
   }
 
   return (
-    <div className="bg-surface text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
-      <main className="pt-[72px]">
+    <div className="bg-surface text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed overflow-x-hidden">
+      <main className="pt-[72px] min-w-0">
         {/* Hero Section */}
-        <section className="relative h-[360px] flex items-center bg-primary overflow-hidden">
+        <section className="relative min-h-[280px] sm:min-h-[320px] md:h-[360px] flex items-center bg-primary overflow-hidden py-10 md:py-0">
           <div className="absolute inset-0 opacity-40">
             <img
               className="w-full h-full object-cover"
@@ -114,8 +114,8 @@ export default function DigitalLibraryPageClient({ cms }: Props) {
             />
           </div>
           <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/80 to-transparent"></div>
-          <div className="relative max-w-screen-2xl mx-auto px-8 w-full">
-            <nav className="mb-6 flex items-center space-x-2 text-primary-fixed-dim text-sm font-medium">
+          <div className="relative max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 w-full min-w-0">
+            <nav className="mb-4 sm:mb-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-primary-fixed-dim text-sm font-medium">
               <Link className="hover:text-white transition-colors" href="/">
                 {t({ ru: "Главная", kz: "Басты бет" })}
               </Link>
@@ -126,19 +126,19 @@ export default function DigitalLibraryPageClient({ cms }: Props) {
                 {t(cms.hero.breadcrumbLabel)}
               </Link>
             </nav>
-            <h1 className="text-5xl md:text-6xl font-black text-white tracking-tighter mb-4 -ml-1">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tighter mb-3 sm:mb-4 break-words">
               {t(cms.hero.title)}
             </h1>
-            <p className="text-on-primary-container text-lg max-w-2xl leading-relaxed">
+            <p className="text-on-primary-container text-base sm:text-lg max-w-2xl leading-relaxed break-words">
               {t(cms.hero.lead)}
             </p>
           </div>
         </section>
 
         {/* Search & Filter Bar */}
-        <div className="max-w-screen-2xl mx-auto px-8 -mt-8 relative z-10">
-          <div className="bg-surface-container-lowest p-6 rounded-xl shadow-lg shadow-on-surface/5 flex flex-col md:flex-row gap-4 items-end">
-            <div className="flex-grow grid grid-cols-1 md:grid-cols-4 gap-4 w-full">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 relative z-10 min-w-0">
+          <div className="bg-surface-container-lowest p-4 sm:p-6 rounded-xl shadow-lg shadow-on-surface/5 flex flex-col lg:flex-row gap-4 items-stretch lg:items-end">
+            <div className="flex-grow grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full min-w-0">
               <div className="flex flex-col space-y-1.5">
                 <label className="text-[10px] font-bold uppercase tracking-wider text-outline">
                   {t({ ru: "Название или автор", kz: "Атауы немесе автор" })}
@@ -183,14 +183,17 @@ export default function DigitalLibraryPageClient({ cms }: Props) {
                 </select>
               </div>
             </div>
-            <button className="bg-primary text-on-primary px-8 py-2.5 rounded-md font-bold text-sm h-[42px] hover:bg-primary-container transition-all flex items-center gap-2">
+            <button
+              type="button"
+              className="bg-primary text-on-primary px-6 sm:px-8 py-2.5 rounded-md font-bold text-sm min-h-[42px] hover:bg-primary-container transition-all flex items-center justify-center gap-2 w-full lg:w-auto shrink-0"
+            >
               <span className="material-symbols-outlined text-[18px]">search</span>
               {t({ ru: "Найти", kz: "Табу" })}
             </button>
           </div>
         </div>
 
-        <div className="max-w-screen-2xl mx-auto px-8 py-16 grid grid-cols-1 lg:grid-cols-4 gap-12">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 grid grid-cols-1 lg:grid-cols-4 gap-10 lg:gap-12 min-w-0">
           <div className="lg:col-span-3 space-y-16">
             {/* Main Sections Bento-ish Grid */}
             <section>
@@ -200,15 +203,17 @@ export default function DigitalLibraryPageClient({ cms }: Props) {
                   return (
                     <div
                       key={`dl-card-${idx}`}
-                      className="group bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/20 hover:border-primary/30 transition-all"
+                      className="group bg-surface-container-lowest p-5 sm:p-6 md:p-8 rounded-xl border border-outline-variant/20 hover:border-primary/30 transition-all min-w-0"
                     >
                       <div
                         className={`w-12 h-12 ${tone.iconWrap} rounded-lg flex items-center justify-center mb-6`}
                       >
                         <span className="material-symbols-outlined">{c.iconName}</span>
                       </div>
-                      <h3 className="text-xl font-bold mb-3">{t(c.title)}</h3>
-                      <p className="text-on-surface-variant text-sm leading-relaxed">
+                      <h3 className="text-lg sm:text-xl font-bold mb-3 break-words">
+                        {t(c.title)}
+                      </h3>
+                      <p className="text-on-surface-variant text-sm leading-relaxed break-words">
                         {t(c.body)}
                       </p>
                     </div>
@@ -219,22 +224,22 @@ export default function DigitalLibraryPageClient({ cms }: Props) {
 
             {/* E-Books Showcase */}
             <section>
-              <div className="flex justify-between items-end mb-8">
-                <div>
-                  <h2 className="text-3xl font-black tracking-tight mb-2">
+              <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-end mb-6 sm:mb-8 min-w-0">
+                <div className="min-w-0">
+                  <h2 className="text-2xl sm:text-3xl font-black tracking-tight mb-2 break-words">
                     {t({ ru: "Витрина электронных книг", kz: "Электронды кітаптар витринасы" })}
                   </h2>
                   <div className="h-1 w-12 bg-primary"></div>
                 </div>
-                <a className="text-sm font-bold text-secondary hover:underline" href="#">
+                <a className="text-sm font-bold text-secondary hover:underline shrink-0 w-fit" href="#">
                   {t({ ru: "Смотреть все", kz: "Барлығын көру" })}
                 </a>
               </div>
-              <div className="flex overflow-x-auto no-scrollbar gap-6 pb-2">
+              <div className="flex overflow-x-auto overflow-y-hidden no-scrollbar gap-4 sm:gap-6 pb-2 max-w-full -mx-1 px-1">
                 {books === null ? (
                   <>
                     {Array.from({ length: 6 }).map((_, i) => (
-                      <div key={`sk-b-${i}`} className="w-[260px] shrink-0">
+                      <div key={`sk-b-${i}`} className="w-[min(260px,calc(100vw-2.5rem))] shrink-0">
                         <Skeleton className="aspect-[3/4] w-full rounded-md mb-4" />
                         <Skeleton className="h-5 w-3/4 mb-2" />
                         <Skeleton className="h-4 w-1/2" />
@@ -254,7 +259,7 @@ export default function DigitalLibraryPageClient({ cms }: Props) {
                     return (
                       <div
                         key={b.id}
-                        className="flex flex-col flex-shrink-0 w-[260px] cursor-pointer"
+                        className="flex flex-col flex-shrink-0 w-[min(260px,calc(100vw-2.5rem))] cursor-pointer min-w-0"
                         onClick={() => (href ? openExternal(href) : null)}
                         role="button"
                         tabIndex={0}
@@ -274,10 +279,10 @@ export default function DigitalLibraryPageClient({ cms }: Props) {
                             </span>
                           </div>
                         </div>
-                        <h4 className="font-bold text-lg mb-1 line-clamp-1">
+                        <h4 className="font-bold text-base sm:text-lg mb-1 line-clamp-2 break-words">
                           {title}
                         </h4>
-                        <p className="text-on-surface-variant text-sm mb-4 line-clamp-1">
+                        <p className="text-on-surface-variant text-sm mb-4 line-clamp-2 break-words">
                           {author}
                         </p>
                         <div className="flex gap-2">
@@ -307,11 +312,11 @@ export default function DigitalLibraryPageClient({ cms }: Props) {
                 </h2>
                 <div className="h-1 w-12 bg-primary"></div>
               </div>
-              <div className="flex overflow-x-auto no-scrollbar gap-6 pb-2">
+              <div className="flex overflow-x-auto overflow-y-hidden no-scrollbar gap-4 sm:gap-6 pb-2 max-w-full -mx-1 px-1">
                 {popular === null ? (
                   <>
                     {Array.from({ length: 6 }).map((_, i) => (
-                      <div key={`sk-p-${i}`} className="w-[220px] shrink-0">
+                      <div key={`sk-p-${i}`} className="w-[min(220px,calc(100vw-2.5rem))] shrink-0">
                         <Skeleton className="aspect-[3/4] w-full rounded-lg mb-3" />
                         <Skeleton className="h-4 w-3/4 mb-2" />
                         <Skeleton className="h-3 w-1/2" />
@@ -330,7 +335,7 @@ export default function DigitalLibraryPageClient({ cms }: Props) {
                     return (
                       <div
                         key={b.id}
-                        className="relative group flex-shrink-0 w-[220px] cursor-pointer"
+                        className="relative group flex-shrink-0 w-[min(220px,calc(100vw-2.5rem))] cursor-pointer min-w-0"
                         onClick={() => openExternal(b.externalUrl)}
                         role="button"
                         tabIndex={0}
@@ -350,8 +355,8 @@ export default function DigitalLibraryPageClient({ cms }: Props) {
                           </span>{" "}
                           {t({ ru: "TOP", kz: "TOP" })}
                         </div>
-                        <h6 className="font-bold text-sm line-clamp-1">{title}</h6>
-                        <p className="text-[11px] text-on-surface-variant line-clamp-1">
+                        <h6 className="font-bold text-sm line-clamp-2 break-words">{title}</h6>
+                        <p className="text-[11px] text-on-surface-variant line-clamp-2 break-words">
                           {author}
                         </p>
                       </div>
@@ -363,8 +368,8 @@ export default function DigitalLibraryPageClient({ cms }: Props) {
           </div>
 
           {/* Sidebar */}
-          <aside className="space-y-8">
-            <div className="bg-primary text-on-primary p-8 rounded-xl shadow-xl shadow-primary/20">
+          <aside className="space-y-8 min-w-0 lg:min-w-[280px]">
+            <div className="bg-primary text-on-primary p-6 sm:p-8 rounded-xl shadow-xl shadow-primary/20">
               <h4 className="text-xl font-bold mb-6 flex items-center gap-3">
                 <span className="material-symbols-outlined">help_center</span>
                 {t(cms.help.title)}
@@ -407,12 +412,12 @@ export default function DigitalLibraryPageClient({ cms }: Props) {
         </div>
 
         {/* CTA Section */}
-        <section className="max-w-screen-2xl mx-auto px-8 pb-24">
-          <div className="bg-surface-container-highest rounded-3xl p-12 md:p-16 flex flex-col items-center text-center">
-            <h2 className="text-4xl font-black mb-6 max-w-3xl">
+        <section className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-24 min-w-0">
+          <div className="bg-surface-container-highest rounded-2xl sm:rounded-3xl p-8 sm:p-12 md:p-16 flex flex-col items-center text-center">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-4 sm:mb-6 max-w-3xl break-words">
               {t(cms.cta.title)}
             </h2>
-            <p className="text-on-surface-variant text-lg mb-10 max-w-2xl">
+            <p className="text-on-surface-variant text-base sm:text-lg mb-8 sm:mb-10 max-w-2xl break-words">
               {t(cms.cta.lead)}
             </p>
             <div className="flex flex-col md:flex-row gap-4">

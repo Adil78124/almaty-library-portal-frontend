@@ -17,38 +17,38 @@ function AboutPageSections({ data }: { data: ResolvedAbout }) {
 
   return (
     <>
-      <section className="relative h-[480px] w-full flex items-center overflow-hidden">
+      <section className="relative min-h-[300px] sm:min-h-[380px] md:h-[480px] w-full max-w-full flex items-center overflow-hidden py-12 md:py-0">
         <img
           alt={t(hero.imageAlt)}
           className="absolute inset-0 w-full h-full object-cover"
           src={hero.imageUrl}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/70 to-transparent" />
-        <div className="relative z-20 max-w-7xl mx-auto px-8 w-full">
-          <nav className="flex gap-2 text-white/80 text-sm mb-6 font-medium">
+        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full min-w-0">
+          <nav className="flex flex-wrap gap-x-2 gap-y-1 text-white/80 text-sm mb-4 sm:mb-6 font-medium">
             <Link className="hover:text-white transition-colors" href="/">
               {t(L("Главная", "Басты бет"))}
             </Link>
             <span>/</span>
             <span className="text-white">{t(hero.breadcrumbLabel)}</span>
           </nav>
-          <h1 className="text-6xl font-extrabold text-white tracking-tight mb-6 max-w-3xl leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight mb-4 sm:mb-6 max-w-3xl leading-tight break-words">
             {t(hero.title)}
           </h1>
-          <p className="text-xl text-blue-50/90 max-w-2xl leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-blue-50/90 max-w-2xl leading-relaxed break-words">
             {t(hero.lead)}
           </p>
         </div>
       </section>
 
-      <section className="py-24 bg-surface-container-lowest">
-        <div className="max-w-7xl mx-auto px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+      <section className="py-16 sm:py-20 md:py-24 bg-surface-container-lowest overflow-x-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-w-0">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             <div>
               <span className="text-sm font-bold tracking-widest text-secondary uppercase mb-4 block">
                 {t(roleIntro.kicker)}
               </span>
-              <h2 className="text-4xl font-bold text-primary mb-8 leading-tight">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-6 sm:mb-8 leading-tight break-words">
                 {t(roleIntro.title)}
               </h2>
               <div className="space-y-6 text-slate-600 text-lg leading-relaxed">
@@ -60,7 +60,7 @@ function AboutPageSections({ data }: { data: ResolvedAbout }) {
               <div className="absolute -inset-4 bg-tertiary-fixed rounded-xl -rotate-2 z-0"></div>
               <img
                 alt={t(roleIntro.sideImageAlt)}
-                className="relative z-10 rounded-lg shadow-xl w-full h-[500px] object-cover"
+                className="relative z-10 rounded-lg shadow-xl w-full h-[min(52vh,420px)] sm:h-[min(70vh,500px)] object-cover"
                 src={roleIntro.sideImageUrl}
               />
             </div>
@@ -68,8 +68,8 @@ function AboutPageSections({ data }: { data: ResolvedAbout }) {
         </div>
       </section>
 
-      <section className="py-24 bg-surface">
-        <div className="max-w-7xl mx-auto px-8">
+      <section className="py-16 sm:py-20 md:py-24 bg-surface overflow-x-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-w-0">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-primary">{t(timeline.title)}</h2>
             <div className="w-24 h-1 bg-secondary mx-auto mt-6"></div>
@@ -118,9 +118,9 @@ function AboutPageSections({ data }: { data: ResolvedAbout }) {
         </div>
       </section>
 
-      <section className="py-24 bg-surface-container-low">
-        <div className="max-w-7xl mx-auto px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <section className="py-16 sm:py-20 md:py-24 bg-surface-container-low overflow-x-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-w-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {mission.cards.map((card, idx) => (
               <div
                 key={`${idx}-${t(card.title)}`}
@@ -141,9 +141,9 @@ function AboutPageSections({ data }: { data: ResolvedAbout }) {
         </div>
       </section>
 
-      <section className="py-24 bg-primary">
-        <div className="max-w-7xl mx-auto px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+      <section className="py-16 sm:py-20 md:py-24 bg-primary overflow-x-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-w-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 sm:gap-12 text-center">
             {facts.stats.map((s) => (
               <div
                 key={t(s.label)}
@@ -161,20 +161,22 @@ function AboutPageSections({ data }: { data: ResolvedAbout }) {
         </div>
       </section>
 
-      <section className="py-24 bg-surface-container-lowest overflow-hidden">
-        <div className="max-w-7xl mx-auto px-8">
-          <div className="flex justify-between items-end mb-16">
-            <div>
-              <h2 className="text-4xl font-bold text-primary mb-4">{t(space.title)}</h2>
-              <p className="text-slate-600 max-w-xl">{t(space.lead)}</p>
+      <section className="py-16 sm:py-20 md:py-24 bg-surface-container-lowest overflow-x-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-w-0">
+          <div className="flex justify-between items-end mb-10 sm:mb-16">
+            <div className="min-w-0">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-3 sm:mb-4 break-words">
+                {t(space.title)}
+              </h2>
+              <p className="text-slate-600 max-w-xl break-words">{t(space.lead)}</p>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
             {space.slides.map((slide, idx) => (
               <div
                 key={`${t(slide.caption)}-${idx}`}
-                className={`group relative overflow-hidden rounded-lg h-[600px] ${
-                  idx === 1 ? "mt-12" : idx === 2 ? "-mt-6" : ""
+                className={`group relative overflow-hidden rounded-lg h-[min(70vh,520px)] md:h-[600px] ${
+                  idx === 1 ? "md:mt-12" : idx === 2 ? "md:-mt-6" : ""
                 }`}
               >
                 <img
@@ -191,15 +193,15 @@ function AboutPageSections({ data }: { data: ResolvedAbout }) {
         </div>
       </section>
 
-      <section className="py-24 bg-surface-container">
-        <div className="max-w-4xl mx-auto px-8 text-center">
+      <section className="py-16 sm:py-20 md:py-24 bg-surface-container overflow-x-hidden">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center min-w-0">
           <span
             className="material-symbols-outlined text-6xl text-secondary/30 mb-8"
             style={{ fontVariationSettings: "'FILL' 1" }}
           >
             format_quote
           </span>
-          <blockquote className="text-3xl font-medium text-primary italic leading-snug mb-10">
+          <blockquote className="text-xl sm:text-2xl md:text-3xl font-medium text-primary italic leading-snug mb-8 sm:mb-10 break-words px-1">
             {t(quote.quote)}
           </blockquote>
           <div className="w-16 h-px bg-outline-variant mx-auto mb-10"></div>
@@ -209,14 +211,16 @@ function AboutPageSections({ data }: { data: ResolvedAbout }) {
         </div>
       </section>
 
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-8">
-          <div className="bg-gradient-to-r from-primary to-secondary p-16 rounded-2xl relative overflow-hidden">
+      <section className="py-16 sm:py-20 md:py-24 bg-white overflow-x-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-w-0">
+          <div className="bg-gradient-to-r from-primary to-secondary p-8 sm:p-12 md:p-16 rounded-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
             <div className="relative z-10 text-center md:text-left md:flex items-center justify-between gap-12">
               <div className="max-w-2xl mb-10 md:mb-0">
-                <h2 className="text-4xl font-bold text-white mb-6">{t(cta.title)}</h2>
-                <p className="text-blue-100 text-lg">{t(cta.lead)}</p>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 sm:mb-6 break-words">
+                  {t(cta.title)}
+                </h2>
+                <p className="text-blue-100 text-base sm:text-lg break-words">{t(cta.lead)}</p>
               </div>
               <div className="flex flex-col sm:flex-row gap-4 shrink-0">
                 <Link
