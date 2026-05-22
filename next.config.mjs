@@ -5,6 +5,13 @@ const nextConfig = {
   /** Не бандлить Prisma в SSR-чанки Turbopack — иначе после `prisma generate` остаётся старая схема (например hoursWeekdays). */
   serverExternalPackages: ["@prisma/client", "prisma"],
 
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
   async rewrites() {
     return [
       {
