@@ -35,8 +35,8 @@ type DigitalBookRow = {
 }
 
 /** Сброс клиентского состояния блоков при обновлении данных главной (SSR). */
-function homeBlockListKey(items: unknown): string {
-  return JSON.stringify(items)
+function homeBlockListKey(prefix: string, items: unknown): string {
+  return prefix + ":" + JSON.stringify(items)
 }
 
 /** Absolute http(s) links and same-origin paths stay as-is; bare hosts get https:// */
@@ -290,7 +290,7 @@ export function HomePageView({ data }: Props) {
         ) : null}
 
         <HomeEventsBlock
-          key={homeBlockListKey(data.afisha.items)}
+          key={homeBlockListKey("afisha", data.afisha.items)}
           clientRefresh={data.afisha.clientRefresh}
           hasStatsAbove={hasStats}
           initialItems={data.afisha.items}
@@ -389,7 +389,7 @@ export function HomePageView({ data }: Props) {
         ) : null}
 
         <HomeLatestNewsBlock
-          key={homeBlockListKey(data.latestNews.items)}
+          key={homeBlockListKey("news", data.latestNews.items)}
           clientRefresh={data.latestNews.clientRefresh}
           initialItems={data.latestNews.items}
           kicker={data.latestNews.kicker}
