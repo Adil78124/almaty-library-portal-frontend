@@ -7,7 +7,6 @@ async function main() {
   console.log("[partner-links] count:", count)
 
   try {
-    // @ts-expect-error - depends on schema migration being applied
     const activeCount = await prisma.partnerLink.count({ where: { isActive: true } })
     console.log("[partner-links] activeCount:", activeCount)
   } catch (e: any) {
