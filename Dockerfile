@@ -8,6 +8,10 @@ COPY prisma ./prisma
 RUN npm install
 
 COPY . .
+
+ARG BACKEND_URL=http://backend:4000
+ENV BACKEND_URL=$BACKEND_URL
+
 RUN npm run build
 
 EXPOSE 3000
