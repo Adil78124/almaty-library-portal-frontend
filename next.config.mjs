@@ -1,5 +1,24 @@
 /** @type {import('next').NextConfig} */
-const backend = process.env.BACKEND_URL || "http://127.0.0.1:4000"
+const configuredBackend =
+  process.env.BACKEND_URL ||
+  process.env.API_INTERNAL_URL ||
+  process.env.NEXT_PUBLIC_API_URL
+const normalizedBackend = configuredBackend?.trim().replace(/\/$/, "")
+
+if (process.env.NODE_ENV === "production") {
+  if (!normalizedBackend) {
+    throw new Error(
+      "BACKEND_URL is not set in production. Set BACKEND_URL/API_INTERNAL_URL/NEXT_PUBLIC_API_URL to the backend origin."
+    )
+  }
+  if (/^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?/i.test(normalizedBackend)) {
+    throw new Error(
+      `Backend URL points to localhost in production: ${normalizedBackend}. Set BACKEND_URL to the deployed backend origin.`
+    )
+  }
+}
+
+const backend = normalizedBackend || "http://127.0.0.1:4000"
 
 const nextConfig = {
   /** Не бандлить Prisma в SSR-чанки Turbopack — иначе после `prisma generate` остаётся старая схема (например hoursWeekdays). */

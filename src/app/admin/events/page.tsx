@@ -69,7 +69,9 @@ export default async function AdminEventsListPage({
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Мероприятия</h1>
           <p className="text-muted-foreground mt-1 text-sm max-w-xl leading-relaxed">
-            Материалы для /events. Настройки страницы /events — в «Мероприятия → Страница мероприятий», настройки блока «Афиша» на главной — в «Мероприятия → Главная секция».
+            {isSuper
+              ? "Материалы для /events. Настройки страницы /events — в «Мероприятия → Страница мероприятий», настройки блока «Афиша» на главной — в «Мероприятия → Главная секция»."
+              : "Мероприятия вашего филиала. Они привязываются только к текущему филиалу и отображаются на его странице."}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -135,4 +137,3 @@ export default async function AdminEventsListPage({
     </div>
   )
 }
-

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 
 import SiteFooter from "@/components/SiteFooter"
 import { BranchDetailPageClient } from "@/components/branches/branch-detail-page-client"
+import { getBranchDisplaySettings } from "@/lib/branch-display-settings"
 import type { BranchRow } from "@/lib/branch-row"
 import { parseBranchSocialLinksJson } from "@/lib/branch-social-links"
 import { listPublishedEventsPublic } from "@/lib/events/repository"
@@ -26,13 +27,22 @@ export default async function BranchDetailsPage({
   })) as BranchRow | null
   if (!branch) notFound()
 
+  const [newsSettings, eventsSettings] = await Promise.all([
+    getBranchDisplaySettings("news", branch.id),
+    getBranchDisplaySettings("events", branch.id),
+  ])
+
   const [branchNews, branchEvents] = await Promise.all([
-    listPublishedNewsPublic({
-      limit: 12,
-      branchId: branch.id,
-      orderByCreatedAt: false,
-    }),
-    listPublishedEventsPublic({ limit: 12, branchId: branch.id }),
+    newsSettings.enabled
+      ? listPublishedNewsPublic({
+          limit: newsSettings.limit,
+          branchId: branch.id,
+          orderByCreatedAt: false,
+        })
+      : Promise.resolve([]),
+    eventsSettings.enabled
+      ? listPublishedEventsPublic({ limit: eventsSettings.limit, branchId: branch.id })
+      : Promise.resolve([]),
   ])
 
   const branchSocial = parseBranchSocialLinksJson(branch.socialLinksJson)
@@ -51,6 +61,8 @@ export default async function BranchDetailsPage({
         branchSocial={branchSocial}
         heroImg={heroImg}
         buildingImg={buildingImg}
+        showNews={newsSettings.enabled}
+        showEvents={eventsSettings.enabled}
       />
       <SiteFooter />
     </>

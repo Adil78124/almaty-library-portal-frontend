@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 
-type BranchRow = { id: string; name: string; slug: string }
+type BranchRow = { id: string; titleRu: string }
 
 type UserRow = {
   id: string
@@ -375,7 +375,7 @@ export function ProfileSettings() {
                     <option value="">Выберите филиал</option>
                     {branches.map((b) => (
                       <option key={b.id} value={b.id}>
-                        {b.name}
+                        {b.titleRu}
                       </option>
                     ))}
                   </select>
@@ -465,7 +465,7 @@ export function ProfileSettings() {
                         <TableCell className="text-sm">{u.email}</TableCell>
                         <TableCell className="text-muted-foreground text-xs">
                           {u.branchId
-                            ? branches.find((b) => b.id === u.branchId)?.name ??
+                            ? branches.find((b) => b.id === u.branchId)?.titleRu ??
                               u.branchId
                             : "—"}
                         </TableCell>

@@ -169,7 +169,7 @@ async function seedPopularBooksIfEmpty() {
         authorKz: authorRu,
         imageUrl: (b.coverUrl ?? "").trim() || null,
         // Чтобы карточки были кликабельны сразу: ведём на страницу электронной библиотеки
-        externalUrl: "/digital-library",
+        externalUrl: "https://elib.obllibrary.kz",
         isActive: true,
         order: i,
       }

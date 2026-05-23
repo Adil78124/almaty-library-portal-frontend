@@ -28,12 +28,13 @@ export async function PATCH(request: Request, { params }: Params) {
   }
   try {
     const d = parsed.data
-    const data: Prisma.SocialLinkUpdateInput = {}
+    const data: Prisma.SocialLinkUpdateInput & { logoUrl?: string | null } = {}
     if (d.label !== undefined) data.label = d.label
     if (d.labelKz !== undefined) data.labelKz = d.labelKz
     if (d.icon !== undefined) {
       data.icon = d.icon ?? "link"
     }
+    if (d.logoUrl !== undefined) data.logoUrl = d.logoUrl
     if (d.url !== undefined) data.url = d.url
     if (d.sortOrder !== undefined) data.sortOrder = d.sortOrder
     const item = await prisma.socialLink.update({

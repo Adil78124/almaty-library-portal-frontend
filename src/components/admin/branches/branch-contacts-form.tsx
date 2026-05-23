@@ -14,7 +14,7 @@ import { requestRevalidate } from "@/services/revalidate"
 
 type BranchPayload = {
   id: string
-  name: string
+  titleRu: string
   subtitle: string | null
   cityLabel: string | null
   cardImageUrl: string | null
@@ -23,8 +23,7 @@ type BranchPayload = {
   phone: string | null
   email: string | null
   hours: string | null
-  intro: string | null
-  about: string | null
+  descriptionRu: string | null
   socialLinksJson: string | null
 }
 
@@ -32,6 +31,21 @@ const textareaClass = cn(
   "flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm",
   "placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
 )
+
+function splitBranchDescription(description: string | null | undefined) {
+  const paragraphs = (description ?? "")
+    .split(/\n\s*\n/g)
+    .map((p) => p.trim())
+    .filter(Boolean)
+  return {
+    intro: paragraphs[0] ?? "",
+    about: paragraphs.slice(1).join("\n\n"),
+  }
+}
+
+function joinBranchDescription(intro: string, about: string) {
+  return [intro.trim(), about.trim()].filter(Boolean).join("\n\n")
+}
 
 export function BranchContactsForm({ branchId }: { branchId: string }) {
   const router = useRouter()
@@ -68,7 +82,8 @@ export function BranchContactsForm({ branchId }: { branchId: string }) {
           setLoadError(data.error ?? "Не удалось загрузить филиал")
           return
         }
-        setName(data.name ?? "")
+        const description = splitBranchDescription(data.descriptionRu)
+        setName(data.titleRu ?? "")
         setSubtitle(data.subtitle ?? "")
         setCityLabel(data.cityLabel ?? "")
         setHeroImageUrl(data.heroImageUrl?.trim() ?? "")
@@ -77,8 +92,8 @@ export function BranchContactsForm({ branchId }: { branchId: string }) {
         setPhone(data.phone ?? "")
         setEmail(data.email ?? "")
         setHours(data.hours ?? "")
-        setIntro(data.intro ?? "")
-        setAbout(data.about ?? "")
+        setIntro(description.intro)
+        setAbout(description.about)
         setSocialLinksJson(data.socialLinksJson?.trim() ?? "")
       } catch {
         setLoadError("Ошибка сети при загрузке филиала")
@@ -98,7 +113,7 @@ export function BranchContactsForm({ branchId }: { branchId: string }) {
     setPending(true)
     try {
       const body: Record<string, string | null> = {
-        name: name.trim(),
+        titleRu: name.trim(),
         subtitle: subtitle.trim() || null,
         cityLabel: cityLabel.trim() || null,
         heroImageUrl: heroImageUrl.trim() || null,
@@ -107,8 +122,7 @@ export function BranchContactsForm({ branchId }: { branchId: string }) {
         phone: phone.trim() || null,
         email: email.trim() || null,
         hours: hours.trim() || null,
-        intro: intro.trim() || null,
-        about: about.trim() || null,
+        descriptionRu: joinBranchDescription(intro, about),
         socialLinksJson: socialLinksJson.trim() || null,
       }
       const res = await fetch(

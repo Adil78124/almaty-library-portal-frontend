@@ -7,6 +7,7 @@ import type { BranchType } from "@prisma/client"
 import type { BranchRow } from "@/lib/branch-row"
 
 import { BranchSocialLinksEditor } from "@/components/admin/branches/branch-social-links-editor"
+import { BranchAdministratorManager } from "@/components/admin/branches/branch-administrator-manager"
 import { useAdminToast } from "@/components/admin/admin-toast"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -267,17 +268,20 @@ export function BranchAdminForm(props: Props) {
       </div>
 
       {isEdit && b && (
-        <p className="text-muted-foreground text-xs">
-          Ссылка на публичную страницу:{" "}
-          <a
-            className="text-primary underline"
-            href={`/branches/${b.id}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            /branches/{b.id}
-          </a>
-        </p>
+        <>
+          <BranchAdministratorManager branchId={b.id} />
+          <p className="text-muted-foreground text-xs">
+            Ссылка на публичную страницу:{" "}
+            <a
+              className="text-primary underline"
+              href={`/branches/${b.id}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              /branches/{b.id}
+            </a>
+          </p>
+        </>
       )}
 
       <div className="flex gap-3">

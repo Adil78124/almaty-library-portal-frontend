@@ -11,6 +11,7 @@ import { HomeCountersScript } from "@/app/home-counters-script"
 import { HomeEventsBlock } from "@/components/home/home-events-block"
 import { HomeLatestNewsBlock } from "@/components/home/home-latest-news-block"
 import { fetchDigitalBooks } from "@/services/api"
+import { digitalLibraryHref } from "@/lib/digital-library-url"
 import {
   parseYoutubeVideoId,
   youtubeThumbnailHq,
@@ -135,7 +136,7 @@ export function HomePageView({ data }: Props) {
         .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
         .slice(0, lim)
         .map((b) => {
-          const href = (b.externalUrl || b.fileUrl || "").trim()
+          const href = digitalLibraryHref(b.externalUrl || b.fileUrl)
           return {
             coverUrl: b.imageUrl ?? "",
             title: b.titleRu,
@@ -148,7 +149,7 @@ export function HomePageView({ data }: Props) {
     }
     return data.eLibrary.books.map((b: ELibraryBook) => ({
       ...b,
-      href: "",
+      href: digitalLibraryHref(b.href),
     }))
   }, [data.eLibrary.books, dbELibBooks, elibSettings])
 
@@ -324,7 +325,7 @@ export function HomePageView({ data }: Props) {
                 {eLibShowcaseBooks.map((book, i) => {
                   const title = pickDbField(book.title, book.titleKz ?? null, locale)
                   const author = pickDbField(book.author, book.authorKz ?? null, locale)
-                  const href = (book.href ?? "").trim()
+                  const href = digitalLibraryHref(book.href)
                   const outbound = /^https?:\/\//i.test(href) || href.startsWith("//")
                   const card = (
                     <div>
@@ -349,7 +350,7 @@ export function HomePageView({ data }: Props) {
                     </div>
                   )
 
-                  return href ? (
+                  return (
                     <a
                       key={`${book.title}-${i}`}
                       className="w-[min(11rem,calc(100vw-3rem))] sm:w-44 md:w-48 shrink-0 flex-none group cursor-pointer"
@@ -360,29 +361,24 @@ export function HomePageView({ data }: Props) {
                     >
                       {card}
                     </a>
-                  ) : (
-                    <div
-                      key={`${book.title}-${i}`}
-                      className="w-[min(11rem,calc(100vw-3rem))] sm:w-44 md:w-48 shrink-0 flex-none group"
-                    >
-                      {card}
-                    </div>
                   )
                 })}
               </div>
               <div className="h-1 w-full bg-primary-fixed-dim absolute bottom-8 left-0 opacity-20"></div>
             </div>
             <div className="mt-8 sm:mt-12 text-center px-2">
-              <Link
+              <a
                 className="inline-flex justify-center bg-primary text-white px-6 sm:px-10 py-4 sm:py-5 rounded-md font-black uppercase tracking-tighter text-xs sm:text-sm hover:bg-primary-container active:scale-95 transition-all max-w-full text-center"
-                href={data.eLibrary.buttonHref}
+                href={digitalLibraryHref(data.eLibrary.buttonHref)}
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 {pickDbField(
                   data.eLibrary.buttonLabel,
                   data.eLibrary.buttonLabelKz ?? null,
                   locale
                 )}
-              </Link>
+              </a>
             </div>
           </div>
         </section>

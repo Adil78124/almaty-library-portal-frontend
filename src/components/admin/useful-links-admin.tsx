@@ -26,12 +26,15 @@ function changed(a: Draft, b: Draft): boolean {
   return JSON.stringify(a) !== JSON.stringify(b)
 }
 
+function errorMessage(e: unknown, fallback: string): string {
+  return e instanceof Error ? e.message : fallback
+}
+
 export function UsefulLinksAdmin() {
   const [rows, setRows] = useState<PartnerLinkRow[] | null>(null)
   const [drafts, setDrafts] = useState<Record<string, Draft>>({})
   const [busy, setBusy] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [expandedId, setExpandedId] = useState<string | null>(null)
   const [visible, setVisible] = useState(30)
 
   async function load() {
@@ -59,7 +62,10 @@ export function UsefulLinksAdmin() {
   }
 
   useEffect(() => {
-    void load().catch((e: any) => setError(e?.message || "Ошибка загрузки"))
+    const id = window.setTimeout(() => {
+      void load().catch((e: unknown) => setError(errorMessage(e, "Ошибка загрузки")))
+    }, 0)
+    return () => window.clearTimeout(id)
   }, [])
 
   const list = useMemo(() => {
@@ -70,7 +76,7 @@ export function UsefulLinksAdmin() {
       .slice(0, visible)
   }, [rows, visible])
 
-  function setField(id: string, key: keyof Draft, value: any) {
+  function setField<K extends keyof Draft>(id: string, key: K, value: Draft[K]) {
     setDrafts((prev) => ({ ...prev, [id]: { ...(prev[id] as Draft), [key]: value } }))
   }
 
@@ -101,8 +107,8 @@ export function UsefulLinksAdmin() {
         throw new Error(t || "Не удалось создать")
       }
       await load()
-    } catch (e: any) {
-      setError(e?.message || "Ошибка")
+    } catch (e: unknown) {
+      setError(errorMessage(e, "Ошибка"))
     } finally {
       setBusy(null)
     }
@@ -146,8 +152,8 @@ export function UsefulLinksAdmin() {
         throw new Error(t || "Не удалось сохранить")
       }
       await load()
-    } catch (e: any) {
-      setError(e?.message || "Ошибка")
+    } catch (e: unknown) {
+      setError(errorMessage(e, "Ошибка"))
     } finally {
       setBusy(null)
     }
@@ -166,8 +172,8 @@ export function UsefulLinksAdmin() {
         throw new Error(t || "Не удалось удалить")
       }
       await load()
-    } catch (e: any) {
-      setError(e?.message || "Ошибка")
+    } catch (e: unknown) {
+      setError(errorMessage(e, "Ошибка"))
     } finally {
       setBusy(null)
     }
@@ -197,35 +203,25 @@ export function UsefulLinksAdmin() {
         {list.map((r) => {
           const d = drafts[r.id]
           if (!d) return null
-          const expanded = expandedId === r.id
           return (
             <div key={r.id} className="rounded-xl border bg-card p-4 md:p-6 space-y-4">
-              <button
-                type="button"
-                className="w-full text-left"
-                onClick={() => setExpandedId((prev) => (prev === r.id ? null : r.id))}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="text-sm text-muted-foreground shrink-0">Порядок</div>
-                  <Input
-                    className="w-[110px]"
-                    type="number"
-                    value={String(d.sortOrder ?? 0)}
-                    onChange={(e) => setField(r.id, "sortOrder", Number(e.target.value))}
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="text-sm text-muted-foreground shrink-0">Порядок</div>
+                <Input
+                  className="w-[110px]"
+                  type="number"
+                  value={String(d.sortOrder ?? 0)}
+                  onChange={(e) => setField(r.id, "sortOrder", Number(e.target.value))}
+                />
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={!!d.isActive}
+                    onChange={(e) => setField(r.id, "isActive", e.target.checked)}
                   />
-                  <label className="flex items-center gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={!!d.isActive}
-                      onChange={(e) => setField(r.id, "isActive", e.target.checked)}
-                    />
-                    Показывать на сайте
-                  </label>
-                  <div className="ml-auto text-xs text-muted-foreground">
-                    {expanded ? "Свернуть" : "Развернуть"}
-                  </div>
-                </div>
-              </button>
+                  Показывать на сайте
+                </label>
+              </div>
 
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="text-sm font-medium truncate">{d.title || "Без названия"}</div>
@@ -239,42 +235,38 @@ export function UsefulLinksAdmin() {
                 </div>
               </div>
 
-              {expanded ? (
-                <>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground">RU</div>
-                      <Input
-                        value={d.title}
-                        onChange={(e) => setField(r.id, "title", e.target.value)}
-                        placeholder="Название (RU)"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground">KZ</div>
-                      <Input
-                        value={d.titleKz ?? ""}
-                        onChange={(e) => setField(r.id, "titleKz", e.target.value || null)}
-                        placeholder="Атауы (KZ)"
-                      />
-                    </div>
-                  </div>
-
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground">RU</div>
                   <Input
-                    value={d.href}
-                    onChange={(e) => setField(r.id, "href", e.target.value)}
-                    placeholder="Ссылка (https://...)"
+                    value={d.title}
+                    onChange={(e) => setField(r.id, "title", e.target.value)}
+                    placeholder="Название (RU)"
                   />
+                </div>
+                <div className="space-y-2">
+                  <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground">KZ</div>
+                  <Input
+                    value={d.titleKz ?? ""}
+                    onChange={(e) => setField(r.id, "titleKz", e.target.value || null)}
+                    placeholder="Атауы (KZ)"
+                  />
+                </div>
+              </div>
 
-                  <AdminImageUrlField
-                    label="Логотип"
-                    value={d.logoUrl ?? ""}
-                    onChange={(url) => setField(r.id, "logoUrl", url || null)}
-                    urlPlaceholder="Ссылка на логотип (или загрузить файл)"
-                    onUploadError={(msg) => setError(msg)}
-                  />
-                </>
-              ) : null}
+              <Input
+                value={d.href}
+                onChange={(e) => setField(r.id, "href", e.target.value)}
+                placeholder="Ссылка (https://...)"
+              />
+
+              <AdminImageUrlField
+                label="Логотип"
+                value={d.logoUrl ?? ""}
+                onChange={(url) => setField(r.id, "logoUrl", url || null)}
+                urlPlaceholder="Ссылка на логотип или загрузите файл"
+                onUploadError={(msg) => setError(msg)}
+              />
             </div>
           )
         })}

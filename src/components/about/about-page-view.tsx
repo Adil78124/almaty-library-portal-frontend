@@ -4,6 +4,7 @@ import Link from "next/link"
 
 import { useLocale } from "@/components/i18n/locale-provider"
 import type { ResolvedAbout } from "@/lib/cms/about/types"
+import { isExternalHref } from "@/lib/digital-library-url"
 import { L, pickLocalized } from "@/lib/i18n/app-locale"
 
 type Props = {
@@ -229,12 +230,15 @@ function AboutPageSections({ data }: { data: ResolvedAbout }) {
                 >
                   {t(cta.primaryLabel)}
                 </Link>
-                <Link
+                <a
                   href={cta.secondaryHref}
+                  {...(isExternalHref(cta.secondaryHref)
+                    ? { target: "_blank", rel: "noopener noreferrer" }
+                    : {})}
                   className="px-8 py-4 border-2 border-white/30 text-white font-bold rounded-md hover:bg-white/10 transition-all active:scale-95 text-center"
                 >
                   {t(cta.secondaryLabel)}
-                </Link>
+                </a>
               </div>
             </div>
           </div>

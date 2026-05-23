@@ -1,5 +1,6 @@
 import type { Localized } from "@/lib/i18n/app-locale"
 import { L } from "@/lib/i18n/app-locale"
+import { DIGITAL_LIBRARY_URL } from "@/lib/digital-library-url"
 
 export type NavLinkDef = { href: string; label: Localized }
 
@@ -10,7 +11,7 @@ export const HEADER_NAV_LINKS: NavLinkDef[] = [
   { href: "/branches", label: L("Филиалы", "Филиалдар") },
   { href: "/jubilees", label: L("Юбиляры", "Мерейтой иелері") },
   {
-    href: "/digital-library",
+    href: DIGITAL_LIBRARY_URL,
     label: L("Электронная библиотека", "Электронды кітапхана"),
   },
   { href: "/events", label: L("Мероприятия", "Іс-шаралар") },

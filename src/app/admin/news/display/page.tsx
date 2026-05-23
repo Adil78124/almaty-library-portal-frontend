@@ -1,4 +1,6 @@
+import { BranchDisplaySettingsForm } from "@/components/admin/branch-display-settings-form"
 import { NewsHomeSettingsForm } from "@/components/admin/news/news-home-settings-form"
+import { getBranchDisplaySettings } from "@/lib/branch-display-settings"
 import {
   getAdminSession,
   sessionIsSuperAdmin,
@@ -8,6 +10,33 @@ import { prisma } from "@/lib/prisma"
 export default async function AdminNewsDisplaySettingsPage() {
   const session = await getAdminSession()
   const isSuper = session ? sessionIsSuperAdmin(session) : false
+
+  if (
+    session &&
+    session.kind === "user" &&
+    session.user.role === "ADMIN" &&
+    session.user.branchId
+  ) {
+    const settings = await getBranchDisplaySettings("news", session.user.branchId)
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Настройка отображения новостей филиала
+          </h1>
+          <p className="text-muted-foreground mt-1 text-sm max-w-xl leading-relaxed">
+            Управление блоком новостей на странице филиала. Эти настройки
+            применяются только к текущему филиалу.
+          </p>
+        </div>
+        <BranchDisplaySettingsForm
+          kind="news"
+          branchId={session.user.branchId}
+          initial={settings}
+        />
+      </div>
+    )
+  }
 
   const site = isSuper
     ? await prisma.siteSettings.findUnique({ where: { id: "default" } })
@@ -24,7 +53,7 @@ export default async function AdminNewsDisplaySettingsPage() {
           Настройки отображения
         </h1>
         <p className="text-muted-foreground mt-1 text-sm max-w-xl leading-relaxed">
-          Настройки вывода новостей на сайте (включая блок на главной). Создание и
+          Настройки вывода новостей на главной странице сайта. Создание и
           редактирование материалов — в «Все новости».
         </p>
       </div>
@@ -39,7 +68,7 @@ export default async function AdminNewsDisplaySettingsPage() {
         />
       ) : (
         <p className="text-muted-foreground text-sm">
-          Эти настройки доступны только супер-администратору.
+          У учётной записи не задан филиал.
         </p>
       )}
     </div>

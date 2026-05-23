@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/sheet"
 import { HEADER_NAV_LINKS } from "@/lib/i18n/header-nav"
 import { L, pickLocalized } from "@/lib/i18n/app-locale"
+import { SITE_CONTACT_FALLBACK } from "@/lib/site-contact-fallbacks"
+import { isExternalHref } from "@/lib/digital-library-url"
 
 type PublicContacts = {
   orgNameShort: string
@@ -49,18 +51,13 @@ export default function Header() {
         L(contacts.orgNameShort, contacts.orgNameShortKz ?? ""),
         locale
       )
-    : t(L("АОУБ", "АООӘК"))
+    : t(L(SITE_CONTACT_FALLBACK.orgNameShort, SITE_CONTACT_FALLBACK.orgNameShortKz))
   const orgLong = contacts
     ? pickLocalized(
         L(contacts.orgNameLong, contacts.orgNameLongKz ?? ""),
         locale
       )
-    : t(
-        L(
-          "Алматинская областная универсальная библиотека",
-          "Алматы облыстық әмбебап кітапханасы"
-        )
-      )
+    : t(L(SITE_CONTACT_FALLBACK.orgNameLong, SITE_CONTACT_FALLBACK.orgNameLongKz))
 
   const baseLinkClassName =
     "text-[#191c1e] font-medium hover:text-[#0058be] transition-colors tracking-tight text-[12px] xl:whitespace-nowrap break-words"
@@ -73,7 +70,7 @@ export default function Header() {
     if (href === "/events") return pathname.startsWith("/events")
     if (href === "/news") return pathname.startsWith("/news")
     if (href === "/branches") return pathname.startsWith("/branches")
-    if (href === "/digital-library") return pathname.startsWith("/digital-library")
+    if (isExternalHref(href)) return false
     return pathname === href || pathname.startsWith(`${href}/`)
   }
 
@@ -120,9 +117,16 @@ export default function Header() {
           aria-label={t(L("Основная навигация", "Негізгі бағдарлама"))}
         >
           {HEADER_NAV_LINKS.map((item) => {
-            if (item.href === "#") {
+            if (item.href === "#" || isExternalHref(item.href)) {
               return (
-                <a key={item.href} className={baseLinkClassName} href="#">
+                <a
+                  key={item.href}
+                  className={baseLinkClassName}
+                  href={item.href}
+                  {...(isExternalHref(item.href)
+                    ? { target: "_blank", rel: "noopener noreferrer" }
+                    : {})}
+                >
                   {t(item.label)}
                 </a>
               )
@@ -194,12 +198,15 @@ export default function Header() {
                   ? "bg-primary/10 text-primary"
                   : "text-on-surface hover:bg-surface-container-low",
               ].join(" ")
-              if (item.href === "#") {
+              if (item.href === "#" || isExternalHref(item.href)) {
                 return (
                   <a
                     key={`m-${item.href}-${t(item.label)}`}
                     className={cls}
-                    href="#"
+                    href={item.href}
+                    {...(isExternalHref(item.href)
+                      ? { target: "_blank", rel: "noopener noreferrer" }
+                      : {})}
                     onClick={closeMobileNav}
                   >
                     {t(item.label)}

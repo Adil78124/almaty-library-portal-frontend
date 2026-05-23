@@ -1,14 +1,7 @@
-import SiteFooter from "@/components/SiteFooter"
-import { getDigitalLibraryPublic } from "@/lib/cms/digital-library/public"
+import { redirect } from "next/navigation"
 
-import DigitalLibraryPageClient from "./digital-library-page-client"
+import { DIGITAL_LIBRARY_URL } from "@/lib/digital-library-url"
 
-export default async function DigitalLibraryPage() {
-  const cms = await getDigitalLibraryPublic()
-  return (
-    <>
-      <DigitalLibraryPageClient cms={cms} />
-      <SiteFooter />
-    </>
-  )
+export default function DigitalLibraryPage() {
+  redirect(DIGITAL_LIBRARY_URL)
 }

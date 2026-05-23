@@ -4,6 +4,7 @@ import type { SocialLink } from "@prisma/client"
 import { Loader2, Pencil, Plus, Trash2 } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
 
+import { AdminImageUrlField } from "@/components/admin/admin-image-url-field"
 import { useAdminToast } from "@/components/admin/admin-toast"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -30,6 +31,7 @@ type FormState = {
   iconCustom: string
   label: string
   labelKz: string
+  logoUrl: string
   url: string
   sortOrder: number
 }
@@ -47,6 +49,7 @@ const emptyForm: FormState = {
   iconCustom: "",
   label: "",
   labelKz: "",
+  logoUrl: "",
   url: "",
   sortOrder: 0,
 }
@@ -100,6 +103,7 @@ export function SocialLinksAdmin() {
           icon: joinIconForm(form.iconPreset, form.iconCustom),
           label: form.label.trim(),
           labelKz: form.labelKz.trim() || null,
+          logoUrl: form.logoUrl.trim() || null,
           url: form.url.trim(),
           sortOrder: form.sortOrder,
         }),
@@ -134,6 +138,7 @@ export function SocialLinksAdmin() {
       ...splitIconForm(row.icon),
       label: row.label,
       labelKz: row.labelKz ?? "",
+      logoUrl: ((row as SocialLink & { logoUrl?: string | null }).logoUrl ?? ""),
       url: row.url,
       sortOrder: row.sortOrder,
     })
@@ -151,6 +156,7 @@ export function SocialLinksAdmin() {
           icon: joinIconForm(editDraft.iconPreset, editDraft.iconCustom),
           label: editDraft.label.trim(),
           labelKz: editDraft.labelKz.trim() || null,
+          logoUrl: editDraft.logoUrl.trim() || null,
           url: editDraft.url.trim(),
           sortOrder: editDraft.sortOrder,
         }),
@@ -292,6 +298,15 @@ export function SocialLinksAdmin() {
             />
           </div>
           <div className="space-y-2 sm:col-span-2">
+            <AdminImageUrlField
+              label="Логотип вместо SVG (необязательно)"
+              value={form.logoUrl}
+              onChange={(url) => setForm((f) => ({ ...f, logoUrl: url }))}
+              urlPlaceholder="URL логотипа или загрузите файл"
+              onUploadError={(msg) => setError(msg)}
+            />
+          </div>
+          <div className="space-y-2 sm:col-span-2">
             <Label htmlFor="new-url">URL</Label>
             <Input
               id="new-url"
@@ -390,6 +405,17 @@ export function SocialLinksAdmin() {
                             placeholder="Ключ иконки"
                           />
                         ) : null}
+                        <AdminImageUrlField
+                          compact
+                          className="mt-3"
+                          label="Логотип"
+                          value={editDraft.logoUrl}
+                          onChange={(url) =>
+                            setEditDraft((d) => ({ ...d, logoUrl: url }))
+                          }
+                          urlPlaceholder="URL или файл"
+                          onUploadError={(msg) => setError(msg)}
+                        />
                       </TableCell>
                       <TableCell>
                         <Input

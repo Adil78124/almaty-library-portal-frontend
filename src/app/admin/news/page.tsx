@@ -68,9 +68,9 @@ export default async function AdminNewsListPage({
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Новости</h1>
           <p className="text-muted-foreground mt-1 text-sm max-w-xl leading-relaxed">
-            Материалы для раздела /news. Настройки страницы /news — в «Новости →
-            Страница новостей», настройки блока на главной — в «Новости → Главная
-            секция».
+            {isSuper
+              ? "Материалы для раздела /news. Настройки страницы /news — в «Новости → Страница новостей», настройки блока на главной — в «Новости → Главная секция»."
+              : "Новости вашего филиала. Они привязываются только к текущему филиалу и отображаются на его странице."}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">

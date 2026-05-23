@@ -41,7 +41,7 @@ export default async function AdminBranchesPage() {
             </a>{" "}
             и получат страницу{" "}
             <code className="text-xs bg-muted px-1 rounded">/branches/[id]</code>.
-            Затем в профиле можно назначить администратора филиала.
+            Ответственного администратора теперь можно назначить в редактировании филиала.
           </p>
         </div>
         <Link href="/admin/branches/new" className={cn(buttonVariants())}>

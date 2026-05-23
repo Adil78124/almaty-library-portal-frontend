@@ -53,21 +53,55 @@ export const DEFAULT_WORKING_HOURS: WorkingHours = {
   sunday: { isOpen: false },
 }
 
+const DAY_SHORT_LABELS: Record<AppLocale, Record<DayKey, string>> = {
+  ru: {
+    monday: "Пн",
+    tuesday: "Вт",
+    wednesday: "Ср",
+    thursday: "Чт",
+    friday: "Пт",
+    saturday: "Сб",
+    sunday: "Вс",
+  },
+  kz: {
+    monday: "Дүй",
+    tuesday: "Сей",
+    wednesday: "Сәр",
+    thursday: "Бей",
+    friday: "Жұм",
+    saturday: "Сен",
+    sunday: "Жек",
+  },
+}
+
+const DAY_FULL_LABELS: Record<AppLocale, Record<DayKey, string>> = {
+  ru: {
+    monday: "понедельник",
+    tuesday: "вторник",
+    wednesday: "среда",
+    thursday: "четверг",
+    friday: "пятница",
+    saturday: "суббота",
+    sunday: "воскресенье",
+  },
+  kz: {
+    monday: "дүйсенбі",
+    tuesday: "сейсенбі",
+    wednesday: "сәрсенбі",
+    thursday: "бейсенбі",
+    friday: "жұма",
+    saturday: "сенбі",
+    sunday: "жексенбі",
+  },
+}
+
 function dayShortLabel(key: DayKey, lang: AppLocale): string {
-  const i = DAY_KEYS.indexOf(key)
-  const d = new Date(2024, 0, 1 + i)
-  return d.toLocaleDateString(lang === "kz" ? "kk-KZ" : "ru-RU", {
-    weekday: "short",
-  })
+  return DAY_SHORT_LABELS[lang][key]
 }
 
 /** Полное имя дня недели для UI (публичный сайт и админка с учётом локали). */
 export function dayFullLabel(key: DayKey, lang: AppLocale): string {
-  const i = DAY_KEYS.indexOf(key)
-  const d = new Date(2024, 0, 1 + i)
-  return d.toLocaleDateString(lang === "kz" ? "kk-KZ" : "ru-RU", {
-    weekday: "long",
-  })
+  return DAY_FULL_LABELS[lang][key]
 }
 
 function scheduleSignature(d: DaySchedule): string {

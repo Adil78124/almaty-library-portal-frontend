@@ -160,7 +160,7 @@ export function SiteSettingsContactsForm() {
   }
 
   return (
-    <form onSubmit={(e) => void save(e)} className="max-w-2xl space-y-8">
+    <form onSubmit={(e) => void save(e)} className="max-w-2xl space-y-8 pb-24">
       {loadError && (
         <p className="text-destructive text-sm">{loadError}</p>
       )}
@@ -321,9 +321,11 @@ export function SiteSettingsContactsForm() {
           />
         </div>
       </div>
-      <Button type="submit" disabled={saving}>
-        {saving ? "Сохранение…" : "Сохранить"}
-      </Button>
+      <div className="sticky bottom-4 z-20 rounded-md border bg-background/95 p-3 shadow-lg backdrop-blur">
+        <Button type="submit" disabled={saving}>
+          {saving ? "Сохранение…" : "Сохранить"}
+        </Button>
+      </div>
     </form>
   )
 }

@@ -31,11 +31,11 @@ export function buildSiteFooterPayload(site: SiteSettings | null): SiteFooterPay
   return {
     orgShort: L(
       s?.orgNameShort ?? fb.orgNameShort,
-      s?.orgNameShortKz?.trim() ?? ""
+      s?.orgNameShortKz?.trim() ?? fb.orgNameShortKz
     ),
     orgLong: L(
       s?.orgNameLong ?? fb.orgNameLong,
-      s?.orgNameLongKz?.trim() ?? ""
+      s?.orgNameLongKz?.trim() ?? fb.orgNameLongKz
     ),
     tagline: L(
       s?.footerTagline ?? fb.footerTagline,

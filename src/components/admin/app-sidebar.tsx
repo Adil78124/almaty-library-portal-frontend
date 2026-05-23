@@ -11,7 +11,6 @@ import {
   Home,
   LayoutDashboard,
   Library,
-  Link2,
   Landmark,
   MapPinned,
   Newspaper,
@@ -200,11 +199,11 @@ export function AdminAppSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   isActive={pathname.startsWith("/admin/news")}
-                  tooltip="Новости"
+                  tooltip={isSuperAdmin ? "Новости" : "Новости филиала"}
                   render={<Link href="/admin/news" />}
                 >
                   <Newspaper className="text-sidebar-foreground/80" />
-                  <span>Новости</span>
+                  <span>{isSuperAdmin ? "Новости" : "Новости филиала"}</span>
                 </SidebarMenuButton>
                 <SidebarMenuAction
                   className="opacity-100"
@@ -228,22 +227,29 @@ export function AdminAppSidebar() {
                 />
                 {newsOpen ? (
                   <SidebarMenuSub>
-                  <SubNavLink href="/admin/news" label="Все новости" />
-                  <SubNavLink href="/admin/news/new" label="Создать новость" />
-                  <SubNavLink href="/admin/news/page-settings" label="Страница новостей" />
-                  <SubNavLink href="/admin/news/display" label="Настройки отображения" />
-                  <SubNavLink href="/admin/news/home-section" label="Главная секция" />
+                    <SubNavLink
+                      href="/admin/news"
+                      label={isSuperAdmin ? "Все новости" : "Новости филиала"}
+                    />
+                    <SubNavLink href="/admin/news/new" label="Создать новость" />
+                    {isSuperAdmin && (
+                      <SubNavLink href="/admin/news/page-settings" label="Страница новостей" />
+                    )}
+                    <SubNavLink href="/admin/news/display" label="Настройки отображения" />
+                    {isSuperAdmin && (
+                      <SubNavLink href="/admin/news/home-section" label="Главная секция" />
+                    )}
                   </SidebarMenuSub>
                 ) : null}
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
                   isActive={pathname.startsWith("/admin/events")}
-                  tooltip="Мероприятия"
+                  tooltip={isSuperAdmin ? "Мероприятия" : "Мероприятия филиала"}
                   render={<Link href="/admin/events" />}
                 >
                   <CalendarDays className="text-sidebar-foreground/80" />
-                  <span>Мероприятия</span>
+                  <span>{isSuperAdmin ? "Мероприятия" : "Мероприятия филиала"}</span>
                 </SidebarMenuButton>
                 <SidebarMenuAction
                   className="opacity-100"
@@ -267,11 +273,18 @@ export function AdminAppSidebar() {
                 />
                 {eventsOpen ? (
                   <SidebarMenuSub>
-                    <SubNavLink href="/admin/events" label="Все мероприятия" />
+                    <SubNavLink
+                      href="/admin/events"
+                      label={isSuperAdmin ? "Все мероприятия" : "Мероприятия филиала"}
+                    />
                     <SubNavLink href="/admin/events/new" label="Создать мероприятие" />
-                    <SubNavLink href="/admin/events/page-settings" label="Страница мероприятий" />
+                    {isSuperAdmin && (
+                      <SubNavLink href="/admin/events/page-settings" label="Страница мероприятий" />
+                    )}
                     <SubNavLink href="/admin/events/display" label="Настройки отображения" />
-                    <SubNavLink href="/admin/events/home-section" label="Главная секция" />
+                    {isSuperAdmin && (
+                      <SubNavLink href="/admin/events/home-section" label="Главная секция" />
+                    )}
                   </SidebarMenuSub>
                 ) : null}
               </SidebarMenuItem>
@@ -279,7 +292,7 @@ export function AdminAppSidebar() {
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     isActive={pathname.startsWith("/admin/digital-library")}
-                    tooltip="Электронная библиотека"
+                    tooltip="Блок электронной библиотеки на главной"
                     render={<Link href="/admin/digital-library" />}
                   >
                     <Library className="text-sidebar-foreground/80" />
@@ -311,12 +324,8 @@ export function AdminAppSidebar() {
                       <SubNavLink href="/admin/digital-library/new" label="Добавить книгу" />
                       <SubNavLink href="/admin/digital-library/new-arrivals" label="Новые поступления" />
                       <SubNavLink
-                        href="/admin/digital-library/page-settings"
-                        label="Страница электронной библиотеки"
-                      />
-                      <SubNavLink
                         href="/admin/digital-library/display"
-                        label="Настройки отображения"
+                        label="Настройки блока на главной"
                       />
                       <SubNavLink
                         href="/admin/digital-library/home-section"
@@ -347,11 +356,7 @@ export function AdminAppSidebar() {
                     href={item.href}
                     label={item.label}
                     icon={item.icon}
-                    tooltip={
-                      "description" in item && item.description
-                        ? `${item.label} — ${item.description}`
-                        : item.label
-                    }
+                    tooltip={`${item.label} — ${item.description}`}
                   />
                 ))}
 
@@ -370,17 +375,19 @@ export function AdminAppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border">
-        <Link
-          href="/admin/profile"
-          className={cn(
-            buttonVariants({ variant: "ghost", size: "sm" }),
-            "mb-1 w-full justify-start gap-2 text-sidebar-foreground/80 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
-          )}
-        >
-          <UserRound className="size-4" />
-          <span className="group-data-[collapsible=icon]:sr-only">Профиль</span>
-          <span className="group-data-[collapsible=icon]:hidden">Профиль</span>
-        </Link>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              isActive={pathname === "/admin/profile"}
+              tooltip="Профиль"
+              className="mb-1 text-sidebar-foreground/80"
+              render={<Link href="/admin/profile" />}
+            >
+              <UserRound className="text-sidebar-foreground/80" />
+              <span>Профиль</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
         <Button
           variant="ghost"
           size="sm"

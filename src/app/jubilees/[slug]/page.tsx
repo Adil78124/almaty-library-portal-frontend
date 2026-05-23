@@ -11,6 +11,8 @@ import {
   pickLocalized,
 } from "@/lib/i18n/app-locale"
 
+export const dynamic = "force-dynamic"
+
 type JubileeCard = {
   slug: string
   titleRu: string

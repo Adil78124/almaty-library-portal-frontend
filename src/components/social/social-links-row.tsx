@@ -22,6 +22,28 @@ type Props = {
   className?: string
 }
 
+type SocialLinkWithLogo = SocialLink & { logoUrl?: string | null }
+
+function SocialLinkVisual({
+  item,
+  className,
+}: {
+  item: SocialLinkWithLogo
+  className: string
+}) {
+  const logoUrl = (item.logoUrl ?? "").trim()
+  if (logoUrl) {
+    return (
+      <img
+        alt=""
+        className={cn(className, "object-contain")}
+        src={logoUrl}
+      />
+    )
+  }
+  return <SocialIcon icon={item.icon} className={className} />
+}
+
 export function SocialLinksRow({ items, variant, className }: Props) {
   const { locale } = useLocale()
   const labelShown = (item: SocialLink) =>
@@ -42,7 +64,7 @@ export function SocialLinksRow({ items, variant, className }: Props) {
             aria-label={labelShown(item)}
             title={labelShown(item)}
           >
-            <SocialIcon icon={item.icon} className="size-5" />
+            <SocialLinkVisual item={item as SocialLinkWithLogo} className="size-5" />
           </a>
         ))}
       </div>
@@ -61,7 +83,7 @@ export function SocialLinksRow({ items, variant, className }: Props) {
           aria-label={labelShown(item)}
           title={labelShown(item)}
         >
-          <SocialIcon icon={item.icon} className="size-6" />
+          <SocialLinkVisual item={item as SocialLinkWithLogo} className="size-6" />
         </a>
       ))}
     </div>

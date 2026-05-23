@@ -18,6 +18,8 @@ import EventsPageClient, {
   type SerializedEventCard,
 } from "./events-page-client"
 
+export const dynamic = "force-dynamic"
+
 function serializeEvent(e: Event, locale: AppLocale): SerializedEventCard {
   const desc = pickDbField(e.descriptionRu, e.descriptionKz ?? null, locale)
   const lead = splitBodyParagraphs(desc)[0]?.trim() ?? desc.trim()

@@ -19,7 +19,7 @@ export async function GET() {
     email: site?.email ?? SITE_CONTACT_FALLBACK.email,
     orgNameShort: site?.orgNameShort ?? SITE_CONTACT_FALLBACK.orgNameShort,
     orgNameLong: site?.orgNameLong ?? SITE_CONTACT_FALLBACK.orgNameLong,
-    orgNameShortKz: site?.orgNameShortKz ?? null,
-    orgNameLongKz: site?.orgNameLongKz ?? null,
+    orgNameShortKz: site?.orgNameShortKz ?? SITE_CONTACT_FALLBACK.orgNameShortKz,
+    orgNameLongKz: site?.orgNameLongKz ?? SITE_CONTACT_FALLBACK.orgNameLongKz,
   })
 }

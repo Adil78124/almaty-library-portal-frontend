@@ -74,12 +74,10 @@ async function main() {
         where: { id: existing.id },
         data: {
           title: m.title,
-          // @ts-expect-error depends on prisma generate after schema update
           titleKz: m.titleKz ?? null,
           href: m.href,
           logoUrl,
           sortOrder,
-          // @ts-expect-error depends on prisma generate after schema update
           isActive: true,
         },
       })
@@ -88,12 +86,10 @@ async function main() {
       await prisma.partnerLink.create({
         data: {
           title: m.title,
-          // @ts-expect-error depends on prisma generate after schema update
           titleKz: m.titleKz ?? null,
           href: m.href,
           logoUrl,
           sortOrder,
-          // @ts-expect-error depends on prisma generate after schema update
           isActive: true,
         } as any,
       })

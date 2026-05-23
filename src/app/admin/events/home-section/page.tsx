@@ -1,7 +1,15 @@
+import { redirect } from "next/navigation"
+
 import { EventsHomeSectionForm } from "@/components/admin/events/events-home-section-form"
+import { getAdminSession, sessionIsSuperAdmin } from "@/lib/auth/require-admin"
 import { getHomeSectionsRaw } from "@/lib/cms/home/public"
 
 export default async function AdminEventsHomeSectionPage() {
+  const session = await getAdminSession()
+  if (!session || !sessionIsSuperAdmin(session)) {
+    redirect("/admin")
+  }
+
   const sections = await getHomeSectionsRaw()
   return (
     <div className="space-y-6">

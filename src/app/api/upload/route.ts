@@ -3,7 +3,7 @@ import { mkdir, writeFile } from "node:fs/promises"
 import path from "node:path"
 
 import { jsonError } from "@/lib/api/http"
-import { requireSuperAdminSession } from "@/lib/auth/require-admin"
+import { getAdminSession } from "@/lib/auth/require-admin"
 import { prisma } from "@/lib/prisma"
 
 function safeName(name: string): string {
@@ -12,9 +12,17 @@ function safeName(name: string): string {
 }
 
 export async function POST(request: Request) {
-  const session = await requireSuperAdminSession()
+  const session = await getAdminSession()
   if (!session) {
-    return jsonError("Требуется доступ супер-админа", 403)
+    return jsonError("Требуется вход в админку", 401)
+  }
+
+  if (
+    session.kind === "user" &&
+    session.user.role === "ADMIN" &&
+    !session.user.branchId
+  ) {
+    return jsonError("У учётной записи не задан филиал", 403)
   }
 
   const form = await request.formData().catch(() => null)

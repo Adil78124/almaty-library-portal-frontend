@@ -5,8 +5,6 @@ import { jsonValidationError } from "@/lib/api/http"
 import { requireSuperAdminSession } from "@/lib/auth/require-admin"
 import { parseAboutCmsPayload } from "@/lib/cms/about/validate"
 import { getAboutPublic } from "@/lib/cms/about/public"
-import { getDigitalLibraryPublic } from "@/lib/cms/digital-library/public"
-import { parseDigitalLibraryCmsPayload } from "@/lib/cms/digital-library/validate"
 import { parseSimpleCmsPayload } from "@/lib/cms/simple-page/validate"
 import { getSimplePagePublic } from "@/lib/cms/simple-page/public"
 import {
@@ -27,7 +25,6 @@ function revalidateForSlug(slug: string) {
   if (slug === "events") revalidatePath("/events")
   if (slug === "branches") revalidatePath("/branches")
   if (slug === "branches-network") revalidatePath("/branches")
-  if (slug === "digital-library") revalidatePath("/digital-library")
 }
 
 export async function GET(
@@ -49,11 +46,6 @@ export async function GET(
   if (slug === "branches-network") {
     const data = await getBranchesNetworkPublic()
     return NextResponse.json({ page: "branches-network", data })
-  }
-
-  if (slug === "digital-library") {
-    const data = await getDigitalLibraryPublic()
-    return NextResponse.json({ page: "digital-library", data })
   }
 
   return NextResponse.json({ error: "Страница не найдена" }, { status: 404 })
@@ -119,20 +111,6 @@ export async function POST(
       update: { sections: parsed.data.sections as object[] },
     })
     revalidateForSlug("branches-network")
-    return NextResponse.json({ ok: true })
-  }
-
-  if (slug === "digital-library") {
-    const parsed = parseDigitalLibraryCmsPayload(raw)
-    if (!parsed.ok) {
-      return jsonValidationError(parsed.error)
-    }
-    await prisma.pageContent.upsert({
-      where: { page: "digital-library" },
-      create: { page: "digital-library", sections: parsed.data.sections as object[] },
-      update: { sections: parsed.data.sections as object[] },
-    })
-    revalidateForSlug("digital-library")
     return NextResponse.json({ ok: true })
   }
 

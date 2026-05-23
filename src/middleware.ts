@@ -25,11 +25,22 @@ export async function middleware(request: NextRequest) {
 
   const path = request.nextUrl.pathname
   const isBranchAdmin = session.role === "ADMIN"
+  const branchAdminDeniedPrefixes = [
+    "/admin/content",
+    "/admin/site",
+    "/admin/branches",
+    "/admin/news/page-settings",
+    "/admin/news/home-section",
+    "/admin/events/page-settings",
+    "/admin/events/home-section",
+    "/admin/digital-library",
+    "/admin/local-history",
+    "/admin/useful-links",
+    "/admin/media",
+  ]
   if (
     isBranchAdmin &&
-    (path.startsWith("/admin/content") ||
-      path.startsWith("/admin/site") ||
-      path.startsWith("/admin/branches"))
+    branchAdminDeniedPrefixes.some((prefix) => path.startsWith(prefix))
   ) {
     return NextResponse.redirect(new URL("/admin", request.url))
   }

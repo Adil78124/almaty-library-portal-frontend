@@ -65,6 +65,7 @@ export type ELibraryBook = {
   titleKz?: string | null
   author: string
   authorKz?: string | null
+  href?: string | null
 }
 
 export type HomeELibraryData = {

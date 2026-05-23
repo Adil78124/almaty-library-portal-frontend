@@ -35,6 +35,7 @@ import {
 import { eventToAfishaCard } from "@/lib/events/home-afisha-card"
 import { listPublishedEventsPublic } from "@/lib/events/repository"
 import { splitBodyParagraphs } from "@/lib/news/split-body"
+import { DIGITAL_LIBRARY_URL } from "@/lib/digital-library-url"
 
 function pickSection<T extends HomeSection["type"]>(
   sections: HomeSection[],
@@ -141,6 +142,7 @@ export async function resolveHomeSections(
       titleKz: null,
       author: pickDbField(r.author, r.authorKz ?? null, locale),
       authorKz: null,
+      href: r.resourceUrl ?? DIGITAL_LIBRARY_URL,
     }))
     if (!eBooks.length && elibS.data.manualBooks?.length) {
       eBooks = elibS.data.manualBooks
@@ -333,7 +335,7 @@ export async function resolveHomeSections(
       descriptionKz: elibS.data.descriptionKz?.trim() || null,
       buttonLabel: elibS.data.buttonLabel,
       buttonLabelKz: elibS.data.buttonLabelKz?.trim() || null,
-      buttonHref: elibS.data.buttonHref,
+      buttonHref: elibS.data.buttonHref?.trim() || DIGITAL_LIBRARY_URL,
       books: eBooks,
     },
     latestNews: {

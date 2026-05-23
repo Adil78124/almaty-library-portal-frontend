@@ -18,6 +18,8 @@ type Props = {
   branchSocial: BranchSocialLink[]
   heroImg: string
   buildingImg: string
+  showNews: boolean
+  showEvents: boolean
 }
 
 export function BranchDetailPageClient({
@@ -27,6 +29,8 @@ export function BranchDetailPageClient({
   branchSocial,
   heroImg,
   buildingImg,
+  showNews,
+  showEvents,
 }: Props) {
   const { locale } = useLocale()
   const t = (v: Parameters<typeof pickLocalized>[0]) => pickLocalized(v, locale)
@@ -214,6 +218,8 @@ export function BranchDetailPageClient({
           branch={branch}
           newsRows={branchNews}
           eventRows={branchEvents}
+          showNews={showNews}
+          showEvents={showEvents}
         />
 
         {aboutParagraphs.length > 0 ? (

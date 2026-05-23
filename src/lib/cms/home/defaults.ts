@@ -121,7 +121,7 @@ export function getDefaultHomeSections(): HomeSection[] {
           "Мыңдаған сандық басылымдарға, ғылыми мақалаларға және сирек құжаттарға бір шертумен қол жеткізу.",
         buttonLabel: "Перейти в электронную библиотеку",
         buttonLabelKz: "Электронды кітапханаға өту",
-        buttonHref: "/digital-library",
+        buttonHref: "https://elib.obllibrary.kz",
         source: "manual",
         manualBooks: [
           { coverUrl: B1, title: "Абай жолы. I том", author: "М. Ауэзов" },
@@ -264,8 +264,8 @@ export function getDefaultHomeSections(): HomeSection[] {
         manualLinks: [
           {
             href: "https://www.gov.kz/memleket/entities/mam",
-            title: "Официальный сайт Президента РК",
-            titleKz: "ҚР Президентінің ресми сайты",
+            title: "Министерство культуры и информации РК",
+            titleKz: "ҚР Мәдениет және ақпарат министрлігі",
             logoUrl: "/images/Emblem_of_Kazakhstan_(2014-2018).png",
             logoVariant: "round",
           },

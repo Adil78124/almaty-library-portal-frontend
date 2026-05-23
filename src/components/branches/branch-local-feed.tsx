@@ -16,9 +16,17 @@ type Props = {
   branch: BranchDetailViewModel
   newsRows: NewsArticle[]
   eventRows: Event[]
+  showNews: boolean
+  showEvents: boolean
 }
 
-export function BranchLocalFeed({ branch, newsRows, eventRows }: Props) {
+export function BranchLocalFeed({
+  branch,
+  newsRows,
+  eventRows,
+  showNews,
+  showEvents,
+}: Props) {
   const { locale } = useLocale()
   const t = (v: Parameters<typeof pickLocalized>[0]) => pickLocalized(v, locale)
   const branchName = pickDbField(branch.titleRu, branch.titleKz, locale)
@@ -47,6 +55,7 @@ export function BranchLocalFeed({ branch, newsRows, eventRows }: Props) {
 
   return (
     <>
+      {showNews ? (
       <section className="bg-surface px-8 py-16">
         <div className="mx-auto max-w-[1440px]">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
@@ -118,7 +127,9 @@ export function BranchLocalFeed({ branch, newsRows, eventRows }: Props) {
           )}
         </div>
       </section>
+      ) : null}
 
+      {showEvents ? (
       <section className="bg-surface-container-low px-8 py-16">
         <div className="mx-auto max-w-[1440px]">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
@@ -208,6 +219,7 @@ export function BranchLocalFeed({ branch, newsRows, eventRows }: Props) {
           )}
         </div>
       </section>
+      ) : null}
     </>
   )
 }

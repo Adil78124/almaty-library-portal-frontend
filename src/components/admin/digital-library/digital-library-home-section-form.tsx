@@ -7,6 +7,7 @@ import { useAdminToast } from "@/components/admin/admin-toast"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { DIGITAL_LIBRARY_URL } from "@/lib/digital-library-url"
 
 function pickELibrarySection(
   sections: HomeSection[]
@@ -43,7 +44,7 @@ export function DigitalLibraryHomeSectionForm({
     initial?.data.buttonLabelKz ?? ""
   )
   const [buttonHref, setButtonHref] = useState(
-    initial?.data.buttonHref ?? "/digital-library"
+    initial?.data.buttonHref ?? DIGITAL_LIBRARY_URL
   )
 
   const [error, setError] = useState<string | null>(null)

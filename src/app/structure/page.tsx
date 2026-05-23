@@ -3,11 +3,14 @@ import Link from "next/link"
 import SiteFooter from "@/components/SiteFooter"
 import { BranchesNetworkBlock } from "@/components/structure/branches-network-block"
 import { StaffGrid, type StaffApiItem } from "@/components/structure/staff-grid"
+import { getBackendBaseUrl } from "@/lib/backend"
 import { getBranchesNetworkPublic } from "@/lib/cms/branches-network/public"
 import { getSimplePagePublic } from "@/lib/cms/simple-page/public"
 
+export const dynamic = "force-dynamic"
+
 async function getStaffPublic(): Promise<StaffApiItem[]> {
-  const backend = process.env.BACKEND_URL || "http://127.0.0.1:4000"
+  const backend = getBackendBaseUrl()
   const res = await fetch(`${backend}/staff?activeOnly=1`, {
     cache: "no-store",
   })
@@ -63,4 +66,3 @@ export default async function StructurePage() {
     </div>
   )
 }
-

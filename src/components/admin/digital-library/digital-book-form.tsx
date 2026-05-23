@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { createDigitalBook, createNewArrival, createPopularBook } from "@/services/api"
+import { createDigitalBook, createNewArrival } from "@/services/api"
 
 export function DigitalBookForm() {
   const router = useRouter()
@@ -36,7 +36,6 @@ export function DigitalBookForm() {
   const [order, setOrder] = useState("0")
   const preset = searchParams.get("preset")
   const [alsoNewArrivals, setAlsoNewArrivals] = useState(preset === "new-arrivals")
-  const [alsoPopularNow, setAlsoPopularNow] = useState(preset === "popular")
 
   function save() {
     setError(null)
@@ -90,25 +89,6 @@ export function DigitalBookForm() {
         if (!r2.ok) {
           const msg = (await r2.json().catch(() => ({}))) as { error?: string }
           setError(msg.error ?? "Книга создана, но не удалось добавить в «Новые поступления»")
-          return
-        }
-      }
-
-      if (alsoPopularNow) {
-        const href = (externalUrl || fileUrl || "/digital-library").trim()
-        const r3 = await createPopularBook({
-          titleRu: titleRu.trim(),
-          titleKz: titleKz.trim(),
-          authorRu: authorRu.trim(),
-          authorKz: authorKz.trim(),
-          imageUrl: imageUrl.trim() || null,
-          externalUrl: href,
-          isActive: true,
-          order: Number(order) || 0,
-        })
-        if (!r3.ok) {
-          const msg = (await r3.json().catch(() => ({}))) as { error?: string }
-          setError(msg.error ?? "Книга создана, но не удалось добавить в «Популярные сейчас»")
           return
         }
       }
@@ -201,15 +181,6 @@ export function DigitalBookForm() {
                 onChange={(e) => setAlsoNewArrivals(e.target.checked)}
               />
               Также добавить в «Новые поступления»
-            </label>
-            <label className="flex cursor-pointer items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                className="size-4 rounded border-input"
-                checked={alsoPopularNow}
-                onChange={(e) => setAlsoPopularNow(e.target.checked)}
-              />
-              Также добавить в «Популярные сейчас»
             </label>
           </div>
         </CardContent>

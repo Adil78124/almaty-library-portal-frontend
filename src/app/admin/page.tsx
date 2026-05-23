@@ -62,9 +62,9 @@ const quickLinksSuper = [
     icon: PanelTop,
   },
   {
-    href: "/admin/content/digital-library",
-    title: "Электронная библиотека",
-    description: "Тизер и каталог изданий",
+    href: "/admin/digital-library/home-section",
+    title: "Блок электронной библиотеки на главной",
+    description: "Тизер и карточки для главной страницы",
     icon: Library,
   },
   {
@@ -89,10 +89,22 @@ const quickLinksBranch = [
     icon: Newspaper,
   },
   {
+    href: "/admin/news/display",
+    title: "Отображение новостей филиала",
+    description: "Блок новостей на странице вашего филиала",
+    icon: PanelTop,
+  },
+  {
     href: "/admin/events",
     title: "Мероприятия (материалы)",
     description: "Афиша и карточки мероприятий вашего филиала",
     icon: CalendarDays,
+  },
+  {
+    href: "/admin/events/display",
+    title: "Отображение мероприятий филиала",
+    description: "Блок мероприятий на странице вашего филиала",
+    icon: PanelTop,
   },
   {
     href: "/admin/branch/contacts",

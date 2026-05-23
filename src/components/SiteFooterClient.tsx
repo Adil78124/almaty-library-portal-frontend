@@ -11,6 +11,7 @@ import { L, pickLocalized } from "@/lib/i18n/app-locale"
 import type { SiteFooterPayload } from "@/lib/site/footer-payload"
 import { telHref } from "@/lib/site-contact-fallbacks"
 import { formatWorkingHoursGrouped } from "@/lib/working-hours"
+import { isExternalHref } from "@/lib/digital-library-url"
 
 const SECTIONS = L("Разделы", "Бөлімдер")
 const HOURS = L("Часы работы", "Жұмыс уақыты")
@@ -64,8 +65,14 @@ export function SiteFooterClient({ data, socialLinks }: Props) {
             <ul className="space-y-4 text-white/70 text-sm">
               {HEADER_NAV_LINKS.map((item) => (
                 <li key={item.href}>
-                  {item.href === "#" ? (
-                    <a className="hover:text-white transition-colors" href="#">
+                  {item.href === "#" || isExternalHref(item.href) ? (
+                    <a
+                      className="hover:text-white transition-colors"
+                      href={item.href}
+                      {...(isExternalHref(item.href)
+                        ? { target: "_blank", rel: "noopener noreferrer" }
+                        : {})}
+                    >
                       {t(item.label)}
                     </a>
                   ) : (

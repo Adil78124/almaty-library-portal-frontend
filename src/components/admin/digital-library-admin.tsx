@@ -10,13 +10,9 @@ import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 import {
-  createPopularBook,
   deleteDigitalBook,
-  deletePopularBook,
   fetchDigitalBooks,
-  fetchPopularBooks,
   updateDigitalBook,
-  updatePopularBook,
 } from "@/services/api"
 
 type DigitalBookRow = {
@@ -28,18 +24,6 @@ type DigitalBookRow = {
   imageUrl: string | null
   fileUrl: string | null
   externalUrl: string | null
-  isActive: boolean
-  order: number
-}
-
-type PopularBookRow = {
-  id: string
-  titleRu: string
-  titleKz: string
-  authorRu: string
-  authorKz: string
-  imageUrl: string | null
-  externalUrl: string
   isActive: boolean
   order: number
 }
@@ -76,10 +60,8 @@ export function DigitalLibraryAdmin() {
   const [pending, setPending] = useState(false)
 
   const [books, setBooks] = useState<DigitalBookRow[] | null>(null)
-  const [popular, setPopular] = useState<PopularBookRow[] | null>(null)
 
   const [showHidden, setShowHidden] = useState(false)
-  const [showPopularOnly, setShowPopularOnly] = useState(false)
   const [query, setQuery] = useState("")
   const [visible, setVisible] = useState(30)
   const [expandedId, setExpandedId] = useState<string | null>(null)
@@ -88,21 +70,16 @@ export function DigitalLibraryAdmin() {
     setError(null)
     setPending(true)
     try {
-      const [rb, rp] = await Promise.all([
-        fetchDigitalBooks(false),
-        fetchPopularBooks(false),
-      ])
+      const rb = await fetchDigitalBooks(false)
 
       if (!rb.ok) throw new Error(await safeReadErrorMessage(rb))
-      if (!rp.ok) throw new Error(await safeReadErrorMessage(rp))
 
-    const [b, p] = await Promise.all([rb.json(), rp.json()])
+    const b = await rb.json()
     // Новые/пустые записи удобнее видеть сверху.
     const ordered = Array.isArray(b)
       ? [...b].sort((a, c) => (a.order ?? 0) - (c.order ?? 0))
       : b
     setBooks(ordered)
-      setPopular(p)
     } catch (e) {
       setError(errText(e))
     } finally {
@@ -135,52 +112,6 @@ export function DigitalLibraryAdmin() {
     }
   }
 
-  function matchPopularRow(book: DigitalBookRow): PopularBookRow | null {
-    const tRu = (book.titleRu ?? "").trim()
-    const aRu = (book.authorRu ?? "").trim()
-    if (!tRu || !aRu) return null
-    return (
-      (popular ?? []).find(
-        (p) => (p.titleRu ?? "").trim() === tRu && (p.authorRu ?? "").trim() === aRu
-      ) ?? null
-    )
-  }
-
-  async function togglePopularFromBook(book: DigitalBookRow, next: boolean) {
-    setError(null)
-    setPending(true)
-    try {
-      const existing = matchPopularRow(book)
-      if (next) {
-        if (!existing) {
-          const href =
-            (book.externalUrl ?? "").trim() ||
-            (book.fileUrl ?? "").trim() ||
-            "/digital-library"
-          await createPopularBook({
-            titleRu: norm(book.titleRu),
-            titleKz: norm(book.titleKz),
-            authorRu: norm(book.authorRu),
-            authorKz: norm(book.authorKz),
-            imageUrl: book.imageUrl?.trim() || null,
-            externalUrl: href,
-            isActive: true,
-            order: Number(book.order) || 0,
-          })
-        }
-      } else {
-        if (existing) {
-          await deletePopularBook(existing.id)
-        }
-      }
-      await load()
-    } catch (e) {
-      setError(errText(e))
-    } finally {
-      setPending(false)
-    }
-  }
-
   async function removeBook(id: string) {
     setError(null)
     setPending(true)
@@ -194,7 +125,7 @@ export function DigitalLibraryAdmin() {
     }
   }
 
-  const loading = pending && (!books || !popular)
+  const loading = pending && !books
   const list = useMemo(() => {
     const base = books ?? []
     const filteredByVisibility = showHidden
@@ -220,13 +151,10 @@ export function DigitalLibraryAdmin() {
     const final = q
       ? filtered.filter((r) => (showHidden ? true : (r.isActive ?? true) === true))
       : filtered
-    const popularFiltered = showPopularOnly
-      ? final.filter((r) => matchPopularRow(r) !== null)
-      : final
-    return [...popularFiltered]
+    return [...final]
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
       .slice(0, visible)
-  }, [books, query, showHidden, showPopularOnly, visible, popular])
+  }, [books, query, showHidden, visible])
 
   function normalizeBookForSave(b: DigitalBookRow) {
     return {
@@ -253,14 +181,6 @@ export function DigitalLibraryAdmin() {
               onChange={(e) => setShowHidden(e.target.checked)}
             />
             Показать скрытые
-          </label>
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={showPopularOnly}
-              onChange={(e) => setShowPopularOnly(e.target.checked)}
-            />
-            Популярные сейчас
           </label>
           <Input
             value={query}
@@ -346,18 +266,6 @@ export function DigitalLibraryAdmin() {
                         }
                       />
                       Показывать
-                    </label>
-                    <label
-                      className="flex items-center gap-2 text-sm"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={!!matchPopularRow(b)}
-                        onChange={(e) => void togglePopularFromBook(b, e.target.checked)}
-                        disabled={pending}
-                      />
-                      Популярно сейчас
                     </label>
                   </div>
                   <div
@@ -519,4 +427,3 @@ export function DigitalLibraryAdmin() {
     </div>
   )
 }
-

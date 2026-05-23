@@ -6,14 +6,11 @@ import {
 } from "@/lib/cms/home/map-from-public-api"
 import type { AfishaItemManual, NewsItemManual } from "@/lib/cms/home/types"
 import type { AppLocale } from "@/lib/i18n/app-locale"
+import { getBackendBaseUrl as getConfiguredBackendBaseUrl } from "@/lib/backend"
 
 /** Как в `next.config.mjs` rewrites → тот же бэкенд, что и у браузера. */
 export function getBackendBaseUrl(): string {
-  return (
-    process.env.BACKEND_URL ||
-    process.env.API_INTERNAL_URL ||
-    "http://127.0.0.1:4000"
-  )
+  return getConfiguredBackendBaseUrl()
 }
 
 /**

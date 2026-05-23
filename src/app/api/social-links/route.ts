@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import type { Prisma } from "@prisma/client"
 
 import { jsonError, jsonValidationError, parseJson } from "@/lib/api/http"
 import { prisma } from "@/lib/prisma"
@@ -20,6 +21,7 @@ export async function POST(request: Request) {
   if (!parsed.success) {
     return jsonValidationError(parsed.error)
   }
-  const item = await prisma.socialLink.create({ data: parsed.data })
+  const data = parsed.data as unknown as Prisma.SocialLinkCreateInput
+  const item = await prisma.socialLink.create({ data })
   return NextResponse.json(item, { status: 201 })
 }

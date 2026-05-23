@@ -4,10 +4,10 @@ import type { AboutSection } from "./types"
 
 /** Согласованные с заказчиком тексты (источник: инфо.docx). */
 export const OFFICIAL_ORG = {
-  orgNameShort: "АОУБ",
-  orgNameLong: "Алматинская областная универсальная библиотека",
+  orgNameShort: "АООЦУБ",
+  orgNameLong: "Алматинская областная центральная универсальная библиотека",
   orgNameShortKz: "АООӘК",
-  orgNameLongKz: "Алматы облыстық әмбебап кітапханасы",
+  orgNameLongKz: "Алматы облыстық орталық әмбебап кітапхана",
   footerTaglineRu:
     "Современный культурно-информационный центр со свободным доступом к знаниям, информации и культурному наследию.",
   footerTaglineKz:
@@ -241,7 +241,7 @@ export function buildOfficialAboutSectionsBilingual(): AboutSection[] {
         primaryLabel: L("Мероприятия", "Іс-шаралар"),
         primaryHref: "/events",
         secondaryLabel: L("Электронная библиотека", "Электронды кітапхана"),
-        secondaryHref: "/digital-library",
+        secondaryHref: "https://elib.obllibrary.kz",
       },
     },
   ]

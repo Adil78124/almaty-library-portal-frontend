@@ -5,6 +5,8 @@ import { getBranchesNetworkPublic } from "@/lib/cms/branches-network/public"
 import { getSimplePagePublic } from "@/lib/cms/simple-page/public"
 import { fetchBackendJson } from "@/lib/backend"
 
+export const dynamic = "force-dynamic"
+
 export default async function BranchesPage() {
   const [{ hero }, { network }, branchesRaw] = await Promise.all([
     getSimplePagePublic("branches"),
