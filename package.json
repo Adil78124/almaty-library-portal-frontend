@@ -47,6 +47,7 @@
     "db:import-home-useful-links": "npx tsx scripts/import-home-useful-links-to-db.ts"
     ,
     "db:import-jubilees-2026": "npx tsx scripts/import-jubilees-from-2026.ts",
+    "db:import-jubilees-from-chunks": "npx tsx scripts/import-jubilees-from-chunks.ts",
     "db:rename-jubilee-portraits": "npx tsx scripts/rename-jubilee-portraits.ts"
   },
   "dependencies": {
