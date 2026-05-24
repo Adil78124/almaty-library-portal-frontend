@@ -117,10 +117,45 @@ export function HomeEventsBlock({
             return (
             <div
               key={`${ev.ctaHref}-${idx}`}
-              className="flex-none w-[min(100%,calc(100vw-2.5rem))] max-w-[320px] shrink-0 snap-start flex flex-col gap-4"
+              className="flex-none w-[min(100%,calc(100vw-2rem))] max-w-[420px] sm:max-w-[320px] shrink-0 snap-start flex flex-col"
             >
-              <div className="w-full max-w-[320px] shrink-0 rounded-xl overflow-hidden shadow-2xl group">
-                <div className="relative w-full aspect-[9/16]">
+              <div className="overflow-hidden rounded-xl bg-surface-container-lowest shadow-[0_22px_56px_-28px_rgba(25,28,30,0.55)] sm:hidden">
+                <div className="mx-3 mt-3 aspect-[4/5] overflow-hidden rounded-xl bg-surface-container">
+                  <img
+                    alt=""
+                    className="h-full w-full object-cover"
+                    src={ev.posterUrl}
+                  />
+                </div>
+                <div className="flex min-w-0 flex-col px-5 pb-6 pt-5">
+                  <div className="flex min-w-0 items-baseline gap-2 text-[#00236f]">
+                    <span className="shrink-0 text-4xl font-black leading-none">
+                      {ev.dayNum}
+                    </span>
+                    <span className="min-w-0 text-[11px] font-black uppercase leading-tight tracking-widest text-[#00236f]/80 line-clamp-1">
+                      {timeLineShown}
+                    </span>
+                  </div>
+                  <h3 className="mt-4 text-[19px] font-black leading-[1.08] text-on-surface line-clamp-2 break-words">
+                    {evTitle}
+                  </h3>
+                  <p className="mt-3 text-[13px] leading-5 text-on-surface-variant line-clamp-1 break-words">
+                    {evExcerpt}
+                  </p>
+                  <Link
+                    className="mt-5 inline-flex max-w-full w-fit items-center justify-center rounded-md bg-[#00236f] px-4 py-2 text-center text-[11px] font-black uppercase leading-tight tracking-tight text-white transition-colors hover:bg-[#00236f]/90"
+                    href={ev.ctaHref}
+                  >
+                    {pickDbField(
+                      ev.ctaLabel,
+                      ev.ctaLabelKz ?? null,
+                      locale
+                    )}
+                  </Link>
+                </div>
+              </div>
+              <div className="hidden w-full shrink-0 overflow-hidden rounded-xl shadow-2xl group sm:block">
+                <div className="relative w-full aspect-[9/16] bg-surface-container">
                   <img
                     alt=""
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -128,7 +163,7 @@ export function HomeEventsBlock({
                   />
                 </div>
               </div>
-              <div className="w-full max-w-[320px] shrink-0 rounded-xl bg-surface-container-lowest p-5 sm:p-6 md:p-8 shadow-[0_10px_30px_-5px_rgba(25,28,30,0.08)] flex flex-col flex-1 min-w-0">
+              <div className="hidden w-full shrink-0 rounded-xl bg-surface-container-lowest p-5 sm:mt-4 sm:flex sm:p-6 md:p-8 shadow-[0_10px_30px_-5px_rgba(25,28,30,0.08)] flex-col flex-1 min-w-0">
                 <div className="mb-4">
                   <span className="text-3xl sm:text-4xl font-black leading-none block text-on-surface">
                     {ev.dayNum}

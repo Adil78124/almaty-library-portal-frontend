@@ -88,9 +88,16 @@ export async function listPublishedEventsPublic(options: {
       startsAt: { not: null, gte: now },
       branchId: null,
     }
-    return prisma.event.findMany({
+    const upcomingGlobal = await prisma.event.findMany({
       where,
       orderBy: [{ startsAt: "asc" }, { updatedAt: "desc" }],
+      take: options.limit,
+    })
+    if (upcomingGlobal.length > 0) return upcomingGlobal
+
+    return prisma.event.findMany({
+      where: publishedWhere,
+      orderBy: [{ startsAt: "desc" }, { updatedAt: "desc" }],
       take: options.limit,
     })
   }
@@ -105,4 +112,3 @@ export async function listPublishedEventsPublic(options: {
     take: options.limit,
   })
 }
-

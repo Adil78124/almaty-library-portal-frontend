@@ -85,8 +85,6 @@ async function main() {
     byKey.set(base.replace(/[^a-z0-9]/gi, "").toLowerCase(), f)
   }
 
-  await prisma.staff.deleteMany()
-
   for (let i = 0; i < PEOPLE.length; i++) {
     const p = PEOPLE[i]!
     const slug = `${fileKey(p.fullNameRu)}-${slugifyBase(p.branchRu)}`
@@ -114,8 +112,9 @@ async function main() {
 
     const imageUrl = filename ? `/structurpageimg/${filename}` : null
 
-    await prisma.staff.create({
-      data: {
+    await prisma.staff.upsert({
+      where: { slug },
+      create: {
         slug,
         fullNameRu: p.fullNameRu,
         fullNameKz: p.fullNameRu,
@@ -128,6 +127,18 @@ async function main() {
         imageUrl,
         sortOrder: i,
         isActive: true,
+      },
+      update: {
+        fullNameRu: p.fullNameRu,
+        fullNameKz: p.fullNameRu,
+        birthDate,
+        phone: normalizePhone(p.phone),
+        positionRu: "Р”РёСЂРµРєС‚РѕСЂ",
+        positionKz: "Р”РёСЂРµРєС‚РѕСЂ",
+        branchRu: p.branchRu,
+        branchKz: p.branchRu,
+        imageUrl,
+        sortOrder: i,
       },
     })
     console.log(`  ${p.fullNameRu} → ${imageUrl ?? "no photo"}`)
