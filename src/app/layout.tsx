@@ -3,6 +3,7 @@ import { cookies } from "next/headers"
 import { Inter } from "next/font/google"
 
 import { ConditionalHeader } from "@/components/conditional-header"
+import { SiteAnalyticsTracker } from "@/components/analytics/site-analytics-tracker"
 import { AppProviders } from "@/app/providers"
 import {
   appLocaleFromRequestValue,
@@ -58,6 +59,7 @@ export default async function RootLayout({
       >
         <AppProviders>
           <ConditionalHeader />
+          <SiteAnalyticsTracker />
           {children}
         </AppProviders>
       </body>

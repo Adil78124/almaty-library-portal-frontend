@@ -4,6 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
+  BarChart3,
   BookOpen,
   Building2,
   CalendarDays,
@@ -156,6 +157,7 @@ export function AdminAppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <NavLink href="/admin" label="Панель" icon={LayoutDashboard} />
+              <NavLink href="/admin/analytics" label="Статистика посещений" icon={BarChart3} />
               {isSuperAdmin && (
                 <SidebarMenuItem>
                   <SidebarMenuButton

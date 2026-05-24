@@ -21,31 +21,20 @@
     "db:backfill-about-kz": "npx tsx scripts/backfill-about-kz-translations.ts",
     "db:backfill-events-kz": "npx tsx scripts/backfill-events-kz-from-seed.ts",
     "db:backfill-news-kz": "npx tsx scripts/backfill-news-kz-from-seed.ts",
-    "db:backfill-demo-news-kz": "npx tsx scripts/backfill-demo-news-kz.ts"
-    ,
+    "db:backfill-demo-news-kz": "npx tsx scripts/backfill-demo-news-kz.ts",
     "db:audit-missing-kz": "npx tsx scripts/audit-missing-kz.ts",
-    "db:fill-missing-kz-fallback": "npx tsx scripts/fill-missing-kz-fallback.ts"
-    ,
-    "db:export-kz-translation-work": "npx tsx scripts/export-kz-translation-work.ts"
-    ,
-    "db:cleanup-test-content": "npx tsx scripts/cleanup-test-content.ts"
-    ,
-    "db:branches-kz-placeholders": "npx tsx scripts/branches-kz-placeholders.ts"
-    ,
-    "db:restore-simple-pages-official-kz": "npx tsx scripts/restore-simple-pages-official-kz.ts"
-    ,
-    "db:restore-about-official-kz": "npx tsx scripts/restore-about-official-kz.ts"
-    ,
-    "db:switch-home-local-history-to-db": "npx tsx scripts/switch-home-local-history-to-db.ts"
-    ,
+    "db:fill-missing-kz-fallback": "npx tsx scripts/fill-missing-kz-fallback.ts",
+    "db:export-kz-translation-work": "npx tsx scripts/export-kz-translation-work.ts",
+    "db:cleanup-test-content": "npx tsx scripts/cleanup-test-content.ts",
+    "db:branches-kz-placeholders": "npx tsx scripts/branches-kz-placeholders.ts",
+    "db:restore-simple-pages-official-kz": "npx tsx scripts/restore-simple-pages-official-kz.ts",
+    "db:restore-about-official-kz": "npx tsx scripts/restore-about-official-kz.ts",
+    "db:switch-home-local-history-to-db": "npx tsx scripts/switch-home-local-history-to-db.ts",
     "db:seed-local-history-people": "npx tsx scripts/seed-local-history-people.ts",
     "db:seed-local-history-2026": "npx tsx scripts/seed-local-history-2026.ts",
-    "db:import-kraevedenie-portraits": "npx tsx scripts/import-kraevedenie-portraits.ts"
-    ,
-    "db:switch-home-useful-links-to-db": "npx tsx scripts/switch-home-useful-links-to-db.ts"
-    ,
-    "db:import-home-useful-links": "npx tsx scripts/import-home-useful-links-to-db.ts"
-    ,
+    "db:import-kraevedenie-portraits": "npx tsx scripts/import-kraevedenie-portraits.ts",
+    "db:switch-home-useful-links-to-db": "npx tsx scripts/switch-home-useful-links-to-db.ts",
+    "db:import-home-useful-links": "npx tsx scripts/import-home-useful-links-to-db.ts",
     "db:import-jubilees-2026": "npx tsx scripts/import-jubilees-from-2026.ts",
     "db:import-jubilees-from-chunks": "npx tsx scripts/import-jubilees-from-chunks.ts",
     "db:import-structure-staff": "npx tsx scripts/import-structure-staff.ts",
@@ -61,6 +50,7 @@
     "next": "16.2.4",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "recharts": "^3.8.1",
     "tailwind-merge": "^3.5.0",
     "zod": "^4.4.1"
   },

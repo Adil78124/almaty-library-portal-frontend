@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useMemo } from "react"
 
 import { FooterSocialIcons } from "@/components/FooterSocialIcons"
+import { FooterVisitCounter } from "@/components/analytics/footer-visit-counter"
 import { useLocale } from "@/components/i18n/locale-provider"
 import { HEADER_NAV_LINKS } from "@/lib/i18n/header-nav"
 import { L, pickLocalized } from "@/lib/i18n/app-locale"
@@ -163,6 +164,9 @@ export function SiteFooterClient({ data, socialLinks }: Props) {
               {t(TERMS)}
             </a>
           </div>
+        </div>
+        <div className="pt-8">
+          <FooterVisitCounter />
         </div>
       </div>
     </footer>

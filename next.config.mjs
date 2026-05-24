@@ -82,6 +82,22 @@ const nextConfig = {
         destination: `${backend}/api/upload`,
       },
       {
+        source: "/api/analytics",
+        destination: `${backend}/api/analytics`,
+      },
+      {
+        source: "/api/analytics/:path*",
+        destination: `${backend}/api/analytics/:path*`,
+      },
+      {
+        source: "/api/admin/analytics",
+        destination: `${backend}/api/admin/analytics`,
+      },
+      {
+        source: "/api/admin/analytics/:path*",
+        destination: `${backend}/api/admin/analytics/:path*`,
+      },
+      {
         source: "/api/staff",
         destination: `${backend}/staff`,
       },
