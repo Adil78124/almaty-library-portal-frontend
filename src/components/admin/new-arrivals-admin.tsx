@@ -215,11 +215,7 @@ export function NewArrivalsAdmin() {
           const expanded = expandedId === r.id
           return (
             <div key={r.id} className="rounded-xl border bg-card p-4 md:p-6 space-y-4">
-              <button
-                type="button"
-                className="w-full text-left"
-                onClick={() => setExpandedId((prev) => (prev === r.id ? null : r.id))}
-              >
+              <div className="w-full text-left">
                 <div className="flex items-center gap-3">
                   <div className="text-sm text-muted-foreground shrink-0">Порядок</div>
                   <Input
@@ -236,11 +232,20 @@ export function NewArrivalsAdmin() {
                     />
                     Показывать на сайте
                   </label>
-                  <div className="ml-auto text-xs text-muted-foreground">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="ml-auto"
+                    aria-expanded={expanded}
+                    onClick={() =>
+                      setExpandedId((prev) => (prev === r.id ? null : r.id))
+                    }
+                  >
                     {expanded ? "Свернуть" : "Развернуть"}
-                  </div>
+                  </Button>
                 </div>
-              </button>
+              </div>
 
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="text-sm font-medium truncate">

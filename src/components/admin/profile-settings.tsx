@@ -37,6 +37,14 @@ type UserRow = {
   branchId: string | null
 }
 
+type UserDraft = {
+  login: string
+  email: string
+  name: string
+  branchId: string
+  password: string
+}
+
 type MeRow = {
   id: string
   login: string | null
@@ -54,6 +62,7 @@ export function ProfileSettings() {
   const [loadError, setLoadError] = useState<string | null>(null)
   const [profileError, setProfileError] = useState<string | null>(null)
   const [adminFormError, setAdminFormError] = useState<string | null>(null)
+  const [userActionError, setUserActionError] = useState<string | null>(null)
 
   const [currentPassword, setCurrentPassword] = useState("")
   const [login, setLogin] = useState("")
@@ -64,6 +73,8 @@ export function ProfileSettings() {
 
   const [branches, setBranches] = useState<BranchRow[]>([])
   const [users, setUsers] = useState<UserRow[]>([])
+  const [userDrafts, setUserDrafts] = useState<Record<string, UserDraft>>({})
+  const [savingUserId, setSavingUserId] = useState<string | null>(null)
   const [adminEmail, setAdminEmail] = useState("")
   const [adminLogin, setAdminLogin] = useState("")
   const [adminName, setAdminName] = useState("")
@@ -72,6 +83,41 @@ export function ProfileSettings() {
   const [creating, setCreating] = useState(false)
   const [me, setMe] = useState<MeRow | null>(null)
   const [meLoadError, setMeLoadError] = useState<string | null>(null)
+
+  function resetUserDrafts(list: UserRow[]) {
+    const next: Record<string, UserDraft> = {}
+    for (const user of list) {
+      next[user.id] = {
+        login: user.login ?? "",
+        email: user.email,
+        name: user.name,
+        branchId: user.branchId ?? "",
+        password: "",
+      }
+    }
+    setUserDrafts(next)
+  }
+
+  async function readError(res: Response): Promise<string> {
+    const data = (await res.json().catch(() => ({}))) as {
+      error?: string
+      issues?: { path: string; message: string }[]
+    }
+    return (
+      data.issues?.map((i) => i.message).join(" ").trim() ||
+      data.error ||
+      `HTTP ${res.status}`
+    )
+  }
+
+  async function loadUsers() {
+    const uRes = await fetch("/users", { credentials: "include" })
+    if (!uRes.ok) throw new Error(await readError(uRes))
+    const list = (await uRes.json()) as UserRow[]
+    const safeList = Array.isArray(list) ? list : []
+    setUsers(safeList)
+    resetUserDrafts(safeList)
+  }
 
   useEffect(() => {
     void (async () => {
@@ -111,7 +157,9 @@ export function ProfileSettings() {
         }
         if (uRes.ok) {
           const data = (await uRes.json()) as UserRow[]
-          setUsers(Array.isArray(data) ? data : [])
+          const safeList = Array.isArray(data) ? data : []
+          setUsers(safeList)
+          resetUserDrafts(safeList)
         } else {
           setLoadError("Не удалось загрузить пользователей")
         }
@@ -196,15 +244,91 @@ export function ProfileSettings() {
       const uRes = await fetch("/users", { credentials: "include" })
       if (uRes.ok) {
         const list = (await uRes.json()) as UserRow[]
-        setUsers(Array.isArray(list) ? list : [])
+        const safeList = Array.isArray(list) ? list : []
+        setUsers(safeList)
+        resetUserDrafts(safeList)
       }
     } finally {
       setCreating(false)
     }
   }
 
+  function setUserDraftField(id: string, key: keyof UserDraft, value: string) {
+    setUserDrafts((prev) => ({
+      ...prev,
+      [id]: {
+        ...(prev[id] ?? {
+          login: "",
+          email: "",
+          name: "",
+          branchId: "",
+          password: "",
+        }),
+        [key]: value,
+      },
+    }))
+  }
+
+  async function saveBranchAdmin(user: UserRow) {
+    const draft = userDrafts[user.id]
+    if (!draft || user.role !== "ADMIN") return
+    if (!draft.branchId) {
+      setUserActionError("Р’С‹Р±РµСЂРёС‚Рµ С„РёР»РёР°Р» РґР»СЏ Р°РґРјРёРЅР°.")
+      return
+    }
+
+    setSavingUserId(user.id)
+    setUserActionError(null)
+    try {
+      const payload: Record<string, string | null> = {
+        name: draft.name.trim(),
+        email: draft.email.trim(),
+        login: draft.login.trim() || null,
+        branchId: draft.branchId,
+      }
+      if (draft.password.trim()) payload.password = draft.password
+
+      const res = await fetch(`/users/admin/${encodeURIComponent(user.id)}`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+      if (!res.ok) {
+        setUserActionError(await readError(res))
+        return
+      }
+      toast.success("РЈС‡С‘С‚РЅР°СЏ Р·Р°РїРёСЃСЊ РѕР±РЅРѕРІР»РµРЅР°")
+      await loadUsers()
+    } finally {
+      setSavingUserId(null)
+    }
+  }
+
+  async function deleteBranchAdmin(user: UserRow) {
+    if (user.role !== "ADMIN") return
+    if (!window.confirm(`РЈРґР°Р»РёС‚СЊ Р°РґРјРёРЅР° ${user.name}?`)) return
+
+    setSavingUserId(user.id)
+    setUserActionError(null)
+    try {
+      const res = await fetch(`/users/admin/${encodeURIComponent(user.id)}`, {
+        method: "DELETE",
+        credentials: "include",
+      })
+      if (!res.ok) {
+        setUserActionError(await readError(res))
+        return
+      }
+      toast.success("РђРґРјРёРЅ С„РёР»РёР°Р»Р° СѓРґР°Р»С‘РЅ")
+      await loadUsers()
+    } finally {
+      setSavingUserId(null)
+    }
+  }
+
   return (
-    <div className="mx-auto max-w-3xl space-y-8">
+    <div className="mx-auto max-w-6xl space-y-8">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Профиль</h1>
         <p className="text-muted-foreground mt-1 text-sm leading-relaxed">
@@ -413,6 +537,7 @@ export function ProfileSettings() {
                   <Input
                     id="adminPassword"
                     type="password"
+                    autoComplete="new-password"
                     required
                     minLength={6}
                     value={adminPassword}
@@ -434,6 +559,10 @@ export function ProfileSettings() {
               </CardDescription>
             </CardHeader>
             <CardContent>
+              {userActionError && (
+                <p className="text-destructive mb-4 text-sm">{userActionError}</p>
+              )}
+              <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -441,6 +570,8 @@ export function ProfileSettings() {
                     <TableHead>Роль</TableHead>
                     <TableHead>Логин</TableHead>
                     <TableHead>Email</TableHead>
+                    <TableHead>Password</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                     <TableHead>Филиал</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -448,16 +579,30 @@ export function ProfileSettings() {
                   {users.length === 0 ? (
                     <TableRow>
                       <TableCell
-                        colSpan={5}
+                        colSpan={7}
                         className="text-muted-foreground py-8 text-center"
                       >
                         Нет данных
                       </TableCell>
                     </TableRow>
                   ) : (
-                    users.map((u) => (
+                    users.map((u) => {
+                      const draft = userDrafts[u.id]
+                      const editable = u.role === "ADMIN" && draft
+                      return (
                       <TableRow key={u.id}>
-                        <TableCell className="font-medium">{u.name}</TableCell>
+                        <TableCell className="min-w-[160px]">
+                          {editable ? (
+                            <Input
+                              value={draft.name}
+                              onChange={(e) =>
+                                setUserDraftField(u.id, "name", e.target.value)
+                              }
+                            />
+                          ) : (
+                            <span className="font-medium">{u.name}</span>
+                          )}
+                        </TableCell>
                         <TableCell>{u.role}</TableCell>
                         <TableCell className="font-mono text-xs">
                           {u.login ?? "—"}
@@ -469,11 +614,150 @@ export function ProfileSettings() {
                               u.branchId
                             : "—"}
                         </TableCell>
+                        <TableCell className="min-w-[170px]">
+                          {editable ? (
+                            <Input
+                              type="password"
+                              autoComplete="new-password"
+                              minLength={6}
+                              value={draft.password}
+                              onChange={(e) =>
+                                setUserDraftField(u.id, "password", e.target.value)
+                              }
+                              placeholder="не менять"
+                            />
+                          ) : (
+                            <span className="text-muted-foreground text-xs">вЂ”</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {editable ? (
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                disabled={savingUserId === u.id}
+                                onClick={() => void saveBranchAdmin(u)}
+                              >
+                                Сохранить
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                disabled={savingUserId === u.id}
+                                onClick={() => void deleteBranchAdmin(u)}
+                              >
+                                Удалить
+                              </Button>
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground text-xs">вЂ”</span>
+                          )}
+                        </TableCell>
                       </TableRow>
-                    ))
+                      )
+                    })
                   )}
                 </TableBody>
               </Table>
+              </div>
+
+              <div className="mt-6 grid gap-4">
+                {users
+                  .filter((u) => u.role === "ADMIN")
+                  .map((u) => {
+                    const draft = userDrafts[u.id]
+                    if (!draft) return null
+                    return (
+                      <div key={u.id} className="rounded-lg border p-4">
+                        <div className="grid gap-3 md:grid-cols-2">
+                          <div className="space-y-1">
+                            <Label>Имя</Label>
+                            <Input
+                              value={draft.name}
+                              onChange={(e) =>
+                                setUserDraftField(u.id, "name", e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label>Email</Label>
+                            <Input
+                              type="email"
+                              value={draft.email}
+                              onChange={(e) =>
+                                setUserDraftField(u.id, "email", e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label>Логин</Label>
+                            <Input
+                              value={draft.login}
+                              onChange={(e) =>
+                                setUserDraftField(u.id, "login", e.target.value)
+                              }
+                              placeholder="Можно оставить пустым"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label>Филиал</Label>
+                            <select
+                              className={cn(
+                                "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs",
+                                "outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                              )}
+                              value={draft.branchId}
+                              onChange={(e) =>
+                                setUserDraftField(u.id, "branchId", e.target.value)
+                              }
+                            >
+                              <option value="">Выберите филиал</option>
+                              {branches.map((b) => (
+                                <option key={b.id} value={b.id}>
+                                  {b.titleRu}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="space-y-1 md:col-span-2">
+                            <Label>Новый пароль</Label>
+                            <Input
+                              type="password"
+                              autoComplete="new-password"
+                              minLength={6}
+                              value={draft.password}
+                              onChange={(e) =>
+                                setUserDraftField(u.id, "password", e.target.value)
+                              }
+                              placeholder="Оставьте пустым, если пароль не меняется"
+                            />
+                          </div>
+                        </div>
+                        <div className="mt-4 flex justify-end gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            disabled={savingUserId === u.id}
+                            onClick={() => void saveBranchAdmin(u)}
+                          >
+                            Сохранить
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            disabled={savingUserId === u.id}
+                            onClick={() => void deleteBranchAdmin(u)}
+                          >
+                            Удалить
+                          </Button>
+                        </div>
+                      </div>
+                    )
+                  })}
+              </div>
             </CardContent>
           </Card>
         </>

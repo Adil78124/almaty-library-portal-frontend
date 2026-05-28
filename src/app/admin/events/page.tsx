@@ -2,6 +2,7 @@ import type { Prisma } from "@prisma/client"
 import Link from "next/link"
 
 import { AdminContentScopeFilter } from "@/components/admin/content-scope-filter"
+import { EventDeleteButton } from "@/components/admin/events/event-delete-button"
 import { buttonVariants } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import {
@@ -123,7 +124,12 @@ export default async function AdminEventsListPage({
                       >
                         Редактировать
                       </Link>
-                      <form action={`/api/events/${r.id}`} method="post">
+                      <EventDeleteButton
+                        id={r.id}
+                        slug={r.slug}
+                        title={r.titleRu}
+                      />
+                      <form action={`/api/events/${r.id}`} method="post" hidden>
                         {/* delete кнопка — через fetch будет добавлена позднее, чтобы не расширять UI лишним */}
                       </form>
                     </div>

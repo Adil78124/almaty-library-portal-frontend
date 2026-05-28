@@ -223,18 +223,7 @@ export function DigitalLibraryAdmin() {
           const author = (b.authorRu ?? "").trim() || "(без автора)"
           return (
             <div key={b.id} className="rounded-xl border bg-card p-4 md:p-6 space-y-4">
-              <div
-                role="button"
-                tabIndex={0}
-                className="w-full text-left"
-                onClick={() => setExpandedId((prev) => (prev === b.id ? null : b.id))}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault()
-                    setExpandedId((prev) => (prev === b.id ? null : b.id))
-                  }
-                }}
-              >
+              <div className="w-full text-left">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-3">
                     <div className="text-sm text-muted-foreground shrink-0">Порядок</div>
@@ -288,16 +277,31 @@ export function DigitalLibraryAdmin() {
                     >
                       Удалить
                     </Button>
-                    <div className="text-sm text-muted-foreground ml-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      aria-expanded={expanded}
+                      onClick={() =>
+                        setExpandedId((prev) => (prev === b.id ? null : b.id))
+                      }
+                    >
                       {expanded ? "Свернуть" : "Развернуть"}
-                    </div>
+                    </Button>
                   </div>
                 </div>
 
-                <div className="mt-3">
+                <button
+                  type="button"
+                  className="mt-3 block w-full text-left"
+                  aria-expanded={expanded}
+                  onClick={() =>
+                    setExpandedId((prev) => (prev === b.id ? null : b.id))
+                  }
+                >
                   <div className="font-semibold">{title}</div>
                   <div className="text-sm text-muted-foreground">{author}</div>
-                </div>
+                </button>
               </div>
 
               {expanded ? (

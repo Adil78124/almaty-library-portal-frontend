@@ -72,6 +72,10 @@ export async function updateEvent(id: string, body: Record<string, unknown>) {
   })
 }
 
+export async function deleteEvent(id: string) {
+  return fetch(`/api/events/${id}`, { method: "DELETE", ...adminFetchInit })
+}
+
 export async function patchSiteSettingsHome(body: Record<string, unknown>) {
   return fetch("/api/site-settings", {
     method: "PATCH",

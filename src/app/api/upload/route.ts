@@ -5,11 +5,7 @@ import path from "node:path"
 import { jsonError } from "@/lib/api/http"
 import { getAdminSession } from "@/lib/auth/require-admin"
 import { prisma } from "@/lib/prisma"
-
-function safeName(name: string): string {
-  const base = (name || "file").replaceAll("\\", "/").split("/").pop() || "file"
-  return base.replace(/[^\p{L}\p{N}._-]+/gu, "_").slice(0, 80) || "file"
-}
+import { safeUploadName, uploadsRootDir } from "@/lib/uploads"
 
 export async function POST(request: Request) {
   const session = await getAdminSession()
@@ -39,10 +35,10 @@ export async function POST(request: Request) {
   }
 
   const bytes = Buffer.from(await file.arrayBuffer())
-  const uploadsDir = path.join(process.cwd(), "public", "uploads")
+  const uploadsDir = uploadsRootDir()
   await mkdir(uploadsDir, { recursive: true })
 
-  const filename = `${Date.now()}-${safeName(file.name)}`
+  const filename = `${Date.now()}-${safeUploadName(file.name)}`
   const abs = path.join(uploadsDir, filename)
   await writeFile(abs, bytes)
 
@@ -52,7 +48,7 @@ export async function POST(request: Request) {
   await prisma.mediaAsset.create({
     data: {
       url,
-      filename: safeName(file.name),
+      filename: safeUploadName(file.name),
       mimeType: file.type,
     },
   })

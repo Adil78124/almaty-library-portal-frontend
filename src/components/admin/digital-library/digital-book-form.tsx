@@ -33,7 +33,7 @@ export function DigitalBookForm() {
   const [fileUrl, setFileUrl] = useState("")
   const [externalUrl, setExternalUrl] = useState("")
   const [isActive, setIsActive] = useState(true)
-  const [order, setOrder] = useState("0")
+  const [order, setOrder] = useState("1")
   const preset = searchParams.get("preset")
   const [alsoNewArrivals, setAlsoNewArrivals] = useState(preset === "new-arrivals")
 
@@ -54,7 +54,7 @@ export function DigitalBookForm() {
         fileUrl: fileUrl.trim() || null,
         externalUrl: externalUrl.trim() || null,
         isActive,
-        order: Number(order) || 0,
+        order: Number(order) || 1,
       })
 
       const data = (await res.json().catch(() => ({}))) as {
@@ -74,7 +74,7 @@ export function DigitalBookForm() {
 
       // Дополнительные места (не нарушая существующие модели).
       if (alsoNewArrivals) {
-        const maxOrder = Number(order) || 0
+        const maxOrder = Number(order) || 1
         const detailUrl = (externalUrl || fileUrl || "").trim() || null
         const r2 = await createNewArrival({
           title: titleRu.trim(),

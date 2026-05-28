@@ -32,6 +32,27 @@ export async function POST(request: Request) {
   if (!parsed.success) {
     return jsonValidationError(parsed.error)
   }
-  const item = await prisma.newArrival.create({ data: parsed.data })
+  const item = await prisma.$transaction(async (tx) => {
+    const existing = await tx.newArrival.findMany({
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }, { id: "asc" }],
+      select: { id: true },
+    })
+
+    await Promise.all(
+      existing.map((arrival, index) =>
+        tx.newArrival.update({
+          where: { id: arrival.id },
+          data: { sortOrder: index + 2 },
+        })
+      )
+    )
+
+    return tx.newArrival.create({
+      data: {
+        ...parsed.data,
+        sortOrder: 1,
+      },
+    })
+  })
   return NextResponse.json(item, { status: 201 })
 }

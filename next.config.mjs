@@ -78,10 +78,6 @@ const nextConfig = {
         destination: `${backend}/api/site-settings`,
       },
       {
-        source: "/api/upload",
-        destination: `${backend}/api/upload`,
-      },
-      {
         source: "/api/analytics",
         destination: `${backend}/api/analytics`,
       },

@@ -33,7 +33,28 @@ export async function POST(request: Request) {
   const parsed = digitalBookCreateSchema.safeParse(raw)
   if (!parsed.success) return jsonValidationError(parsed.error)
 
-  const item = await prisma.digitalBook.create({ data: parsed.data })
+  const item = await prisma.$transaction(async (tx) => {
+    const existing = await tx.digitalBook.findMany({
+      orderBy: [{ order: "asc" }, { createdAt: "asc" }, { id: "asc" }],
+      select: { id: true },
+    })
+
+    await Promise.all(
+      existing.map((book, index) =>
+        tx.digitalBook.update({
+          where: { id: book.id },
+          data: { order: index + 2 },
+        })
+      )
+    )
+
+    return tx.digitalBook.create({
+      data: {
+        ...parsed.data,
+        order: 1,
+      },
+    })
+  })
   return NextResponse.json(item, { status: 201 })
 }
 

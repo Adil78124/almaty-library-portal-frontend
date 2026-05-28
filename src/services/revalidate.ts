@@ -46,6 +46,10 @@ export function pathsAfterEventMutation(item: { slug: string; id: string }): str
   ]
 }
 
+export function pathsAfterEventDelete(item: { slug: string; id: string }): string[] {
+  return ["/", "/branches", "/events", `/events/${item.slug}`, `/events/${item.id}`]
+}
+
 export function pathsAfterSiteSettingsHomePatch(): string[] {
   return ["/"]
 }
