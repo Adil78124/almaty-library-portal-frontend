@@ -32,6 +32,12 @@ function changed(a: Draft, b: Draft): boolean {
   return JSON.stringify(a) !== JSON.stringify(b)
 }
 
+function orderRows(rows: NewArrivalRow[]): NewArrivalRow[] {
+  return [...rows]
+    .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
+    .map((row, index) => ({ ...row, sortOrder: index + 1 }))
+}
+
 async function readApiError(r: Response): Promise<string> {
   try {
     const data = (await r.json()) as any
@@ -58,9 +64,10 @@ export function NewArrivalsAdmin() {
     const r = await fetch(`/api/new-arrivals`, { cache: "no-store" })
     if (!r.ok) throw new Error(await readApiError(r))
     const data = (await r.json()) as NewArrivalRow[]
-    setRows(data)
+    const ordered = Array.isArray(data) ? orderRows(data) : []
+    setRows(ordered)
     const nextDrafts: Record<string, Draft> = {}
-    for (const it of data) {
+    for (const it of ordered) {
       nextDrafts[it.id] = {
         id: it.id,
         title: it.title,

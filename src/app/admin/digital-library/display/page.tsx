@@ -22,7 +22,7 @@ export default async function AdminDigitalLibraryDisplaySettingsPage() {
         <h1 className="text-2xl font-semibold tracking-tight">Настройки отображения</h1>
         <p className="text-muted-foreground mt-1 text-sm max-w-xl leading-relaxed">
           Настройки вывода электронной библиотеки на сайте (включая блок на главной).
-          Создание и редактирование книг — в «Все ресурсы».
+          Создание и редактирование ресурсов — в разделе «Электронная библиотека».
         </p>
       </div>
 

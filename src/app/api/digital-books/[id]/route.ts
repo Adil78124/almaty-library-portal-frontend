@@ -7,6 +7,21 @@ import { digitalBookUpdateSchema } from "@/lib/validators/content"
 
 type Params = { params: Promise<{ id: string }> }
 
+async function normalizeDigitalBookOrder() {
+  const items = await prisma.digitalBook.findMany({
+    orderBy: [{ order: "asc" }, { createdAt: "asc" }, { id: "asc" }],
+    select: { id: true },
+  })
+  await Promise.all(
+    items.map((item, index) =>
+      prisma.digitalBook.update({
+        where: { id: item.id },
+        data: { order: index + 1 },
+      })
+    )
+  )
+}
+
 export async function GET(_request: Request, { params }: Params) {
   const { id } = await params
   const item = await prisma.digitalBook.findUnique({ where: { id } })
@@ -40,9 +55,9 @@ export async function DELETE(_request: Request, { params }: Params) {
   const { id } = await params
   try {
     await prisma.digitalBook.delete({ where: { id } })
+    await normalizeDigitalBookOrder()
     return new NextResponse(null, { status: 204 })
   } catch {
     return jsonError("Не найдено", 404)
   }
 }
-

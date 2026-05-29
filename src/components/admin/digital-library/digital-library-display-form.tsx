@@ -63,7 +63,7 @@ export function DigitalLibraryDisplayForm({ initial }: { initial: Initial }) {
       <h2 className="text-lg font-semibold tracking-tight">Настройки отображения</h2>
       <p className="text-muted-foreground text-sm leading-relaxed">
         Эти параметры задают блок «Электронная библиотека» на главной странице сайта.
-        Сами книги создаются только в «Все ресурсы».
+        Сами ресурсы создаются в разделе «Электронная библиотека».
       </p>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">

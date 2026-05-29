@@ -322,8 +322,8 @@ export function AdminAppSidebar() {
                   />
                   {elibOpen ? (
                     <SidebarMenuSub>
-                      <SubNavLink href="/admin/digital-library" label="Все ресурсы" />
-                      <SubNavLink href="/admin/digital-library/new" label="Добавить книгу" />
+                      <SubNavLink href="/admin/digital-library" label="Электронная библиотека" />
+                      <SubNavLink href="/admin/digital-library/new" label="Добавить ресурс" />
                       <SubNavLink href="/admin/digital-library/new-arrivals" label="Новые поступления" />
                       <SubNavLink
                         href="/admin/digital-library/display"

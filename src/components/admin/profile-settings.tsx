@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState, type FormEvent } from "react"
 import { useRouter } from "next/navigation"
 
 import { useAdminShellSession } from "@/components/admin/admin-session-context"
@@ -16,14 +16,6 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 
 type BranchRow = { id: string; titleRu: string }
@@ -45,13 +37,26 @@ type UserDraft = {
   password: string
 }
 
-type MeRow = {
-  id: string
-  login: string | null
-  email: string
-  name: string
-  role: string
-  branchId: string | null
+type MeRow = UserRow
+
+function emptyDraft(): UserDraft {
+  return {
+    login: "",
+    email: "",
+    name: "",
+    branchId: "",
+    password: "",
+  }
+}
+
+function draftFromUser(user: UserRow): UserDraft {
+  return {
+    login: user.login ?? "",
+    email: user.email,
+    name: user.name,
+    branchId: user.branchId ?? "",
+    password: "",
+  }
 }
 
 export function ProfileSettings() {
@@ -74,26 +79,43 @@ export function ProfileSettings() {
   const [branches, setBranches] = useState<BranchRow[]>([])
   const [users, setUsers] = useState<UserRow[]>([])
   const [userDrafts, setUserDrafts] = useState<Record<string, UserDraft>>({})
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
   const [savingUserId, setSavingUserId] = useState<string | null>(null)
+
+  const [createOpen, setCreateOpen] = useState(false)
   const [adminEmail, setAdminEmail] = useState("")
   const [adminLogin, setAdminLogin] = useState("")
   const [adminName, setAdminName] = useState("")
   const [adminPassword, setAdminPassword] = useState("")
   const [adminBranchId, setAdminBranchId] = useState("")
   const [creating, setCreating] = useState(false)
+
   const [me, setMe] = useState<MeRow | null>(null)
   const [meLoadError, setMeLoadError] = useState<string | null>(null)
+
+  const branchAdmins = useMemo(
+    () => users.filter((user) => user.role === "ADMIN"),
+    [users]
+  )
+  const superAdmins = useMemo(
+    () => users.filter((user) => user.role === "SUPER_ADMIN"),
+    [users]
+  )
+  const selectedUser = useMemo(
+    () => branchAdmins.find((user) => user.id === selectedUserId) ?? null,
+    [branchAdmins, selectedUserId]
+  )
+  const selectedDraft = selectedUserId ? userDrafts[selectedUserId] : undefined
+
+  function branchName(branchId: string | null) {
+    if (!branchId) return "Филиал не выбран"
+    return branches.find((branch) => branch.id === branchId)?.titleRu ?? branchId
+  }
 
   function resetUserDrafts(list: UserRow[]) {
     const next: Record<string, UserDraft> = {}
     for (const user of list) {
-      next[user.id] = {
-        login: user.login ?? "",
-        email: user.email,
-        name: user.name,
-        branchId: user.branchId ?? "",
-        password: "",
-      }
+      next[user.id] = draftFromUser(user)
     }
     setUserDrafts(next)
   }
@@ -104,19 +126,24 @@ export function ProfileSettings() {
       issues?: { path: string; message: string }[]
     }
     return (
-      data.issues?.map((i) => i.message).join(" ").trim() ||
+      data.issues?.map((issue) => issue.message).join(" ").trim() ||
       data.error ||
       `HTTP ${res.status}`
     )
   }
 
   async function loadUsers() {
-    const uRes = await fetch("/users", { credentials: "include" })
-    if (!uRes.ok) throw new Error(await readError(uRes))
-    const list = (await uRes.json()) as UserRow[]
+    const res = await fetch("/users", { credentials: "include" })
+    if (!res.ok) throw new Error(await readError(res))
+    const list = (await res.json()) as UserRow[]
     const safeList = Array.isArray(list) ? list : []
     setUsers(safeList)
     resetUserDrafts(safeList)
+    setSelectedUserId((prev) =>
+      prev && safeList.some((user) => user.id === prev && user.role === "ADMIN")
+        ? prev
+        : null
+    )
   }
 
   useEffect(() => {
@@ -145,23 +172,25 @@ export function ProfileSettings() {
     void (async () => {
       try {
         setLoadError(null)
-        const [bRes, uRes] = await Promise.all([
+        const [branchesRes, usersRes] = await Promise.all([
           fetch("/api/branches", { credentials: "include" }),
           fetch("/users", { credentials: "include" }),
         ])
-        if (bRes.ok) {
-          const data = (await bRes.json()) as BranchRow[]
-          setBranches(Array.isArray(data) ? data : [])
-        } else {
+
+        if (!branchesRes.ok) {
           setLoadError("Не удалось загрузить филиалы")
+        } else {
+          const data = (await branchesRes.json()) as BranchRow[]
+          setBranches(Array.isArray(data) ? data : [])
         }
-        if (uRes.ok) {
-          const data = (await uRes.json()) as UserRow[]
+
+        if (!usersRes.ok) {
+          setLoadError("Не удалось загрузить пользователей")
+        } else {
+          const data = (await usersRes.json()) as UserRow[]
           const safeList = Array.isArray(data) ? data : []
           setUsers(safeList)
           resetUserDrafts(safeList)
-        } else {
-          setLoadError("Не удалось загрузить пользователей")
         }
       } catch {
         setLoadError("Ошибка сети при загрузке данных")
@@ -169,7 +198,7 @@ export function ProfileSettings() {
     })()
   }, [isSuperAdmin])
 
-  async function saveProfile(e: React.FormEvent) {
+  async function saveProfile(e: FormEvent) {
     e.preventDefault()
     setSaving(true)
     setProfileError(null)
@@ -186,15 +215,8 @@ export function ProfileSettings() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       })
-      const data = (await res.json().catch(() => ({}))) as {
-        error?: string
-        issues?: { path: string; message: string }[]
-      }
       if (!res.ok) {
-        const issueText = data.issues?.map((i) => i.message).join(" ").trim()
-        setProfileError(
-          issueText || data.error || "Не удалось сохранить"
-        )
+        setProfileError(await readError(res))
         return
       }
       toast.success("Профиль обновлён")
@@ -209,7 +231,7 @@ export function ProfileSettings() {
     }
   }
 
-  async function createBranchAdmin(e: React.FormEvent) {
+  async function createBranchAdmin(e: FormEvent) {
     e.preventDefault()
     setAdminFormError(null)
     if (!adminBranchId) {
@@ -230,24 +252,23 @@ export function ProfileSettings() {
           branchId: adminBranchId,
         }),
       })
-      const data = (await res.json().catch(() => ({}))) as { error?: string }
+      const data = (await res.json().catch(() => ({}))) as UserRow & {
+        error?: string
+      }
       if (!res.ok) {
         setAdminFormError(data.error ?? "Не удалось создать учётную запись")
         return
       }
+
       toast.success("Администратор филиала создан")
       setAdminEmail("")
       setAdminLogin("")
       setAdminName("")
       setAdminPassword("")
       setAdminBranchId("")
-      const uRes = await fetch("/users", { credentials: "include" })
-      if (uRes.ok) {
-        const list = (await uRes.json()) as UserRow[]
-        const safeList = Array.isArray(list) ? list : []
-        setUsers(safeList)
-        resetUserDrafts(safeList)
-      }
+      setCreateOpen(false)
+      await loadUsers()
+      if (data.id) setSelectedUserId(data.id)
     } finally {
       setCreating(false)
     }
@@ -257,15 +278,17 @@ export function ProfileSettings() {
     setUserDrafts((prev) => ({
       ...prev,
       [id]: {
-        ...(prev[id] ?? {
-          login: "",
-          email: "",
-          name: "",
-          branchId: "",
-          password: "",
-        }),
+        ...(prev[id] ?? emptyDraft()),
         [key]: value,
       },
+    }))
+  }
+
+  function resetSelectedDraft() {
+    if (!selectedUser) return
+    setUserDrafts((prev) => ({
+      ...prev,
+      [selectedUser.id]: draftFromUser(selectedUser),
     }))
   }
 
@@ -273,7 +296,7 @@ export function ProfileSettings() {
     const draft = userDrafts[user.id]
     if (!draft || user.role !== "ADMIN") return
     if (!draft.branchId) {
-      setUserActionError("Р’С‹Р±РµСЂРёС‚Рµ С„РёР»РёР°Р» РґР»СЏ Р°РґРјРёРЅР°.")
+      setUserActionError("Выберите филиал для администратора.")
       return
     }
 
@@ -298,7 +321,7 @@ export function ProfileSettings() {
         setUserActionError(await readError(res))
         return
       }
-      toast.success("РЈС‡С‘С‚РЅР°СЏ Р·Р°РїРёСЃСЊ РѕР±РЅРѕРІР»РµРЅР°")
+      toast.success("Учётная запись обновлена")
       await loadUsers()
     } finally {
       setSavingUserId(null)
@@ -307,7 +330,7 @@ export function ProfileSettings() {
 
   async function deleteBranchAdmin(user: UserRow) {
     if (user.role !== "ADMIN") return
-    if (!window.confirm(`РЈРґР°Р»РёС‚СЊ Р°РґРјРёРЅР° ${user.name}?`)) return
+    if (!window.confirm(`Удалить администратора ${user.name}?`)) return
 
     setSavingUserId(user.id)
     setUserActionError(null)
@@ -320,8 +343,9 @@ export function ProfileSettings() {
         setUserActionError(await readError(res))
         return
       }
-      toast.success("РђРґРјРёРЅ С„РёР»РёР°Р»Р° СѓРґР°Р»С‘РЅ")
+      toast.success("Администратор филиала удалён")
       await loadUsers()
+      setSelectedUserId((prev) => (prev === user.id ? null : prev))
     } finally {
       setSavingUserId(null)
     }
@@ -331,26 +355,24 @@ export function ProfileSettings() {
     <div className="mx-auto max-w-6xl space-y-8">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Профиль</h1>
-        <p className="text-muted-foreground mt-1 text-sm leading-relaxed">
-          Смена логина, email и пароля. Для любых изменений укажите текущий
-          пароль.
+        <p className="text-muted-foreground mt-1 max-w-3xl text-sm leading-relaxed">
+          Здесь меняются данные текущего пользователя. Супер-админ также может
+          создавать, редактировать и удалять администраторов филиалов.
         </p>
       </div>
 
-      {meLoadError && (
-        <p className="text-destructive text-sm">{meLoadError}</p>
-      )}
-      {me && (
+      {meLoadError ? <p className="text-destructive text-sm">{meLoadError}</p> : null}
+
+      {me ? (
         <Card>
           <CardHeader>
             <CardTitle>Сейчас в системе</CardTitle>
             <CardDescription>
-              Данные учётной записи (без пароля). Имя и email отображаются в
-              шапке админки после входа.
+              Эти данные используются в админке после входа.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <dl className="grid gap-3 text-sm sm:grid-cols-2">
+            <dl className="grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
               <div>
                 <dt className="text-muted-foreground">Имя</dt>
                 <dd className="font-medium">{me.name || "—"}</dd>
@@ -361,7 +383,7 @@ export function ProfileSettings() {
               </div>
               <div>
                 <dt className="text-muted-foreground">Логин</dt>
-                <dd className="font-mono text-xs">{me.login ?? "—"}</dd>
+                <dd className="break-all font-mono text-xs">{me.login ?? "—"}</dd>
               </div>
               <div>
                 <dt className="text-muted-foreground">Email</dt>
@@ -370,21 +392,21 @@ export function ProfileSettings() {
             </dl>
           </CardContent>
         </Card>
-      )}
+      ) : null}
 
       <Card>
         <CardHeader>
           <CardTitle>Мои данные</CardTitle>
           <CardDescription>
-            Логин и email используются для входа. После сохранения сессия
-            обновится автоматически.
+            Для сохранения изменений укажите текущий пароль. Пустые поля не
+            меняют текущие значения.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={(e) => void saveProfile(e)} className="space-y-4">
-            {profileError && (
+            {profileError ? (
               <p className="text-destructive text-sm">{profileError}</p>
-            )}
+            ) : null}
             <div className="space-y-2">
               <Label htmlFor="currentPassword">Текущий пароль</Label>
               <Input
@@ -398,22 +420,17 @@ export function ProfileSettings() {
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="login">Новый логин (необязательно)</Label>
+                <Label htmlFor="login">Новый логин</Label>
                 <Input
                   id="login"
                   autoComplete="username"
                   value={login}
                   onChange={(e) => setLogin(e.target.value)}
-                  placeholder="например: checkadmin"
+                  placeholder="Оставьте пустым, если не меняете"
                 />
-                <p className="text-muted-foreground text-xs leading-relaxed">
-                  Отдельное имя для входа: буквы, цифры, точка или дефис,{" "}
-                  <strong>без символа @</strong>. Чтобы сменить почту, заполните
-                  поле «Новый email» справа.
-                </p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Новый email (необязательно)</Label>
+                <Label htmlFor="email">Новый email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -424,344 +441,364 @@ export function ProfileSettings() {
                 />
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="name">Имя (необязательно)</Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Как отображать в интерфейсе"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="newPassword">Новый пароль (необязательно)</Label>
-              <Input
-                id="newPassword"
-                type="password"
-                autoComplete="new-password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Не короче 6 символов"
-              />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="name">Имя</Label>
+                <Input
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Как отображать в интерфейсе"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="newPassword">Новый пароль</Label>
+                <Input
+                  id="newPassword"
+                  type="password"
+                  autoComplete="new-password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Не короче 6 символов"
+                />
+              </div>
             </div>
             <Button type="submit" disabled={saving}>
-              {saving ? "Сохранение…" : "Сохранить"}
+              {saving ? "Сохранение..." : "Сохранить"}
             </Button>
           </form>
         </CardContent>
       </Card>
 
-      {isSuperAdmin && (
+      {isSuperAdmin ? (
         <>
-          {branches.length === 0 && (
+          {branches.length === 0 ? (
             <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm leading-relaxed text-foreground">
               <strong className="font-semibold">Сначала создайте филиалы.</strong>{" "}
-              Без записей в справочнике нельзя назначить администратора.{" "}
+              Без филиала нельзя назначить администратора.{" "}
               <Link className="font-medium text-primary underline" href="/admin/branches">
-                Открыть раздел «Филиалы»
+                Открыть раздел филиалов
               </Link>
               .
             </div>
-          )}
+          ) : null}
 
           <Card>
             <CardHeader>
-              <CardTitle>Новый администратор филиала</CardTitle>
-              <CardDescription>
-                Создаётся роль «ADMIN» с доступом только к материалам выбранного
-                филиала (новости и мероприятия), без редактирования общего
-                контента сайта.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {loadError && (
-                <p className="text-destructive mb-4 text-sm">{loadError}</p>
-              )}
-              <form
-                onSubmit={(e) => void createBranchAdmin(e)}
-                className="space-y-4"
-              >
-                {adminFormError && (
-                  <p className="text-destructive text-sm">{adminFormError}</p>
-                )}
-                <div className="space-y-2">
-                  <Label htmlFor="adminBranch">Филиал</Label>
-                  <select
-                    id="adminBranch"
-                    className={cn(
-                      "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs",
-                      "outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
-                    )}
-                    value={adminBranchId}
-                    onChange={(e) => setAdminBranchId(e.target.value)}
-                    required
-                  >
-                    <option value="">Выберите филиал</option>
-                    {branches.map((b) => (
-                      <option key={b.id} value={b.id}>
-                        {b.titleRu}
-                      </option>
-                    ))}
-                  </select>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <CardTitle>Администраторы филиалов</CardTitle>
+                  <CardDescription>
+                    Выберите человека из списка, чтобы изменить email, логин,
+                    филиал или сбросить пароль.
+                  </CardDescription>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="adminEmail">Email</Label>
-                  <Input
-                    id="adminEmail"
-                    type="email"
-                    required
-                    value={adminEmail}
-                    onChange={(e) => setAdminEmail(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="adminLogin">Логин (необязательно)</Label>
-                  <Input
-                    id="adminLogin"
-                    value={adminLogin}
-                    onChange={(e) => setAdminLogin(e.target.value)}
-                    placeholder="Иначе — из email"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="adminName">Имя</Label>
-                  <Input
-                    id="adminName"
-                    required
-                    value={adminName}
-                    onChange={(e) => setAdminName(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="adminPassword">Пароль</Label>
-                  <Input
-                    id="adminPassword"
-                    type="password"
-                    autoComplete="new-password"
-                    required
-                    minLength={6}
-                    value={adminPassword}
-                    onChange={(e) => setAdminPassword(e.target.value)}
-                  />
-                </div>
-                <Button type="submit" disabled={creating}>
-                  {creating ? "Создание…" : "Создать администратора"}
+                <Button
+                  type="button"
+                  onClick={() => setCreateOpen((value) => !value)}
+                  disabled={branches.length === 0}
+                >
+                  {createOpen ? "Закрыть форму" : "Добавить админа"}
                 </Button>
-              </form>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Учётные записи</CardTitle>
-              <CardDescription>
-                Все пользователи с доступом в админку (без паролей).
-              </CardDescription>
+              </div>
             </CardHeader>
-            <CardContent>
-              {userActionError && (
-                <p className="text-destructive mb-4 text-sm">{userActionError}</p>
-              )}
-              <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Имя</TableHead>
-                    <TableHead>Роль</TableHead>
-                    <TableHead>Логин</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Password</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                    <TableHead>Филиал</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {users.length === 0 ? (
-                    <TableRow>
-                      <TableCell
-                        colSpan={7}
-                        className="text-muted-foreground py-8 text-center"
+            <CardContent className="space-y-5">
+              {loadError ? (
+                <p className="text-destructive text-sm">{loadError}</p>
+              ) : null}
+              {userActionError ? (
+                <p className="text-destructive text-sm">{userActionError}</p>
+              ) : null}
+
+              {createOpen ? (
+                <form
+                  onSubmit={(e) => void createBranchAdmin(e)}
+                  className="rounded-lg border bg-muted/20 p-4"
+                >
+                  <div className="mb-3">
+                    <h2 className="font-medium">Новый администратор</h2>
+                    <p className="text-muted-foreground text-sm">
+                      Создаётся роль ADMIN с доступом к материалам выбранного
+                      филиала.
+                    </p>
+                  </div>
+                  {adminFormError ? (
+                    <p className="text-destructive mb-3 text-sm">{adminFormError}</p>
+                  ) : null}
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="adminName">Имя</Label>
+                      <Input
+                        id="adminName"
+                        required
+                        value={adminName}
+                        onChange={(e) => setAdminName(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="adminEmail">Email</Label>
+                      <Input
+                        id="adminEmail"
+                        type="email"
+                        autoComplete="email"
+                        required
+                        value={adminEmail}
+                        onChange={(e) => setAdminEmail(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="adminLogin">Логин</Label>
+                      <Input
+                        id="adminLogin"
+                        autoComplete="username"
+                        value={adminLogin}
+                        onChange={(e) => setAdminLogin(e.target.value)}
+                        placeholder="Можно оставить пустым"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="adminBranch">Филиал</Label>
+                      <select
+                        id="adminBranch"
+                        className={cn(
+                          "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs",
+                          "outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                        )}
+                        value={adminBranchId}
+                        onChange={(e) => setAdminBranchId(e.target.value)}
+                        required
                       >
-                        Нет данных
-                      </TableCell>
-                    </TableRow>
+                        <option value="">Выберите филиал</option>
+                        {branches.map((branch) => (
+                          <option key={branch.id} value={branch.id}>
+                            {branch.titleRu}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="space-y-2 md:col-span-2">
+                      <Label htmlFor="adminPassword">Пароль</Label>
+                      <Input
+                        id="adminPassword"
+                        type="password"
+                        autoComplete="new-password"
+                        required
+                        minLength={6}
+                        value={adminPassword}
+                        onChange={(e) => setAdminPassword(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div className="mt-4 flex flex-wrap justify-end gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setCreateOpen(false)}
+                    >
+                      Отмена
+                    </Button>
+                    <Button type="submit" disabled={creating}>
+                      {creating ? "Создание..." : "Создать"}
+                    </Button>
+                  </div>
+                </form>
+              ) : null}
+
+              <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_420px]">
+                <div className="space-y-2">
+                  {branchAdmins.length === 0 ? (
+                    <div className="rounded-lg border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
+                      Администраторов филиалов пока нет.
+                    </div>
                   ) : (
-                    users.map((u) => {
-                      const draft = userDrafts[u.id]
-                      const editable = u.role === "ADMIN" && draft
+                    branchAdmins.map((user) => {
+                      const active = user.id === selectedUserId
                       return (
-                      <TableRow key={u.id}>
-                        <TableCell className="min-w-[160px]">
-                          {editable ? (
-                            <Input
-                              value={draft.name}
-                              onChange={(e) =>
-                                setUserDraftField(u.id, "name", e.target.value)
-                              }
-                            />
-                          ) : (
-                            <span className="font-medium">{u.name}</span>
+                        <button
+                          key={user.id}
+                          type="button"
+                          className={cn(
+                            "grid w-full gap-2 rounded-lg border px-4 py-3 text-left transition-colors md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_auto]",
+                            active
+                              ? "border-primary bg-primary/5"
+                              : "hover:bg-muted/50"
                           )}
-                        </TableCell>
-                        <TableCell>{u.role}</TableCell>
-                        <TableCell className="font-mono text-xs">
-                          {u.login ?? "—"}
-                        </TableCell>
-                        <TableCell className="text-sm">{u.email}</TableCell>
-                        <TableCell className="text-muted-foreground text-xs">
-                          {u.branchId
-                            ? branches.find((b) => b.id === u.branchId)?.titleRu ??
-                              u.branchId
-                            : "—"}
-                        </TableCell>
-                        <TableCell className="min-w-[170px]">
-                          {editable ? (
-                            <Input
-                              type="password"
-                              autoComplete="new-password"
-                              minLength={6}
-                              value={draft.password}
-                              onChange={(e) =>
-                                setUserDraftField(u.id, "password", e.target.value)
-                              }
-                              placeholder="не менять"
-                            />
-                          ) : (
-                            <span className="text-muted-foreground text-xs">вЂ”</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          {editable ? (
-                            <div className="flex justify-end gap-2">
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                disabled={savingUserId === u.id}
-                                onClick={() => void saveBranchAdmin(u)}
-                              >
-                                Сохранить
-                              </Button>
-                              <Button
-                                type="button"
-                                variant="destructive"
-                                size="sm"
-                                disabled={savingUserId === u.id}
-                                onClick={() => void deleteBranchAdmin(u)}
-                              >
-                                Удалить
-                              </Button>
-                            </div>
-                          ) : (
-                            <span className="text-muted-foreground text-xs">вЂ”</span>
-                          )}
-                        </TableCell>
-                      </TableRow>
+                          onClick={() => setSelectedUserId(user.id)}
+                        >
+                          <span className="min-w-0">
+                            <span className="block truncate font-medium">
+                              {user.name || "Без имени"}
+                            </span>
+                            <span className="text-muted-foreground block truncate text-xs">
+                              {user.email}
+                            </span>
+                          </span>
+                          <span className="min-w-0 text-sm">
+                            <span className="text-muted-foreground block text-xs">
+                              Филиал
+                            </span>
+                            <span className="block truncate">
+                              {branchName(user.branchId)}
+                            </span>
+                          </span>
+                          <span className="self-center justify-self-start md:justify-self-end">
+                            <span className="rounded-md border px-2 py-1 text-xs">
+                              {active ? "Открыто" : "Редактировать"}
+                            </span>
+                          </span>
+                        </button>
                       )
                     })
                   )}
-                </TableBody>
-              </Table>
-              </div>
+                </div>
 
-              <div className="mt-6 grid gap-4">
-                {users
-                  .filter((u) => u.role === "ADMIN")
-                  .map((u) => {
-                    const draft = userDrafts[u.id]
-                    if (!draft) return null
-                    return (
-                      <div key={u.id} className="rounded-lg border p-4">
-                        <div className="grid gap-3 md:grid-cols-2">
-                          <div className="space-y-1">
-                            <Label>Имя</Label>
-                            <Input
-                              value={draft.name}
-                              onChange={(e) =>
-                                setUserDraftField(u.id, "name", e.target.value)
-                              }
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label>Email</Label>
-                            <Input
-                              type="email"
-                              value={draft.email}
-                              onChange={(e) =>
-                                setUserDraftField(u.id, "email", e.target.value)
-                              }
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label>Логин</Label>
-                            <Input
-                              value={draft.login}
-                              onChange={(e) =>
-                                setUserDraftField(u.id, "login", e.target.value)
-                              }
-                              placeholder="Можно оставить пустым"
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label>Филиал</Label>
-                            <select
-                              className={cn(
-                                "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs",
-                                "outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
-                              )}
-                              value={draft.branchId}
-                              onChange={(e) =>
-                                setUserDraftField(u.id, "branchId", e.target.value)
-                              }
-                            >
-                              <option value="">Выберите филиал</option>
-                              {branches.map((b) => (
-                                <option key={b.id} value={b.id}>
-                                  {b.titleRu}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                          <div className="space-y-1 md:col-span-2">
-                            <Label>Новый пароль</Label>
-                            <Input
-                              type="password"
-                              autoComplete="new-password"
-                              minLength={6}
-                              value={draft.password}
-                              onChange={(e) =>
-                                setUserDraftField(u.id, "password", e.target.value)
-                              }
-                              placeholder="Оставьте пустым, если пароль не меняется"
-                            />
-                          </div>
-                        </div>
-                        <div className="mt-4 flex justify-end gap-2">
+                <div className="rounded-lg border bg-muted/20 p-4">
+                  {selectedUser && selectedDraft ? (
+                    <div className="space-y-4">
+                      <div>
+                        <h2 className="font-medium">Редактирование</h2>
+                        <p className="text-muted-foreground text-sm">
+                          {selectedUser.name} · {branchName(selectedUser.branchId)}
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="selectedAdminName">Имя</Label>
+                        <Input
+                          id="selectedAdminName"
+                          value={selectedDraft.name}
+                          onChange={(e) =>
+                            setUserDraftField(selectedUser.id, "name", e.target.value)
+                          }
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="selectedAdminEmail">Email</Label>
+                        <Input
+                          id="selectedAdminEmail"
+                          type="email"
+                          autoComplete="email"
+                          value={selectedDraft.email}
+                          onChange={(e) =>
+                            setUserDraftField(selectedUser.id, "email", e.target.value)
+                          }
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="selectedAdminLogin">Логин</Label>
+                        <Input
+                          id="selectedAdminLogin"
+                          autoComplete="username"
+                          value={selectedDraft.login}
+                          onChange={(e) =>
+                            setUserDraftField(selectedUser.id, "login", e.target.value)
+                          }
+                          placeholder="Можно оставить пустым"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="selectedAdminBranch">Филиал</Label>
+                        <select
+                          id="selectedAdminBranch"
+                          className={cn(
+                            "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs",
+                            "outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                          )}
+                          value={selectedDraft.branchId}
+                          onChange={(e) =>
+                            setUserDraftField(selectedUser.id, "branchId", e.target.value)
+                          }
+                        >
+                          <option value="">Выберите филиал</option>
+                          {branches.map((branch) => (
+                            <option key={branch.id} value={branch.id}>
+                              {branch.titleRu}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="selectedAdminPassword">Новый пароль</Label>
+                        <Input
+                          id="selectedAdminPassword"
+                          type="password"
+                          autoComplete="new-password"
+                          minLength={6}
+                          value={selectedDraft.password}
+                          onChange={(e) =>
+                            setUserDraftField(selectedUser.id, "password", e.target.value)
+                          }
+                          placeholder="Оставьте пустым, если пароль не меняется"
+                        />
+                      </div>
+                      <div className="flex flex-wrap justify-between gap-2">
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          disabled={savingUserId === selectedUser.id}
+                          onClick={() => void deleteBranchAdmin(selectedUser)}
+                        >
+                          Удалить
+                        </Button>
+                        <div className="flex flex-wrap gap-2">
                           <Button
                             type="button"
                             variant="outline"
-                            disabled={savingUserId === u.id}
-                            onClick={() => void saveBranchAdmin(u)}
+                            onClick={resetSelectedDraft}
                           >
-                            Сохранить
+                            Сбросить
                           </Button>
                           <Button
                             type="button"
-                            variant="destructive"
-                            disabled={savingUserId === u.id}
-                            onClick={() => void deleteBranchAdmin(u)}
+                            disabled={savingUserId === selectedUser.id}
+                            onClick={() => void saveBranchAdmin(selectedUser)}
                           >
-                            Удалить
+                            {savingUserId === selectedUser.id
+                              ? "Сохранение..."
+                              : "Сохранить"}
                           </Button>
                         </div>
                       </div>
-                    )
-                  })}
+                    </div>
+                  ) : (
+                    <div className="flex min-h-[240px] items-center justify-center text-center text-sm text-muted-foreground">
+                      Нажмите «Редактировать» у нужного администратора.
+                    </div>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Супер-админы</CardTitle>
+              <CardDescription>
+                Эти пользователи управляют всей админкой. Их список отделён от
+                администраторов филиалов, чтобы не путать роли.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {superAdmins.length === 0 ? (
+                <p className="text-muted-foreground text-sm">Супер-админов нет.</p>
+              ) : (
+                <div className="grid gap-2 md:grid-cols-2">
+                  {superAdmins.map((user) => (
+                    <div key={user.id} className="rounded-lg border px-4 py-3">
+                      <div className="font-medium">{user.name || "Без имени"}</div>
+                      <div className="text-muted-foreground mt-1 break-all text-sm">
+                        {user.email}
+                      </div>
+                      <div className="text-muted-foreground mt-1 break-all font-mono text-xs">
+                        {user.login ?? "логин не указан"}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </>
-      )}
+      ) : null}
     </div>
   )
 }
