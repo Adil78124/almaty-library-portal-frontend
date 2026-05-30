@@ -5,24 +5,44 @@ import {
   LOCALE_STORAGE_KEY,
 } from "@/lib/i18n/app-locale"
 import { prisma } from "@/lib/prisma"
-import type { HomeSection } from "./types"
+import type { HomeAfishaData, HomeSection } from "./types"
+import { DEFAULT_AFISHA_INFO } from "./types"
 import { HOME_SECTION_ORDER } from "./types"
 import { resolveHomeSections } from "./resolve"
 import type { ResolvedHome } from "./types"
 
-function normalizeLatestNewsInSections(sections: HomeSection[]): HomeSection[] {
+function normalizeHomeEditorSections(sections: HomeSection[]): HomeSection[] {
   return sections.map((s) =>
     s.type === "latestNews"
       ? {
           type: "latestNews",
           data: {
             kicker: s.data.kicker,
-            kickerKz: (s.data as any).kickerKz,
+            kickerKz: s.data.kickerKz,
             title: s.data.title,
-            titleKz: (s.data as any).titleKz,
+            titleKz: s.data.titleKz,
           },
         }
-      : s
+      : s.type === "afisha"
+        ? ({
+            type: "afisha",
+            data: {
+              kicker: s.data.kicker,
+              kickerKz: s.data.kickerKz,
+              title: s.data.title,
+              titleKz: s.data.titleKz,
+              infoTitle:
+                s.data.infoTitle ?? DEFAULT_AFISHA_INFO.title,
+              infoTitleKz:
+                s.data.infoTitleKz ?? DEFAULT_AFISHA_INFO.titleKz,
+              infoDescription:
+                s.data.infoDescription ?? DEFAULT_AFISHA_INFO.description,
+              infoDescriptionKz:
+                s.data.infoDescriptionKz ??
+                DEFAULT_AFISHA_INFO.descriptionKz,
+            },
+          } satisfies { type: "afisha"; data: HomeAfishaData })
+        : s
   )
 }
 
@@ -50,5 +70,5 @@ export async function getHomeSectionsRaw(): Promise<HomeSection[]> {
   ) {
     return defaults
   }
-  return normalizeLatestNewsInSections(raw)
+  return normalizeHomeEditorSections(raw)
 }

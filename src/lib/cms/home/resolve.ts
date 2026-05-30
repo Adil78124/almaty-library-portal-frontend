@@ -18,6 +18,7 @@ import type {
   ResolvedHome,
   UsefulLinkManual,
 } from "./types"
+import { DEFAULT_AFISHA_INFO as AFISHA_INFO } from "./types"
 import { HOME_SECTION_ORDER } from "./types"
 import { getDefaultHomeSections } from "./defaults"
 import {
@@ -79,6 +80,12 @@ export async function resolveHomeSections(
           kickerKz: raw.data.kickerKz,
           title: raw.data.title,
           titleKz: raw.data.titleKz,
+          infoTitle: raw.data.infoTitle?.trim() || AFISHA_INFO.title,
+          infoTitleKz: raw.data.infoTitleKz?.trim() || AFISHA_INFO.titleKz,
+          infoDescription:
+            raw.data.infoDescription?.trim() || AFISHA_INFO.description,
+          infoDescriptionKz:
+            raw.data.infoDescriptionKz?.trim() || AFISHA_INFO.descriptionKz,
         },
       }
     }
@@ -317,6 +324,12 @@ export async function resolveHomeSections(
       kickerKz: afishaS.data.kickerKz?.trim() || null,
       title: afishaS.data.title,
       titleKz: afishaS.data.titleKz?.trim() || null,
+      infoTitle: afishaS.data.infoTitle?.trim() || AFISHA_INFO.title,
+      infoTitleKz: afishaS.data.infoTitleKz?.trim() || AFISHA_INFO.titleKz,
+      infoDescription:
+        afishaS.data.infoDescription?.trim() || AFISHA_INFO.description,
+      infoDescriptionKz:
+        afishaS.data.infoDescriptionKz?.trim() || AFISHA_INFO.descriptionKz,
       items: afishaItems,
       ...(site?.homeEventsAutoRefresh !== false
         ? {

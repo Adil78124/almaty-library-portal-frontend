@@ -4,11 +4,11 @@ import Link from "next/link"
 
 import { useLocale } from "@/components/i18n/locale-provider"
 import { L, pickDbField, pickLocalized } from "@/lib/i18n/app-locale"
+import { formatEventFullDateTime } from "@/lib/events/format-dates"
 import { EVENT_POSTER_FALLBACK } from "@/lib/events/poster-fallback"
 import { eventPublicPath } from "@/lib/events/public-path"
 import type { EventDetailPublicPayload } from "@/lib/events/event-public-payload"
 import { splitBodyParagraphs } from "@/lib/news/split-body"
-import { formatNewsListDate } from "@/lib/news/format-dates"
 
 type Props = { data: EventDetailPublicPayload }
 
@@ -21,14 +21,14 @@ export function EventDetailPublic({ data }: Props) {
   const excerpt = data.excerpt
   const body = data.body
   const paragraphs = splitBodyParagraphs(body)
-  const dateLabel = data.startsAt
-    ? formatNewsListDate(data.startsAt, locale)
-    : ""
   const timeLabel = pickDbField(
     (data.timeDisplay ?? "").trim(),
     (data.timeDisplayKz ?? "").trim() || null,
     locale
   )
+  const dateLabel = data.startsAt
+    ? formatEventFullDateTime(data.startsAt, locale, timeLabel)
+    : ""
   const posterSrc = data.posterUrl?.trim() || EVENT_POSTER_FALLBACK
 
   return (
@@ -193,7 +193,7 @@ export function EventDetailPublic({ data }: Props) {
                 .slice(0, 3)
                 .map((o) => {
                   const d = o.startsAt
-                    ? formatNewsListDate(o.startsAt, locale)
+                    ? formatEventFullDateTime(o.startsAt, locale)
                     : ""
                   const ot = o.title
                   const ox = o.excerpt

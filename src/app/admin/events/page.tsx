@@ -9,18 +9,12 @@ import {
   getAdminSession,
   sessionIsSuperAdmin,
 } from "@/lib/auth/require-admin"
+import { formatEventFullDateTime } from "@/lib/events/format-dates"
 import { prisma } from "@/lib/prisma"
 import { cn } from "@/lib/utils"
 
 function formatEventDate(d: Date | null): string {
-  if (!d) return "—"
-  return d.toLocaleString("ru-RU", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  })
+  return formatEventFullDateTime(d, "ru") || "—"
 }
 
 type Scope = "main" | "branches" | "all"

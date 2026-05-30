@@ -9,7 +9,7 @@ import { L, pickLocalized } from "@/lib/i18n/app-locale"
 import { useLocale } from "./locale-provider"
 
 const btn =
-  "rounded px-2.5 py-1 text-xs font-bold transition-colors min-w-[2.25rem]"
+  "relative z-10 flex h-8 min-w-[2.75rem] flex-1 items-center justify-center rounded-full px-3 text-xs font-black transition-colors"
 
 export function LanguageSwitcher() {
   const router = useRouter()
@@ -25,17 +25,24 @@ export function LanguageSwitcher() {
 
   return (
     <div
-      className="flex items-center rounded-md border border-[#00236f]/20 bg-white p-0.5 shadow-sm"
+      className="relative grid h-10 min-w-[6.25rem] grid-cols-2 items-center overflow-hidden rounded-full border border-[#00236f]/15 bg-white p-1 shadow-[0_6px_18px_-10px_rgba(0,35,111,0.65),0_1px_4px_rgba(0,35,111,0.16)]"
       role="group"
       aria-label={t(L("Переключение языка: русский или қазақша", "Тілді ауыстыру: орыс немесе қазақша"))}
     >
+      <span
+        className={cn(
+          "absolute left-1 top-1 bottom-1 w-[calc(50%-0.25rem)] rounded-full bg-[#00236f] shadow-sm transition-transform duration-200 ease-out",
+          locale === "kz" ? "translate-x-full" : "translate-x-0"
+        )}
+        aria-hidden="true"
+      />
       <button
         type="button"
         className={cn(
           btn,
           locale === "ru"
-            ? "bg-[#00236f] text-white"
-            : "text-[#00236f] hover:bg-slate-100"
+            ? "text-white"
+            : "text-[#00236f] hover:bg-[#00236f]/5"
         )}
         onClick={() => setLang("ru")}
       >
@@ -46,8 +53,8 @@ export function LanguageSwitcher() {
         className={cn(
           btn,
           locale === "kz"
-            ? "bg-[#00236f] text-white"
-            : "text-[#00236f] hover:bg-slate-100"
+            ? "text-white"
+            : "text-[#00236f] hover:bg-[#00236f]/5"
         )}
         onClick={() => setLang("kz")}
       >

@@ -68,6 +68,10 @@ const sectionSchema = z.discriminatedUnion("type", [
       kickerKz: z.string().optional(),
       title: z.string(),
       titleKz: z.string().optional(),
+      infoTitle: z.string().optional(),
+      infoTitleKz: z.string().optional(),
+      infoDescription: z.string().optional(),
+      infoDescriptionKz: z.string().optional(),
     }),
   }),
   z.object({

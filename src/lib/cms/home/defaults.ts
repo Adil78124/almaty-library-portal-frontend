@@ -1,4 +1,4 @@
-import type { HomeSection } from "./types"
+import { DEFAULT_AFISHA_INFO, type HomeSection } from "./types"
 
 const BG =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuD5c0vwXfTeNC1AaHELlTsgyqBVBWHLT_5m0czaeghM0gnzUNOFyUNf7y8OUpF_t7sjojmVXtHTWEzj5_r0btWSFJ1kxaB6vvIwqtvtgu9L_fqPTD7T77dAjVG_HLEOS2L9FpJaK_UZXEmZ7M3jBsWotG9RCjlU3H0kwbJRuWBU6XvndLotEdP7MTviCqjUuh7JkWdsoKxW6tJtgqtIxIY15VMnO0_SanZD01FOuzYaR5vFEG00-vaEoSC_I98VYWPCiRmKMxiyjXQN"
@@ -108,6 +108,10 @@ export function getDefaultHomeSections(): HomeSection[] {
         kickerKz: "Афиша",
         title: "Предстоящие мероприятия",
         titleKz: "Алдағы іс-шаралар",
+        infoTitle: DEFAULT_AFISHA_INFO.title,
+        infoTitleKz: DEFAULT_AFISHA_INFO.titleKz,
+        infoDescription: DEFAULT_AFISHA_INFO.description,
+        infoDescriptionKz: DEFAULT_AFISHA_INFO.descriptionKz,
       },
     },
     {

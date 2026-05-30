@@ -2,6 +2,8 @@ import type { Event } from "@prisma/client"
 import { cookies } from "next/headers"
 
 import SiteFooter from "@/components/SiteFooter"
+import { getHomeSectionsRaw } from "@/lib/cms/home/public"
+import { DEFAULT_AFISHA_INFO } from "@/lib/cms/home/types"
 import { getSimplePagePublic } from "@/lib/cms/simple-page/public"
 import { listAllPublishedEvents } from "@/lib/events/repository"
 import {
@@ -50,10 +52,33 @@ export default async function EventsPage() {
   const locale = appLocaleFromRequestValue(jar.get(LOCALE_STORAGE_KEY)?.value)
 
   const { hero } = await getSimplePagePublic("events")
-  const [rawEvents, newsArticles] = await Promise.all([
+  const [homeSections, rawEvents, newsArticles] = await Promise.all([
+    getHomeSectionsRaw(),
     listAllPublishedEvents(),
     listPublishedNewsPublic({ limit: 3, orderByCreatedAt: true }),
   ])
+  const afishaSettings = homeSections.find((s) => s.type === "afisha")
+  const infoBox =
+    afishaSettings?.type === "afisha"
+      ? {
+          title:
+            afishaSettings.data.infoTitle?.trim() || DEFAULT_AFISHA_INFO.title,
+          titleKz:
+            afishaSettings.data.infoTitleKz?.trim() ||
+            DEFAULT_AFISHA_INFO.titleKz,
+          description:
+            afishaSettings.data.infoDescription?.trim() ||
+            DEFAULT_AFISHA_INFO.description,
+          descriptionKz:
+            afishaSettings.data.infoDescriptionKz?.trim() ||
+            DEFAULT_AFISHA_INFO.descriptionKz,
+        }
+      : {
+          title: DEFAULT_AFISHA_INFO.title,
+          titleKz: DEFAULT_AFISHA_INFO.titleKz,
+          description: DEFAULT_AFISHA_INFO.description,
+          descriptionKz: DEFAULT_AFISHA_INFO.descriptionKz,
+        }
   const events = rawEvents.map((e) => serializeEvent(e, locale))
   const newsTeasers: NewsTeaser[] = newsArticles.map((n) => ({
     id: n.id,
@@ -67,7 +92,12 @@ export default async function EventsPage() {
     <div className="bg-surface font-body text-on-surface antialiased">
       <main className="pt-16 pb-12 sm:pb-20">
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 min-w-0">
-          <EventsPageClient hero={hero} events={events} newsTeasers={newsTeasers} />
+          <EventsPageClient
+            hero={hero}
+            events={events}
+            infoBox={infoBox}
+            newsTeasers={newsTeasers}
+          />
         </div>
       </main>
 

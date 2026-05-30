@@ -327,14 +327,23 @@ export function HomePageView({ data }: Props) {
                   const author = pickDbField(book.author, book.authorKz ?? null, locale)
                   const href = digitalLibraryHref(book.href)
                   const outbound = /^https?:\/\//i.test(href) || href.startsWith("//")
+                  const coverUrl = book.coverUrl?.trim()
                   const card = (
                     <div>
                       <div className="relative mb-6 transform group-hover:-translate-y-4 transition-transform duration-500">
-                        <img
-                          alt={title}
-                          className="w-full aspect-[2/3] object-cover rounded-sm shadow-xl"
-                          src={book.coverUrl}
-                        />
+                        {coverUrl ? (
+                          <img
+                            alt={title}
+                            className="w-full aspect-[2/3] object-cover rounded-sm shadow-xl"
+                            src={coverUrl}
+                          />
+                        ) : (
+                          <div className="flex aspect-[2/3] w-full items-center justify-center rounded-sm bg-surface-container shadow-xl">
+                            <span className="material-symbols-outlined text-4xl text-outline">
+                              menu_book
+                            </span>
+                          </div>
+                        )}
                         <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-sm flex items-center justify-center">
                           <span className="material-symbols-outlined text-white text-4xl">
                             menu_book
@@ -418,6 +427,7 @@ export function HomePageView({ data }: Props) {
                 const href = book.detailHref?.trim() || "#"
                 const resolvedHref = outboundHref(href)
                 const external = /^https?:\/\//i.test(resolvedHref)
+                const coverUrl = book.coverUrl?.trim()
                 return (
                   <a
                     key={`${book.title}-${i}`}
@@ -428,11 +438,19 @@ export function HomePageView({ data }: Props) {
                       : {})}
                   >
                     <div className="relative mb-4 aspect-[2/3] w-full transform overflow-hidden rounded-sm shadow-xl transition-transform duration-500 group-hover:-translate-y-4">
-                      <img
-                        alt=""
-                        className="h-full w-full object-cover"
-                        src={book.coverUrl}
-                      />
+                      {coverUrl ? (
+                        <img
+                          alt=""
+                          className="h-full w-full object-cover"
+                          src={coverUrl}
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center bg-surface-container">
+                          <span className="material-symbols-outlined text-4xl text-outline">
+                            menu_book
+                          </span>
+                        </div>
+                      )}
                       <div className="absolute inset-0 flex items-center justify-center bg-primary/20 opacity-0 transition-opacity group-hover:opacity-100">
                         <span className="material-symbols-outlined text-4xl text-white">
                           menu_book

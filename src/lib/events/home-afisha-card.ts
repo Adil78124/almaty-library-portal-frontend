@@ -1,14 +1,15 @@
 import type { AfishaItemManual } from "@/lib/cms/home/types"
 import { EVENT_POSTER_FALLBACK } from "@/lib/events/poster-fallback"
 import { eventPublicPath } from "@/lib/events/public-path"
+import {
+  formatEventMonthUpper,
+  parseEventDate,
+} from "@/lib/events/format-dates"
 import type { AppLocale } from "@/lib/i18n/app-locale"
 import { L, pickLocalized } from "@/lib/i18n/app-locale"
 
-function toDate(v: Date | string | null | undefined): Date | null {
-  if (v == null) return null
-  const d = v instanceof Date ? v : new Date(v)
-  return Number.isNaN(d.getTime()) ? null : d
-}
+const MONTH_WORD_RE =
+  /(январ|феврал|март|апрел|ма[йя]|июн|июл|август|сентябр|октябр|ноябр|декабр|қаңтар|ақпан|наурыз|сәуір|мамыр|маусым|шілде|тамыз|қыркүйек|қазан|қараша|желтоқсан)/i
 
 /** Строка даты/времени в карточке афиши с учётом языка. */
 export function formatAfishaTimeLine(
@@ -20,13 +21,19 @@ export function formatAfishaTimeLine(
   const ru = (rawTimeDisplay ?? "").trim()
   const kz = (rawTimeDisplayKz ?? "").trim()
   const td = lang === "kz" && kz ? kz : ru
-  if (td) return td
   const iso = (startsAtIso ?? "").trim()
-  const starts = iso ? toDate(iso) : null
-  const loc = lang === "kz" ? "kk-KZ" : "ru-RU"
+  const starts = iso ? parseEventDate(iso) : null
   if (starts) {
-    return `${starts.toLocaleDateString(loc, { month: "long" }).toUpperCase()} | ${starts.toLocaleTimeString(loc, { hour: "2-digit", minute: "2-digit" })}`
+    if (td && MONTH_WORD_RE.test(td)) return td
+    const time =
+      td ||
+      starts.toLocaleTimeString(lang === "kz" ? "kk-KZ" : "ru-RU", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    return `${formatEventMonthUpper(starts, lang)} | ${time}`
   }
+  if (td) return td
   return pickLocalized(L("Дата уточняется", "Күні нақтылануда"), lang)
 }
 
@@ -48,7 +55,7 @@ export function eventToAfishaCard(e: {
   ctaLabelKz?: string | null
   ctaHref: string | null
 }): AfishaItemManual {
-  const starts = toDate(e.startsAt)
+  const starts = parseEventDate(e.startsAt)
   const dayNum = starts ? String(starts.getDate()).padStart(2, "0") : "—"
   const rawTimeDisplay = (e.timeDisplay ?? "").trim() || null
   const startsAtIso = starts ? starts.toISOString() : null

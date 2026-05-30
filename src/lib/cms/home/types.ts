@@ -57,7 +57,20 @@ export type HomeAfishaData = {
   kickerKz?: string
   title: string
   titleKz?: string
+  infoTitle?: string
+  infoTitleKz?: string
+  infoDescription?: string
+  infoDescriptionKz?: string
 }
+
+export const DEFAULT_AFISHA_INFO = {
+  title: "Вход свободный",
+  titleKz: "Кіру тегін",
+  description:
+    "Вход на мероприятие свободный. При необходимости уточняйте информацию у библиотеки.",
+  descriptionKz:
+    "Іс-шараға кіру тегін. Қосымша ақпаратты кітапханадан нақтылауға болады.",
+} as const
 
 export type ELibraryBook = {
   coverUrl: string
@@ -207,6 +220,10 @@ export type ResolvedHome = {
     kickerKz?: string | null
     title: string
     titleKz?: string | null
+    infoTitle: string
+    infoTitleKz: string | null
+    infoDescription: string
+    infoDescriptionKz: string | null
     items: AfishaItemManual[]
     clientRefresh?: {
       enabled: boolean

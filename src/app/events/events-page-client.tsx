@@ -5,6 +5,11 @@ import { useMemo, useState } from "react"
 
 import { useLocale } from "@/components/i18n/locale-provider"
 import type { SimpleHeroData } from "@/lib/cms/simple-page/types"
+import {
+  formatEventCardDate,
+  formatEventFullDateTime,
+  formatEventShortDateTime,
+} from "@/lib/events/format-dates"
 import { EVENT_POSTER_FALLBACK } from "@/lib/events/poster-fallback"
 import { eventPublicPath } from "@/lib/events/public-path"
 import type { AppLocale } from "@/lib/i18n/app-locale"
@@ -78,10 +83,21 @@ function buildCalendarCells(year: number, monthIndex: number): (number | null)[]
 type Props = {
   hero: SimpleHeroData
   events: SerializedEventCard[]
+  infoBox: {
+    title: string
+    titleKz: string | null
+    description: string
+    descriptionKz: string | null
+  }
   newsTeasers: NewsTeaser[]
 }
 
-export default function EventsPageClient({ hero, events, newsTeasers }: Props) {
+export default function EventsPageClient({
+  hero,
+  events,
+  infoBox,
+  newsTeasers,
+}: Props) {
   const { locale } = useLocale()
   const t = (v: Parameters<typeof pickLocalized>[0]) => pickLocalized(v, locale)
   const intlLocale = locale === "kz" ? "kk-KZ" : "ru-RU"
@@ -191,12 +207,7 @@ export default function EventsPageClient({ hero, events, newsTeasers }: Props) {
     const cat = rawCat
       ? pickDbField(rawCat, rawCatKz || null, locale)
       : t(L("Событие", "Іс-шара"))
-    const dateLabel = e.startsAt
-      ? new Date(e.startsAt).toLocaleDateString(intlLocale, {
-          day: "numeric",
-          month: "long",
-        })
-      : ""
+    const dateLabel = formatEventCardDate(e.startsAt, locale)
     const timeLabel = pickDbField(
       (e.timeDisplay || "").trim(),
       (e.timeDisplayKz || "").trim() || null,
@@ -416,12 +427,7 @@ export default function EventsPageClient({ hero, events, newsTeasers }: Props) {
               ) : (
                 nearest.map((e) => {
                   const line = e.startsAt
-                    ? new Date(e.startsAt).toLocaleDateString(intlLocale, {
-                        day: "numeric",
-                        month: "short",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
+                    ? formatEventShortDateTime(e.startsAt, locale)
                     : ""
                   return (
                     <Link
@@ -471,15 +477,10 @@ export default function EventsPageClient({ hero, events, newsTeasers }: Props) {
 
           <div className="bg-primary p-8 rounded-xl text-on-primary">
             <h4 className="text-xl font-bold mb-4">
-              {t(L("Вход свободный", "Кіру еркін"))}
+              {pickDbField(infoBox.title, infoBox.titleKz, locale)}
             </h4>
             <p className="text-on-primary/80 text-sm leading-relaxed">
-              {t(
-                L(
-                  "Большинство наших мероприятий бесплатны для посещения при наличии читательского билета.",
-                  "Біздің іс-шараларымыздың көпшілігі оқу билеті болғанда тегін өтеді."
-                )
-              )}
+              {pickDbField(infoBox.description, infoBox.descriptionKz, locale)}
             </p>
           </div>
         </aside>
@@ -521,11 +522,7 @@ export default function EventsPageClient({ hero, events, newsTeasers }: Props) {
               ) : (
                 archive.map((e) => {
                   const dl = e.startsAt
-                    ? new Date(e.startsAt).toLocaleDateString(intlLocale, {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })
+                    ? formatEventFullDateTime(e.startsAt, locale)
                     : t(L("—", "—"))
                   return (
                     <Link
