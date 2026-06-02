@@ -33,6 +33,10 @@ type EventDbRow = {
   featuredOnHome: boolean
   status: PublishStatus
   sortOrder: number
+  branchId: string | null
+  showOnHomeRequested?: boolean
+  homePublishStatus?: "PENDING" | "APPROVED" | "REJECTED" | null
+  homePublishRejectReason?: string | null
 }
 
 function serialize(row: EventDbRow): SerializedEvent {
@@ -58,6 +62,10 @@ function serialize(row: EventDbRow): SerializedEvent {
     featuredOnHome: row.featuredOnHome,
     status: row.status,
     sortOrder: row.sortOrder,
+    branchId: row.branchId,
+    showOnHomeRequested: row.showOnHomeRequested ?? false,
+    homePublishStatus: row.homePublishStatus ?? null,
+    homePublishRejectReason: row.homePublishRejectReason ?? null,
   }
 }
 

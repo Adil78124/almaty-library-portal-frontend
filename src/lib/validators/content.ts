@@ -11,6 +11,7 @@ import { normalizeSocialIconStored } from "@/lib/social-icon-normalize"
 import { workingHoursSchema } from "@/lib/working-hours"
 
 export const publishStatusSchema = z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"])
+export const homePublishStatusSchema = z.enum(["PENDING", "APPROVED", "REJECTED"])
 
 export const siteSettingsPutSchema = z.object({
   orgNameShort: z.string().min(1),
@@ -108,6 +109,9 @@ export const newsCreateSchema = z.object({
   curatorKz: z.string().max(500).nullable().optional(),
   status: publishStatusSchema.optional(),
   sortOrder: z.number().int().optional(),
+  showOnHomeRequested: z.boolean().optional(),
+  homePublishStatus: homePublishStatusSchema.nullable().optional(),
+  homePublishRejectReason: z.string().max(1000).nullable().optional(),
 })
 
 export const newsUpdateSchema = newsCreateSchema
@@ -138,6 +142,9 @@ export const eventCreateSchema = z.object({
   featuredOnHome: z.boolean().optional(),
   status: publishStatusSchema.optional(),
   sortOrder: z.number().int().optional(),
+  showOnHomeRequested: z.boolean().optional(),
+  homePublishStatus: homePublishStatusSchema.nullable().optional(),
+  homePublishRejectReason: z.string().max(1000).nullable().optional(),
 })
 
 export const eventUpdateSchema = eventCreateSchema.partial().omit({ slug: true })

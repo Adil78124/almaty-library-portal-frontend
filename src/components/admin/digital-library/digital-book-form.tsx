@@ -1,6 +1,6 @@
 "use client"
 
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useState, useTransition } from "react"
 
 import { useAdminToast } from "@/components/admin/admin-toast"
@@ -20,7 +20,6 @@ import { createDigitalBook, createNewArrival } from "@/services/api"
 
 export function DigitalBookForm() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const { success } = useAdminToast()
   const [pending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
@@ -34,8 +33,6 @@ export function DigitalBookForm() {
   const [externalUrl, setExternalUrl] = useState("")
   const [isActive, setIsActive] = useState(true)
   const [order, setOrder] = useState("1")
-  const preset = searchParams.get("preset")
-  const [alsoNewArrivals, setAlsoNewArrivals] = useState(preset === "new-arrivals")
 
   function save() {
     setError(null)
@@ -72,29 +69,26 @@ export function DigitalBookForm() {
         return
       }
 
-      // Дополнительные места (не нарушая существующие модели).
-      if (alsoNewArrivals) {
-        const maxOrder = Number(order) || 1
-        const detailUrl = (externalUrl || fileUrl || "").trim() || null
-        const r2 = await createNewArrival({
-          title: titleRu.trim(),
-          titleKz: titleKz.trim(),
-          author: authorRu.trim(),
-          authorKz: authorKz.trim(),
-          coverUrl: imageUrl.trim() || null,
-          detailUrl,
-          sortOrder: maxOrder,
-          isActive: true,
-        })
-        if (!r2.ok) {
-          const msg = (await r2.json().catch(() => ({}))) as { error?: string }
-          setError(msg.error ?? "Книга создана, но не удалось добавить в «Новые поступления»")
-          return
-        }
+      const maxOrder = Number(order) || 1
+      const detailUrl = (externalUrl || fileUrl || "").trim() || null
+      const r2 = await createNewArrival({
+        title: titleRu.trim(),
+        titleKz: titleKz.trim(),
+        author: authorRu.trim(),
+        authorKz: authorKz.trim(),
+        coverUrl: imageUrl.trim() || null,
+        detailUrl,
+        sortOrder: maxOrder,
+        isActive: true,
+      })
+      if (!r2.ok) {
+        const msg = (await r2.json().catch(() => ({}))) as { error?: string }
+        setError(msg.error ?? "Книга создана, но не удалось добавить в «Новые поступления»")
+        return
       }
 
-      success("Создано.")
-      router.push("/admin/digital-library?created=1")
+      success("Книга добавлена в «Новые поступления».")
+      router.push("/admin/digital-library/new-arrivals")
       router.refresh()
     })
   }
@@ -171,18 +165,6 @@ export function DigitalBookForm() {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <div className="text-sm font-medium">Куда добавить</div>
-            <label className="flex cursor-pointer items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                className="size-4 rounded border-input"
-                checked={alsoNewArrivals}
-                onChange={(e) => setAlsoNewArrivals(e.target.checked)}
-              />
-              Также добавить в «Новые поступления»
-            </label>
-          </div>
         </CardContent>
       </Card>
 
@@ -222,7 +204,7 @@ export function DigitalBookForm() {
         </CardContent>
         <CardFooter className="flex justify-end">
           <Button type="button" disabled={pending} onClick={save}>
-            {pending ? "Создание…" : "Создать"}
+            {pending ? "Создание..." : "Создать книгу"}
           </Button>
         </CardFooter>
       </Card>

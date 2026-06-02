@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils"
 
 const PAGE_TITLES: Record<string, string> = {
   "/admin": "Панель",
+  "/admin/home-publication-requests": "Заявки на главную",
   "/admin/content/home": "Главная страница",
   "/admin/content/news": "Новости",
   "/admin/content/events": "Настройки страницы мероприятий",
@@ -31,8 +32,8 @@ const PAGE_TITLES: Record<string, string> = {
   "/admin/content/new-arrivals": "Новые поступления",
   "/admin/digital-library": "Электронная библиотека",
   "/admin/digital-library/new": "Добавить книгу",
-  "/admin/digital-library/display": "Настройки блока на главной: электронная библиотека",
   "/admin/digital-library/new-arrivals": "Новые поступления",
+  "/admin/digital-library/new-arrivals/display": "Настройки отображения: новые поступления",
   "/admin/digital-library/home-section": "Главная секция: электронная библиотека",
   "/admin/content/local-history": "Краеведение",
   "/admin/site/settings": "Контакты и соцсети",
@@ -55,7 +56,7 @@ function initialsFromName(name: string): string {
 export function AdminTopBar() {
   const pathname = usePathname()
   const router = useRouter()
-  const { displayName, isSuperAdmin } = useAdminShellSession()
+  const { displayName } = useAdminShellSession()
   const title = PAGE_TITLES[pathname] ?? "Раздел"
   const isRoot = pathname === "/admin"
 

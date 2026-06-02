@@ -12,8 +12,6 @@ const EV3 =
 const EV4 =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuCXHeEmP48-jcuA7xvUNXI3qRl9OFIcd5XSyeDKB0CHByLzjKztq5MJ2byGBD5uCXXne2V5NzZT5uhqds_FD_Jq1nEgjLdwRj3K0ePABBknFp0IfyyXlN4A8RtueN8tzYo-jp1hVu-hcN9a8HfzDjcEusQnQzuBiMK3fCzSCGYt6IT6azFZrVw1Lb-kA4Nsnca6Zr_Y4I-Zo52a6wP4lxW2XGIKdxYJgQTYfg81ywPN9ZOwDtN-mwmrEiqbdqYU0BtvDNaiV64QSqWU"
 
-const B1 =
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuCyaPqr0VuTVh_FoUSUQFr5TSQHvVPqfG0jDqSmONcc1OrmAD-GMLVd-bauz5nYr_bsu3aKjAdDmkF895nr6Psj-ERMC0iRGOjbJcygkK1nh-0H-E2YIhAugxJQqJmfdcTmS1Xkald6xTpT0enHJzlvA8XmL4Jt03g19SchwGheJ9Smu6CvCggagq2fWjOKgLRck2fcXa5jPB9dt3LjxPPg6gjxJ1qmMqvZnOOALpnVtKpnAUzrRg51ToMt2b1PRpabwi20ni02tS2T"
 const B2 =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuAZcvykO3Rf9T7OAaM0sya225fvsv7K621Qex6XYLT8d5HUBSpQawifg8QbJ4n19KOznTR0VqBIiwtXVVtT9OKIBT_dwxDBZach2iciatV2OcSjV8fDR3QBk63AVOg_va35p8l_b8btbapkIu-mPoIan7YT-5CuK3YYj1RT3WkZwHlELwFv8_sY-YNjmUP87iDePaVI201fGGJqzCEVavoI4P2I-5-2tFrQPHrr2XY22Tx_OD1QeOtaULnI81mDWHWoc2hXDqjkTUIW"
 const B3 =
@@ -123,18 +121,13 @@ export function getDefaultHomeSections(): HomeSection[] {
           "Доступ к тысячам оцифрованных изданий, научных статей и редких документов в один клик.",
         descriptionKz:
           "Мыңдаған сандық басылымдарға, ғылыми мақалаларға және сирек құжаттарға бір шертумен қол жеткізу.",
+        bannerImageUrl: BG,
+        bannerImageAlt: "Электронная библиотека",
+        bannerImageAltKz: "Электронды кітапхана",
+        bannerWidth: "container",
         buttonLabel: "Перейти в электронную библиотеку",
         buttonLabelKz: "Электронды кітапханаға өту",
         buttonHref: "https://elib.obllibrary.kz",
-        source: "manual",
-        manualBooks: [
-          { coverUrl: B1, title: "Абай жолы. I том", author: "М. Ауэзов" },
-          { coverUrl: B2, title: "История Казахстана", author: "А. Кузембайулы" },
-          { coverUrl: B3, title: "Слова назидания", author: "Абай Кунанбаев" },
-          { coverUrl: B4, title: "Кан мен тер", author: "А. Нурпеисов" },
-          { coverUrl: B5, title: "Мир без границ", author: "Современная проза" },
-          { coverUrl: B6, title: "Цифровое будущее", author: "Научное издание" },
-        ],
       },
     },
     {
@@ -149,6 +142,7 @@ export function getDefaultHomeSections(): HomeSection[] {
     {
       type: "newArrivals",
       data: {
+        enabled: true,
         title: "НОВЫЕ ПОСТУПЛЕНИЯ",
         titleKz: "ЖАҢА ТҮСІМДЕР",
         subtitle: "Последние книги и издания, пополнившие наш фонд.",

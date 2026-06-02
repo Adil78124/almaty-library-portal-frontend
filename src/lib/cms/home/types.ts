@@ -49,6 +49,8 @@ export type AfishaItemManual = {
   ctaLabel: string
   ctaLabelKz?: string | null
   ctaHref: string
+  sourceLabel?: string | null
+  sourceLabelKz?: string | null
 }
 
 /** Только заголовки секции; карточки — из Event (настройки лимита в SiteSettings). */
@@ -84,12 +86,16 @@ export type ELibraryBook = {
 export type HomeELibraryData = {
   title: string
   titleKz?: string
-  description: string
+  description?: string
   descriptionKz?: string
+  bannerImageUrl?: string
+  bannerImageAlt?: string
+  bannerImageAltKz?: string
+  bannerWidth?: "container" | "full"
   buttonLabel: string
   buttonLabelKz?: string
   buttonHref: string
-  source: "manual" | "database"
+  source?: "manual" | "database"
   manualBooks?: ELibraryBook[]
   database?: { limit?: number; showOnHomeOnly?: boolean }
 }
@@ -102,6 +108,8 @@ export type NewsItemManual = {
   excerpt: string
   excerptKz?: string | null
   href: string
+  sourceLabel?: string | null
+  sourceLabelKz?: string | null
 }
 
 /** Только заголовки секции; список карточек всегда из NewsArticle (настройки — SiteSettings). */
@@ -122,6 +130,7 @@ export type ArrivalBookManual = {
 }
 
 export type HomeNewArrivalsData = {
+  enabled?: boolean
   title: string
   titleKz?: string
   subtitle: string
@@ -234,12 +243,15 @@ export type ResolvedHome = {
   eLibrary: {
     title: string
     titleKz?: string | null
-    description: string
+    description?: string
     descriptionKz?: string | null
+    bannerImageUrl: string
+    bannerImageAlt: string
+    bannerImageAltKz?: string | null
+    bannerWidth: "container" | "full"
     buttonLabel: string
     buttonLabelKz?: string | null
     buttonHref: string
-    books: ELibraryBook[]
   }
   latestNews: {
     kicker: string
@@ -255,6 +267,7 @@ export type ResolvedHome = {
     }
   }
   newArrivals: {
+    enabled: boolean
     title: string
     titleKz?: string | null
     subtitle: string

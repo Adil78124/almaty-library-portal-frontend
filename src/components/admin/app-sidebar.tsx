@@ -159,6 +159,13 @@ export function AdminAppSidebar() {
               <NavLink href="/admin" label="Панель" icon={LayoutDashboard} />
               <NavLink href="/admin/analytics" label="Статистика посещений" icon={BarChart3} />
               {isSuperAdmin && (
+                <NavLink
+                  href="/admin/home-publication-requests"
+                  label="Заявки на главную"
+                  icon={Home}
+                />
+              )}
+              {isSuperAdmin && (
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     isActive={pathname.startsWith("/admin/branches")}
@@ -295,7 +302,7 @@ export function AdminAppSidebar() {
                   <SidebarMenuButton
                     isActive={pathname.startsWith("/admin/digital-library")}
                     tooltip="Блок электронной библиотеки на главной"
-                    render={<Link href="/admin/digital-library" />}
+                    render={<Link href="/admin/digital-library/home-section" />}
                   >
                     <Library className="text-sidebar-foreground/80" />
                     <span>Электронная библиотека</span>
@@ -322,16 +329,15 @@ export function AdminAppSidebar() {
                   />
                   {elibOpen ? (
                     <SidebarMenuSub>
-                      <SubNavLink href="/admin/digital-library" label="Электронная библиотека" />
-                      <SubNavLink href="/admin/digital-library/new" label="Добавить ресурс" />
-                      <SubNavLink href="/admin/digital-library/new-arrivals" label="Новые поступления" />
-                      <SubNavLink
-                        href="/admin/digital-library/display"
-                        label="Настройки блока на главной"
-                      />
                       <SubNavLink
                         href="/admin/digital-library/home-section"
                         label="Главная секция"
+                      />
+                      <SubNavLink href="/admin/digital-library/new-arrivals" label="Новые поступления" />
+                      <SubNavLink href="/admin/digital-library/new" label="Добавить книгу" />
+                      <SubNavLink
+                        href="/admin/digital-library/new-arrivals/display"
+                        label="Настройки отображения"
                       />
                     </SidebarMenuSub>
                   ) : null}

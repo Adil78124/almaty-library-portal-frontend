@@ -35,6 +35,7 @@ export async function listPublishedNewsPublic(options?: {
   limit?: number
   /** true — по дате создания (новые сверху); false — по publishedAt */
   orderByCreatedAt?: boolean
+  includeApprovedBranches?: boolean
   /** Не задано → глобальные. Иначе id филиала. */
   branchId?: string | null
 }): Promise<NewsArticle[]> {
@@ -43,13 +44,21 @@ export async function listPublishedNewsPublic(options?: {
     options?.branchId === undefined ? null : options.branchId
   const where: Prisma.NewsArticleWhereInput = {
     ...publishedWhere,
-    branchId,
+    ...(options?.includeApprovedBranches === true && branchId === null
+      ? {
+          OR: [
+            { branchId: null },
+            { branchId: { not: null }, homePublishStatus: "APPROVED" },
+          ],
+        }
+      : { branchId }),
   }
   return prisma.newsArticle.findMany({
     where,
     orderBy: orderByCreated
       ? { createdAt: "desc" }
       : { publishedAt: "desc" },
+    include: { branch: true },
     take: options?.limit,
   })
 }

@@ -10,7 +10,6 @@ import { formatNewsListDate, listPublishedNewsPublic } from "@/lib/news/reposito
 import type {
   AfishaItemManual,
   ArrivalBookManual,
-  ELibraryBook,
   HomeSection,
   HomeTickerLine,
   LocalHistoryCardManual,
@@ -24,7 +23,6 @@ import { getDefaultHomeSections } from "./defaults"
 import {
   filterAfishaItems,
   filterArrivalBooks,
-  filterELibraryBooks,
   filterGalleryVideos,
   filterLocalHistoryCards,
   filterNewsItems,
@@ -45,6 +43,20 @@ function pickSection<T extends HomeSection["type"]>(
   return sections.find((s) => s.type === type) as
     | Extract<HomeSection, { type: T }>
     | undefined
+}
+
+type BranchSource = {
+  branch?: { titleRu: string; titleKz: string | null } | null
+}
+
+function sourceTitle(row: BranchSource): {
+  sourceLabel: string | null
+  sourceLabelKz: string | null
+} {
+  return {
+    sourceLabel: row.branch?.titleRu ?? null,
+    sourceLabelKz: row.branch?.titleKz ?? null,
+  }
 }
 
 export async function resolveHomeSections(
@@ -110,6 +122,7 @@ export async function resolveHomeSections(
   } catch {
     const eventsHome = await listPublishedEventsPublic({
       limit: homeEventsLimit,
+      includeApprovedBranches: true,
     })
     afishaItems = eventsHome.map((e) =>
       eventToAfishaCard({
@@ -126,34 +139,9 @@ export async function resolveHomeSections(
         ctaLabel: e.ctaLabel,
         ctaLabelKz: e.ctaLabelKz,
         ctaHref: e.ctaHref,
+        ...sourceTitle(e as typeof e & BranchSource),
       })
     )
-  }
-
-  let eBooks: ELibraryBook[] = []
-  if (elibS.data.source === "manual" && elibS.data.manualBooks?.length) {
-    eBooks = elibS.data.manualBooks
-  } else {
-    const lim = elibS.data.database?.limit ?? 6
-    const where = elibS.data.database?.showOnHomeOnly
-      ? { showOnHome: true }
-      : {}
-    const rows = await db.digitalLibraryItem.findMany({
-      where,
-      orderBy: { sortOrder: "asc" },
-      take: lim,
-    })
-    eBooks = rows.map((r) => ({
-      coverUrl: r.coverUrl ?? "",
-      title: pickDbField(r.titleRu, r.titleKz ?? null, locale),
-      titleKz: null,
-      author: pickDbField(r.author, r.authorKz ?? null, locale),
-      authorKz: null,
-      href: r.resourceUrl ?? DIGITAL_LIBRARY_URL,
-    }))
-    if (!eBooks.length && elibS.data.manualBooks?.length) {
-      eBooks = elibS.data.manualBooks
-    }
   }
 
   let newsItems: NewsItemManual[] = []
@@ -163,6 +151,7 @@ export async function resolveHomeSections(
     const articles = await listPublishedNewsPublic({
       limit: homeNewsLimit,
       orderByCreatedAt: true,
+      includeApprovedBranches: true,
     })
     newsItems = articles.map((a) => {
       const desc = pickDbField(
@@ -179,6 +168,7 @@ export async function resolveHomeSections(
         excerpt: lead,
         excerptKz: null,
         href: newsArticlePublicPath(a),
+        ...sourceTitle(a as typeof a & BranchSource),
       }
     })
   }
@@ -239,14 +229,14 @@ export async function resolveHomeSections(
     const rows = await db.partnerLink.findMany({
       // Prisma Client может быть не перегенерен сразу после изменения схемы на Windows.
       // Держим совместимость через any — после prisma generate тип станет корректным.
-      where: { isActive: true } as any,
+      where: { isActive: true },
       orderBy: { sortOrder: "asc" },
       take: lim,
     })
     usefulLinks = rows.map((r) => ({
       href: r.href,
       title: r.title,
-      titleKz: (r as any).titleKz ?? null,
+      titleKz: r.titleKz ?? null,
       logoUrl: r.logoUrl ?? "/images/logo.png",
       logoVariant: "round" as const,
     }))
@@ -263,7 +253,6 @@ export async function resolveHomeSections(
       : quoteS.data.text
 
   afishaItems = filterAfishaItems(afishaItems)
-  eBooks = filterELibraryBooks(eBooks)
   newsItems = filterNewsItems(newsItems)
   arrivalBooks = filterArrivalBooks(arrivalBooks).slice(0, 8)
   lhCards = filterLocalHistoryCards(lhCards)
@@ -276,14 +265,20 @@ export async function resolveHomeSections(
   )
   const statCards = filterStatisticsCards(statsS.data.cards)
   // Back-compat: раньше медиагалерея была (mainImageUrl/videoUrl/thumbUrls).
+  type GalleryDataWithLegacy = typeof galS.data & {
+    videos?: unknown
+    videoUrl?: unknown
+    thumbUrls?: unknown
+  }
+  const galleryData = galS.data as GalleryDataWithLegacy
   const rawGalleryVideos =
-    (galS.data as any).videos ??
+    galleryData.videos ??
     (() => {
       const legacy: string[] = []
-      const legacyMain = String((galS.data as any).videoUrl ?? "").trim()
+      const legacyMain = String(galleryData.videoUrl ?? "").trim()
       if (legacyMain) legacy.push(legacyMain)
-      const thumbs = Array.isArray((galS.data as any).thumbUrls)
-        ? ((galS.data as any).thumbUrls as unknown[]).map((x) => String(x))
+      const thumbs = Array.isArray(galleryData.thumbUrls)
+        ? galleryData.thumbUrls.map((x) => String(x))
         : []
       legacy.push(...thumbs)
       const uniq = Array.from(new Set(legacy.map((x) => x.trim()).filter(Boolean)))
@@ -346,10 +341,13 @@ export async function resolveHomeSections(
       titleKz: elibS.data.titleKz?.trim() || null,
       description: elibS.data.description,
       descriptionKz: elibS.data.descriptionKz?.trim() || null,
+      bannerImageUrl: elibS.data.bannerImageUrl?.trim() || heroS.data.backgroundImageUrl,
+      bannerImageAlt: elibS.data.bannerImageAlt?.trim() || elibS.data.title,
+      bannerImageAltKz: elibS.data.bannerImageAltKz?.trim() || null,
+      bannerWidth: elibS.data.bannerWidth === "full" ? "full" : "container",
       buttonLabel: elibS.data.buttonLabel,
       buttonLabelKz: elibS.data.buttonLabelKz?.trim() || null,
       buttonHref: elibS.data.buttonHref?.trim() || DIGITAL_LIBRARY_URL,
-      books: eBooks,
     },
     latestNews: {
       kicker: newsS.data.kicker,
@@ -368,6 +366,7 @@ export async function resolveHomeSections(
         : {}),
     },
     newArrivals: {
+      enabled: arrS.data.enabled !== false,
       title: arrS.data.title,
       titleKz: arrS.data.titleKz?.trim() || null,
       subtitle: arrS.data.subtitle,

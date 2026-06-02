@@ -3,13 +3,14 @@
 import Link from "next/link"
 import { useCallback, useEffect, useState } from "react"
 
+import { AfishaDateStamp } from "@/components/events/afisha-date-stamp"
 import { useLocale } from "@/components/i18n/locale-provider"
 import type { AfishaItemManual } from "@/lib/cms/home/types"
 import {
   mapEventApiRowsToAfisha,
   type ApiEventRow,
 } from "@/lib/cms/home/map-from-public-api"
-import { formatAfishaTimeLine } from "@/lib/events/home-afisha-card"
+import { formatAfishaDateParts } from "@/lib/events/home-afisha-card"
 import { L, pickDbField, pickLocalized } from "@/lib/i18n/app-locale"
 import { fetchPublishedEventsHome } from "@/services/api"
 
@@ -65,7 +66,10 @@ export function HomeEventsBlock({
 
   useEffect(() => {
     if (!clientRefresh?.enabled) return
-    void fetchEvents()
+    const id = window.setTimeout(() => {
+      void fetchEvents()
+    }, 0)
+    return () => window.clearTimeout(id)
   }, [clientRefresh, fetchEvents])
 
   useEffect(() => {
@@ -108,7 +112,12 @@ export function HomeEventsBlock({
           {shownItems.map((ev, idx) => {
             const evTitle = pickDbField(ev.title, ev.titleKz ?? null, locale)
             const evExcerpt = pickDbField(ev.excerpt, ev.excerptKz ?? null, locale)
-            const timeLineShown = formatAfishaTimeLine(
+            const evSource = pickDbField(
+              ev.sourceLabel ?? "",
+              ev.sourceLabelKz ?? null,
+              locale
+            ).trim()
+            const dateParts = formatAfishaDateParts(
               ev.rawTimeDisplay,
               ev.startsAtIso,
               locale,
@@ -119,7 +128,7 @@ export function HomeEventsBlock({
               key={`${ev.ctaHref}-${idx}`}
               className="flex-none w-[min(100%,calc(100vw-2rem))] max-w-[420px] sm:max-w-[320px] shrink-0 snap-start flex flex-col"
             >
-              <div className="overflow-hidden rounded-xl bg-surface-container-lowest shadow-[0_22px_56px_-28px_rgba(25,28,30,0.55)] sm:hidden">
+              <div className="flex min-h-[540px] flex-col overflow-hidden rounded-xl bg-surface-container-lowest shadow-[0_22px_56px_-28px_rgba(25,28,30,0.55)] sm:hidden">
                 <div className="mx-3 mt-3 aspect-[4/5] overflow-hidden rounded-xl bg-surface-container">
                   <img
                     alt=""
@@ -127,23 +136,21 @@ export function HomeEventsBlock({
                     src={ev.posterUrl}
                   />
                 </div>
-                <div className="flex min-w-0 flex-col px-5 pb-6 pt-5">
-                  <div className="flex min-w-0 items-baseline gap-2 text-[#00236f]">
-                    <span className="shrink-0 text-4xl font-black leading-none">
-                      {ev.dayNum}
-                    </span>
-                    <span className="min-w-0 text-[11px] font-black uppercase leading-tight tracking-widest text-[#00236f]/80 line-clamp-1">
-                      {timeLineShown}
-                    </span>
-                  </div>
-                  <h3 className="mt-4 text-[19px] font-black leading-[1.08] text-on-surface line-clamp-2 break-words">
+                <div className="flex min-w-0 flex-1 flex-col px-4 pb-5 pt-4">
+                  <AfishaDateStamp compact parts={dateParts} />
+                  {evSource ? (
+                    <p className="mt-2 text-[11px] font-bold uppercase tracking-wide text-primary/75 line-clamp-1">
+                      {evSource}
+                    </p>
+                  ) : null}
+                  <h3 className="mt-4 min-h-[42px] text-[19px] font-black leading-[1.08] text-on-surface line-clamp-2 break-words">
                     {evTitle}
                   </h3>
-                  <p className="mt-3 text-[13px] leading-5 text-on-surface-variant line-clamp-1 break-words">
+                  <p className="mt-3 min-h-5 text-[13px] leading-5 text-on-surface-variant line-clamp-1 break-words">
                     {evExcerpt}
                   </p>
                   <Link
-                    className="mt-5 inline-flex max-w-full w-fit items-center justify-center rounded-md bg-[#00236f] px-4 py-2 text-center text-[11px] font-black uppercase leading-tight tracking-tight text-white transition-colors hover:bg-[#00236f]/90"
+                    className="mt-auto inline-flex max-w-full w-fit items-center justify-center rounded-md bg-[#00236f] px-4 py-2 text-center text-[11px] font-black uppercase leading-tight tracking-tight text-white transition-colors hover:bg-[#00236f]/90"
                     href={ev.ctaHref}
                   >
                     {pickDbField(
@@ -163,19 +170,19 @@ export function HomeEventsBlock({
                   />
                 </div>
               </div>
-              <div className="hidden w-full shrink-0 rounded-xl bg-surface-container-lowest p-5 sm:mt-4 sm:flex sm:p-6 md:p-8 shadow-[0_10px_30px_-5px_rgba(25,28,30,0.08)] flex-col flex-1 min-w-0">
-                <div className="mb-4">
-                  <span className="text-3xl sm:text-4xl font-black leading-none block text-on-surface">
-                    {ev.dayNum}
-                  </span>
-                  <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-[#00236f] break-words">
-                    {timeLineShown}
-                  </span>
+              <div className="hidden w-full min-h-[260px] shrink-0 rounded-xl bg-surface-container-lowest p-5 sm:mt-4 sm:flex sm:p-6 md:p-8 shadow-[0_10px_30px_-5px_rgba(25,28,30,0.08)] flex-col flex-1 min-w-0">
+                <div className="mb-4 min-w-0">
+                  <AfishaDateStamp parts={dateParts} />
+                  {evSource ? (
+                    <p className="mt-2 text-[11px] font-bold uppercase tracking-wide text-primary/75 line-clamp-1">
+                      {evSource}
+                    </p>
+                  ) : null}
                 </div>
-                <h3 className="text-xl sm:text-2xl font-black mb-3 leading-tight line-clamp-2 text-on-surface break-words whitespace-normal">
+                <h3 className="min-h-[3.75rem] text-xl sm:text-2xl font-black mb-3 leading-tight line-clamp-2 text-on-surface break-words whitespace-normal">
                   {evTitle}
                 </h3>
-                <p className="text-on-surface-variant text-sm mb-6 line-clamp-2 break-words whitespace-normal">
+                <p className="min-h-10 text-on-surface-variant text-sm mb-6 line-clamp-2 break-words whitespace-normal">
                   {evExcerpt}
                 </p>
                 <div className="mt-auto">

@@ -60,9 +60,9 @@ export default function Header() {
     : t(L(SITE_CONTACT_FALLBACK.orgNameLong, SITE_CONTACT_FALLBACK.orgNameLongKz))
 
   const baseLinkClassName =
-    "text-[#191c1e] font-medium hover:text-[#0058be] transition-colors tracking-tight text-[12px] xl:whitespace-nowrap break-words"
+    "text-[#191c1e] font-medium hover:text-[#0058be] transition-colors tracking-tight text-[12px] xl:whitespace-nowrap break-words pt-4 border-b-2 border-transparent"
   const activeLinkClassName =
-    "text-[#00236f] font-bold border-b-2 border-[#00236f] pb-1 tracking-tight text-[12px] xl:whitespace-nowrap break-words"
+    "text-[#00236f] font-bold tracking-tight text-[12px] xl:whitespace-nowrap break-words pb-1 border-b-2 border-[#00236f]"
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/"
@@ -95,7 +95,7 @@ export default function Header() {
             <span className="text-xs sm:text-sm font-black tracking-tight text-[#00236f] uppercase break-words line-clamp-2 xl:line-clamp-1 xl:whitespace-nowrap xl:text-ellipsis xl:overflow-hidden">
               {orgShort}
             </span>
-            <span className="text-[8px] sm:text-[9px] font-bold text-[#00236f] mt-0.5 break-words line-clamp-2 xl:line-clamp-1 xl:whitespace-nowrap xl:text-ellipsis xl:overflow-hidden">
+            <span className="text-[8px] sm:text-[9px] font-bold text-[#00236f] break-words line-clamp-2 xl:line-clamp-1 xl:whitespace-nowrap xl:text-ellipsis xl:overflow-hidden">
               {orgLong}
             </span>
           </div>
@@ -145,9 +145,9 @@ export default function Header() {
           })}
         </nav>
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          <div className="relative hidden md:block">
+          <div className="relative hidden md:block h-10">
             <input
-              className="bg-surface-container-low border-none rounded-md pl-3 pr-9 py-2 text-sm focus:ring-2 focus:ring-[#00236f] transition-all w-[min(100%,160px)] lg:w-[200px] xl:w-[120px] 2xl:w-[160px]"
+              className="bg-surface-container-low border-none rounded-md pl-3 pr-9 h-10 text-sm focus:ring-2 focus:ring-[#00236f] transition-all w-[min(100%,160px)] lg:w-[200px] xl:w-[120px] 2xl:w-[160px]"
               placeholder={t(L("Поиск…", "Іздеу…"))}
               type="search"
               autoComplete="off"

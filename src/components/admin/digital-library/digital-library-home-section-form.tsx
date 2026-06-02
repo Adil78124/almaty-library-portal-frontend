@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react"
 
+import { AdminImageUrlField } from "@/components/admin/admin-image-url-field"
 import type { HomeSection } from "@/lib/cms/home/types"
 import { useAdminToast } from "@/components/admin/admin-toast"
 import { Button } from "@/components/ui/button"
@@ -31,11 +32,11 @@ export function DigitalLibraryHomeSectionForm({
 
   const [titleRu, setTitleRu] = useState(initial?.data.title ?? "")
   const [titleKz, setTitleKz] = useState(initial?.data.titleKz ?? "")
-  const [descriptionRu, setDescriptionRu] = useState(
-    initial?.data.description ?? ""
+  const [bannerImageUrl, setBannerImageUrl] = useState(
+    initial?.data.bannerImageUrl ?? ""
   )
-  const [descriptionKz, setDescriptionKz] = useState(
-    initial?.data.descriptionKz ?? ""
+  const [bannerWidth, setBannerWidth] = useState<"container" | "full">(
+    initial?.data.bannerWidth === "full" ? "full" : "container"
   )
   const [buttonLabelRu, setButtonLabelRu] = useState(
     initial?.data.buttonLabel ?? ""
@@ -61,8 +62,12 @@ export function DigitalLibraryHomeSectionForm({
             ...s.data,
             title: titleRu.trim() || s.data.title,
             titleKz: titleKz.trim() || undefined,
-            description: descriptionRu.trim() || s.data.description,
-            descriptionKz: descriptionKz.trim() || undefined,
+            bannerImageUrl:
+              bannerImageUrl.trim() || s.data.bannerImageUrl || "",
+            bannerImageAlt:
+              titleRu.trim() || s.data.bannerImageAlt || s.data.title,
+            bannerImageAltKz: titleKz.trim() || undefined,
+            bannerWidth,
             buttonLabel: buttonLabelRu.trim() || s.data.buttonLabel,
             buttonLabelKz: buttonLabelKz.trim() || undefined,
             buttonHref: buttonHref.trim() || s.data.buttonHref,
@@ -120,20 +125,32 @@ export function DigitalLibraryHomeSectionForm({
           />
         </div>
         <div className="space-y-2 sm:col-span-2">
-          <Label htmlFor="elib-home-desc-ru">Описание (RU)</Label>
-          <Input
-            id="elib-home-desc-ru"
-            value={descriptionRu}
-            onChange={(e) => setDescriptionRu(e.target.value)}
+          <AdminImageUrlField
+            label="Баннер"
+            value={bannerImageUrl}
+            onChange={setBannerImageUrl}
+            onUploadError={(msg) => setError(msg)}
+            urlPlaceholder="URL изображения баннера"
           />
         </div>
         <div className="space-y-2 sm:col-span-2">
-          <Label htmlFor="elib-home-desc-kz">Описание (KZ)</Label>
-          <Input
-            id="elib-home-desc-kz"
-            value={descriptionKz}
-            onChange={(e) => setDescriptionKz(e.target.value)}
-          />
+          <Label>Ширина баннера</Label>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Button
+              type="button"
+              variant={bannerWidth === "container" ? "default" : "outline"}
+              onClick={() => setBannerWidth("container")}
+            >
+              Обычная ширина
+            </Button>
+            <Button
+              type="button"
+              variant={bannerWidth === "full" ? "default" : "outline"}
+              onClick={() => setBannerWidth("full")}
+            >
+              На всю ширину
+            </Button>
+          </div>
         </div>
         <div className="space-y-2">
           <Label htmlFor="elib-home-btn-ru">Кнопка: текст (RU)</Label>

@@ -64,13 +64,13 @@ const quickLinksSuper = [
   {
     href: "/admin/digital-library/home-section",
     title: "Блок электронной библиотеки на главной",
-    description: "Тизер и карточки для главной страницы",
+    description: "Заголовок, баннер, кнопка и ширина блока на главной странице",
     icon: Library,
   },
   {
     href: "/admin/content/new-arrivals",
     title: "Новые поступления",
-    description: "Книжные карточки для главной",
+    description: "Управление блоком новых поступлений",
     icon: BookMarked,
   },
   {

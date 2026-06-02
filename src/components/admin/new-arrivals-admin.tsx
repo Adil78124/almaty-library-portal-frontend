@@ -202,7 +202,7 @@ export function NewArrivalsAdmin() {
         <div className="flex flex-wrap items-center gap-2">
           <Link
             className={cn(buttonVariants(), "shrink-0")}
-            href="/admin/digital-library/new?preset=new-arrivals"
+            href="/admin/digital-library/new"
           >
             Добавить книгу
           </Link>

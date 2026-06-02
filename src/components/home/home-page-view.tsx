@@ -1,16 +1,15 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 
 import { useLocale } from "@/components/i18n/locale-provider"
-import type { ELibraryBook, ResolvedHome } from "@/lib/cms/home/types"
+import type { ResolvedHome } from "@/lib/cms/home/types"
 import { L, pickDbField, pickLocalized } from "@/lib/i18n/app-locale"
 import { localHistoryPublicPath } from "@/lib/local-history/public-path"
 import { HomeCountersScript } from "@/app/home-counters-script"
 import { HomeEventsBlock } from "@/components/home/home-events-block"
 import { HomeLatestNewsBlock } from "@/components/home/home-latest-news-block"
-import { fetchDigitalBooks } from "@/services/api"
 import { digitalLibraryHref } from "@/lib/digital-library-url"
 import {
   parseYoutubeVideoId,
@@ -20,19 +19,6 @@ import {
 
 type Props = {
   data: ResolvedHome
-}
-
-type DigitalBookRow = {
-  id: string
-  titleRu: string
-  titleKz: string
-  authorRu: string
-  authorKz: string
-  imageUrl: string | null
-  fileUrl: string | null
-  externalUrl: string | null
-  isActive: boolean
-  order: number
 }
 
 /** Сброс клиентского состояния блоков при обновлении данных главной (SSR). */
@@ -60,59 +46,7 @@ export function HomePageView({ data }: Props) {
   const { locale } = useLocale()
   const t = (v: Parameters<typeof pickLocalized>[0]) => pickLocalized(v, locale)
 
-  // Подключаем витрину главной к данным из админки (/api/digital-books).
-  // Если в БД пусто — используем содержимое CMS (data.eLibrary.books).
-  const [dbELibBooks, setDbELibBooks] = useState<DigitalBookRow[] | null>(null)
-  const [elibSettings, setElibSettings] = useState<{
-    homeLimit: number
-    homeAutoRefresh: boolean
-    homePollSeconds: number | null
-  } | null>(null)
   const [openVideoId, setOpenVideoId] = useState<string | null>(null)
-  useEffect(() => {
-    let cancelled = false
-    const load = async () => {
-      const [booksRes, settingsRes] = await Promise.allSettled([
-        fetchDigitalBooks(true),
-        fetch("/api/digital-library/display", { cache: "no-store" }),
-      ])
-      const booksR =
-        booksRes.status === "fulfilled" ? booksRes.value : null
-      const settingsR =
-        settingsRes.status === "fulfilled" ? settingsRes.value : null
-      const items = booksR && booksR.ok ? await booksR.json().catch(() => []) : []
-      const settings =
-        settingsR && settingsR.ok
-          ? await settingsR
-              .json()
-              .catch(() => ({ homeLimit: 12, homeAutoRefresh: false, homePollSeconds: 60 }))
-          : { homeLimit: 12, homeAutoRefresh: false, homePollSeconds: 60 }
-      if (cancelled) return
-      setDbELibBooks(Array.isArray(items) ? (items as DigitalBookRow[]) : [])
-      setElibSettings(settings)
-    }
-    void load()
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!elibSettings?.homeAutoRefresh) return
-    const sec = Math.max(
-      10,
-      Math.min(3600, elibSettings.homePollSeconds ?? 60)
-    )
-    const id = window.setInterval(() => {
-      fetchDigitalBooks(true)
-        .then((r) => (r.ok ? r.json() : []))
-        .catch(() => [])
-        .then((items) => {
-          setDbELibBooks(Array.isArray(items) ? (items as DigitalBookRow[]) : [])
-        })
-    }, sec * 1000)
-    return () => window.clearInterval(id)
-  }, [elibSettings])
 
   const tickerLine = useMemo(() => {
     const sep = " • "
@@ -123,35 +57,13 @@ export function HomePageView({ data }: Props) {
   }, [data.ticker.items, locale])
   const hasTicker = data.ticker.items.length > 0
   const hasStats = data.statistics.cards.length > 0
-  const hasELib = (dbELibBooks?.length ?? 0) > 0 || data.eLibrary.books.length > 0
-  const hasArrivals = data.newArrivals.books.length > 0
+  const hasELib =
+    Boolean((data.eLibrary.title ?? "").trim()) &&
+    Boolean((data.eLibrary.bannerImageUrl ?? "").trim())
+  const eLibraryBannerFullWidth = data.eLibrary.bannerWidth === "full"
+  const hasArrivals = data.newArrivals.enabled && data.newArrivals.books.length > 0
   const hasLocalHistory = data.localHistory.cards.length > 0
   const localHistoryDescription = (data.localHistory.description ?? "").trim()
-
-  const eLibShowcaseBooks = useMemo(() => {
-    if (dbELibBooks && dbELibBooks.length > 0) {
-      const lim = Math.min(30, Math.max(1, elibSettings?.homeLimit ?? 12))
-      return dbELibBooks
-        .slice()
-        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-        .slice(0, lim)
-        .map((b) => {
-          const href = digitalLibraryHref(b.externalUrl || b.fileUrl)
-          return {
-            coverUrl: b.imageUrl ?? "",
-            title: b.titleRu,
-            titleKz: b.titleKz,
-            author: b.authorRu,
-            authorKz: b.authorKz,
-            href,
-          }
-        })
-    }
-    return data.eLibrary.books.map((b: ELibraryBook) => ({
-      ...b,
-      href: digitalLibraryHref(b.href),
-    }))
-  }, [data.eLibrary.books, dbELibBooks, elibSettings])
 
   const galleryByPos = useMemo(() => {
     const out = new Map<number, { id: string; thumb: string; href: string }>()
@@ -304,7 +216,7 @@ export function HomePageView({ data }: Props) {
         {hasELib ? (
         <section className="py-16 sm:py-20 md:py-24 bg-white relative overflow-x-hidden">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 min-w-0">
-            <div className="text-center mb-10 sm:mb-16">
+            <div className="text-center mb-8 sm:mb-10">
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-on-surface tracking-tight mb-3 sm:mb-4 break-words whitespace-normal">
                 {pickDbField(
                   data.eLibrary.title,
@@ -312,68 +224,25 @@ export function HomePageView({ data }: Props) {
                   locale
                 )}
               </h2>
-              <p className="text-on-surface-variant max-w-2xl mx-auto break-words whitespace-normal">
-                {pickDbField(
-                  data.eLibrary.description,
-                  data.eLibrary.descriptionKz ?? null,
-                  locale
-                )}
-              </p>
             </div>
-            <div className="relative">
-              <div className="scroll-smooth flex flex-nowrap gap-4 sm:gap-8 overflow-x-auto overflow-y-hidden pb-12 px-1 sm:px-4 no-scrollbar max-w-full">
-                {eLibShowcaseBooks.map((book, i) => {
-                  const title = pickDbField(book.title, book.titleKz ?? null, locale)
-                  const author = pickDbField(book.author, book.authorKz ?? null, locale)
-                  const href = digitalLibraryHref(book.href)
-                  const outbound = /^https?:\/\//i.test(href) || href.startsWith("//")
-                  const coverUrl = book.coverUrl?.trim()
-                  const card = (
-                    <div>
-                      <div className="relative mb-6 transform group-hover:-translate-y-4 transition-transform duration-500">
-                        {coverUrl ? (
-                          <img
-                            alt={title}
-                            className="w-full aspect-[2/3] object-cover rounded-sm shadow-xl"
-                            src={coverUrl}
-                          />
-                        ) : (
-                          <div className="flex aspect-[2/3] w-full items-center justify-center rounded-sm bg-surface-container shadow-xl">
-                            <span className="material-symbols-outlined text-4xl text-outline">
-                              menu_book
-                            </span>
-                          </div>
-                        )}
-                        <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-sm flex items-center justify-center">
-                          <span className="material-symbols-outlined text-white text-4xl">
-                            menu_book
-                          </span>
-                        </div>
-                      </div>
-                      <h5 className="font-bold text-sm text-center line-clamp-2 break-words whitespace-normal">
-                        {title}
-                      </h5>
-                      <p className="text-[10px] text-outline text-center uppercase tracking-widest mt-1 line-clamp-2 break-words whitespace-normal">
-                        {author}
-                      </p>
-                    </div>
-                  )
-
-                  return (
-                    <a
-                      key={`${book.title}-${i}`}
-                      className="w-[min(11rem,calc(100vw-3rem))] sm:w-44 md:w-48 shrink-0 flex-none group cursor-pointer"
-                      href={outboundHref(href)}
-                      {...(outbound
-                        ? { target: "_blank", rel: "noopener noreferrer" }
-                        : {})}
-                    >
-                      {card}
-                    </a>
-                  )
-                })}
+            <div
+              className={
+                eLibraryBannerFullWidth
+                  ? "-mx-4 sm:-mx-6 lg:-mx-8"
+                  : "mx-auto max-w-5xl"
+              }
+            >
+              <div className="overflow-hidden rounded-md bg-surface-container">
+                <img
+                  alt={pickDbField(
+                    data.eLibrary.bannerImageAlt,
+                    data.eLibrary.bannerImageAltKz ?? null,
+                    locale
+                  )}
+                  className="block h-auto w-full aspect-[4/3] object-cover sm:aspect-[16/7]"
+                  src={data.eLibrary.bannerImageUrl}
+                />
               </div>
-              <div className="h-1 w-full bg-primary-fixed-dim absolute bottom-8 left-0 opacity-20"></div>
             </div>
             <div className="mt-8 sm:mt-12 text-center px-2">
               <a

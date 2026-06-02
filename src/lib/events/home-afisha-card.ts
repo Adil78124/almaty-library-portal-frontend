@@ -2,39 +2,76 @@ import type { AfishaItemManual } from "@/lib/cms/home/types"
 import { EVENT_POSTER_FALLBACK } from "@/lib/events/poster-fallback"
 import { eventPublicPath } from "@/lib/events/public-path"
 import {
+  eventDateLocale,
   formatEventMonthUpper,
   parseEventDate,
 } from "@/lib/events/format-dates"
 import type { AppLocale } from "@/lib/i18n/app-locale"
 import { L, pickLocalized } from "@/lib/i18n/app-locale"
 
-const MONTH_WORD_RE =
-  /(январ|феврал|март|апрел|ма[йя]|июн|июл|август|сентябр|октябр|ноябр|декабр|қаңтар|ақпан|наурыз|сәуір|мамыр|маусым|шілде|тамыз|қыркүйек|қазан|қараша|желтоқсан)/i
-
 /** Строка даты/времени в карточке афиши с учётом языка. */
+const TIME_WORD_RE = /\b\d{1,2}[:.]\d{2}(?:\s*[-\u2013\u2014]\s*\d{1,2}[:.]\d{2})?\b/
+
+export type AfishaDateParts = {
+  day: string
+  month: string
+  time: string
+  metaLine: string
+}
+
+function extractAfishaTime(value: string): string {
+  return value.match(TIME_WORD_RE)?.[0]?.replace(".", ":").trim() ?? ""
+}
+
+export function formatAfishaDateParts(
+  rawTimeDisplay: string | null | undefined,
+  startsAtIso: string | null | undefined,
+  lang: AppLocale,
+  rawTimeDisplayKz?: string | null
+): AfishaDateParts {
+  const ru = (rawTimeDisplay ?? "").trim()
+  const kz = (rawTimeDisplayKz ?? "").trim()
+  const td = lang === "kz" && kz ? kz : ru
+  const iso = (startsAtIso ?? "").trim()
+  const starts = iso ? parseEventDate(iso) : null
+  if (!starts) {
+    const fallback =
+      td ||
+      pickLocalized(L("Дата уточняется", "Күні нақтылануда"), lang)
+    return {
+      day: "—",
+      month: fallback,
+      time: "",
+      metaLine: fallback,
+    }
+  }
+
+  const locale = eventDateLocale(lang)
+  const day = String(starts.getDate()).padStart(2, "0")
+  const month = formatEventMonthUpper(starts, lang)
+  const time =
+    extractAfishaTime(td) ||
+    starts.toLocaleTimeString(locale, {
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+  const metaLine = [month, time].filter(Boolean).join(" | ")
+
+  return { day, month, time, metaLine }
+}
+
 export function formatAfishaTimeLine(
   rawTimeDisplay: string | null | undefined,
   startsAtIso: string | null | undefined,
   lang: AppLocale,
   rawTimeDisplayKz?: string | null
 ): string {
-  const ru = (rawTimeDisplay ?? "").trim()
-  const kz = (rawTimeDisplayKz ?? "").trim()
-  const td = lang === "kz" && kz ? kz : ru
-  const iso = (startsAtIso ?? "").trim()
-  const starts = iso ? parseEventDate(iso) : null
-  if (starts) {
-    if (td && MONTH_WORD_RE.test(td)) return td
-    const time =
-      td ||
-      starts.toLocaleTimeString(lang === "kz" ? "kk-KZ" : "ru-RU", {
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    return `${formatEventMonthUpper(starts, lang)} | ${time}`
-  }
-  if (td) return td
-  return pickLocalized(L("Дата уточняется", "Күні нақтылануда"), lang)
+  return formatAfishaDateParts(
+    rawTimeDisplay,
+    startsAtIso,
+    lang,
+    rawTimeDisplayKz
+  ).metaLine
 }
 
 /** Карточка афиши на главной из записи Event (БД или JSON API). */
@@ -54,6 +91,8 @@ export function eventToAfishaCard(e: {
   ctaLabel: string | null
   ctaLabelKz?: string | null
   ctaHref: string | null
+  sourceLabel?: string | null
+  sourceLabelKz?: string | null
 }): AfishaItemManual {
   const starts = parseEventDate(e.startsAt)
   const dayNum = starts ? String(starts.getDate()).padStart(2, "0") : "—"
@@ -83,5 +122,7 @@ export function eventToAfishaCard(e: {
     ctaLabelKz: kzCtaRaw || (!ruCta ? defaultReadMore.kz : null),
     ctaHref:
       (e.ctaHref ?? "").trim() || eventPublicPath({ slug: e.slug, id: e.id }),
+    sourceLabel: e.sourceLabel ?? null,
+    sourceLabelKz: e.sourceLabelKz ?? null,
   }
 }

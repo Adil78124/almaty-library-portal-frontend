@@ -3,9 +3,10 @@
 import Link from "next/link"
 import type { Event, NewsArticle } from "@prisma/client"
 
+import { AfishaDateStamp } from "@/components/events/afisha-date-stamp"
 import { useLocale } from "@/components/i18n/locale-provider"
 import type { BranchDetailViewModel } from "@/lib/branch-row"
-import { eventToAfishaCard, formatAfishaTimeLine } from "@/lib/events/home-afisha-card"
+import { eventToAfishaCard, formatAfishaDateParts } from "@/lib/events/home-afisha-card"
 import { L, pickDbField, pickLocalized } from "@/lib/i18n/app-locale"
 import { NEWS_COVER_FALLBACK } from "@/lib/news/cover-fallback"
 import { formatNewsListDate } from "@/lib/news/format-dates"
@@ -161,7 +162,7 @@ export function BranchLocalFeed({
           ) : (
             <div className="scroll-smooth flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory">
               {afishaItems.map((ev, idx) => {
-                const timeLineShown = formatAfishaTimeLine(
+                const dateParts = formatAfishaDateParts(
                   ev.rawTimeDisplay,
                   ev.startsAtIso,
                   locale,
@@ -188,19 +189,14 @@ export function BranchLocalFeed({
                         />
                       </div>
                     </div>
-                    <div className="flex w-[320px] shrink-0 flex-1 flex-col rounded-xl bg-surface-container-lowest p-8 shadow-[0_10px_30px_-5px_rgba(25,28,30,0.08)]">
-                      <div className="mb-4">
-                        <span className="block text-4xl font-black leading-none text-on-surface">
-                          {ev.dayNum}
-                        </span>
-                        <span className="text-sm font-bold uppercase tracking-widest text-[#00236f]">
-                          {timeLineShown}
-                        </span>
+                    <div className="flex min-h-[260px] w-[320px] shrink-0 flex-1 flex-col rounded-xl bg-surface-container-lowest p-8 shadow-[0_10px_30px_-5px_rgba(25,28,30,0.08)]">
+                      <div className="mb-4 min-w-0">
+                        <AfishaDateStamp parts={dateParts} />
                       </div>
-                      <h3 className="mb-3 line-clamp-2 text-2xl font-black leading-tight text-on-surface">
+                      <h3 className="mb-3 min-h-[3.75rem] line-clamp-2 text-2xl font-black leading-tight text-on-surface">
                         {evTitle}
                       </h3>
-                      <p className="mb-6 line-clamp-2 text-sm text-on-surface-variant">
+                      <p className="mb-6 min-h-10 line-clamp-2 text-sm text-on-surface-variant">
                         {evExcerpt}
                       </p>
                       <div className="mt-auto">

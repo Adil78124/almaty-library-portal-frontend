@@ -63,7 +63,10 @@ export function HomeLatestNewsBlock({
 
   useEffect(() => {
     if (!clientRefresh?.enabled) return
-    void fetchLatest()
+    const id = window.setTimeout(() => {
+      void fetchLatest()
+    }, 0)
+    return () => window.clearTimeout(id)
   }, [clientRefresh, fetchLatest])
 
   useEffect(() => {
@@ -109,6 +112,11 @@ export function HomeLatestNewsBlock({
             article.excerptKz ?? null,
             locale
           )
+          const source = pickDbField(
+            article.sourceLabel ?? "",
+            article.sourceLabelKz ?? null,
+            locale
+          ).trim()
           return (
             <article
               key={`${article.href}-${i}`}
@@ -125,6 +133,11 @@ export function HomeLatestNewsBlock({
                 </div>
               </div>
               <div className="flex flex-grow flex-col p-5 sm:p-6 md:p-8 min-w-0">
+                {source ? (
+                  <p className="mb-3 text-[11px] font-bold uppercase tracking-wide text-primary/75 line-clamp-1">
+                    {source}
+                  </p>
+                ) : null}
                 <h3 className="text-xl font-bold text-on-surface mb-4 leading-tight transition-colors group-hover:text-primary line-clamp-3 break-words whitespace-normal">
                   {cardTitle}
                 </h3>

@@ -13,6 +13,7 @@ export type ApiNewsRow = {
   description: string
   coverImageUrl: string | null
   publishedAt: string | null
+  branchTitle?: string | null
 }
 
 /** Ответ GET /api/events?limit=… (публичная афиша). */
@@ -34,6 +35,7 @@ export type ApiEventRow = {
   ctaLabel: string | null
   ctaLabelKz?: string | null
   ctaHref: string | null
+  branchTitle?: string | null
 }
 
 export function mapNewsApiRowsToManual(rows: ApiNewsRow[]): NewsItemManual[] {
@@ -83,6 +85,11 @@ export function mapNewsApiRowsToManual(rows: ApiNewsRow[]): NewsItemManual[] {
       excerpt,
       excerptKz,
       href: newsArticlePublicPath({ slug: a.slug, id: a.id }),
+      sourceLabel:
+        typeof a.branchTitle === "string" && a.branchTitle.trim()
+          ? a.branchTitle.trim()
+          : null,
+      sourceLabelKz: null,
     }
   })
 }
@@ -151,6 +158,11 @@ export function mapEventApiRowsToAfisha(rows: ApiEventRow[]): AfishaItemManual[]
       ctaLabel: e.ctaLabel,
       ctaLabelKz: e.ctaLabelKz ?? null,
       ctaHref: e.ctaHref,
+      sourceLabel:
+        typeof e.branchTitle === "string" && e.branchTitle.trim()
+          ? e.branchTitle.trim()
+          : null,
+      sourceLabelKz: null,
     })
   })
 }

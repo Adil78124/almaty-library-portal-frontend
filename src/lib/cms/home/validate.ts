@@ -79,12 +79,16 @@ const sectionSchema = z.discriminatedUnion("type", [
     data: z.object({
       title: z.string(),
       titleKz: z.string().optional(),
-      description: z.string(),
+      description: z.string().optional(),
       descriptionKz: z.string().optional(),
+      bannerImageUrl: z.string().optional(),
+      bannerImageAlt: z.string().optional(),
+      bannerImageAltKz: z.string().optional(),
+      bannerWidth: z.enum(["container", "full"]).optional(),
       buttonLabel: z.string(),
       buttonLabelKz: z.string().optional(),
       buttonHref: z.string(),
-      source: z.enum(["manual", "database"]),
+      source: z.enum(["manual", "database"]).optional(),
       manualBooks: z
         .array(
           z.object({
@@ -116,6 +120,7 @@ const sectionSchema = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("newArrivals"),
     data: z.object({
+      enabled: z.boolean().optional(),
       title: z.string(),
       titleKz: z.string().optional(),
       subtitle: z.string(),

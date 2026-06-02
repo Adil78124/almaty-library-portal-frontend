@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import type { PublishStatus } from "@prisma/client"
 
 import { AdminImageUrlField } from "@/components/admin/admin-image-url-field"
+import { useAdminShellSession } from "@/components/admin/admin-session-context"
 import { useAdminToast } from "@/components/admin/admin-toast"
 import { Button } from "@/components/ui/button"
 import {
@@ -47,6 +48,10 @@ export type SerializedEvent = {
   featuredOnHome: boolean
   status: PublishStatus
   sortOrder: number
+  branchId?: string | null
+  showOnHomeRequested?: boolean
+  homePublishStatus?: "PENDING" | "APPROVED" | "REJECTED" | null
+  homePublishRejectReason?: string | null
 }
 
 function toDatetimeLocal(iso: string | null | undefined): string {
@@ -66,6 +71,7 @@ type Props = { mode: "create" } | { mode: "edit"; initial: SerializedEvent }
 
 export function EventForm(props: Props) {
   const router = useRouter()
+  const { branchId, isSuperAdmin } = useAdminShellSession()
   const { success } = useAdminToast()
   const [pending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
@@ -98,6 +104,14 @@ export function EventForm(props: Props) {
   const [ctaLabel, setCtaLabel] = useState(init?.ctaLabel ?? "")
   const [ctaLabelKz, setCtaLabelKz] = useState(init?.ctaLabelKz ?? "")
   const [status, setStatus] = useState<PublishStatus>(init?.status ?? "DRAFT")
+  const [requestHomePublish, setRequestHomePublish] = useState(
+    Boolean(
+      init?.showOnHomeRequested ||
+        init?.homePublishStatus === "PENDING" ||
+        init?.homePublishStatus === "APPROVED"
+    )
+  )
+  const canRequestHomePublish = !isSuperAdmin && Boolean(branchId)
 
   function save() {
     setError(null)
@@ -131,6 +145,9 @@ export function EventForm(props: Props) {
         ctaLabel: ctaLabel.trim() || null,
         ctaLabelKz: ctaLabelKz.trim() || null,
         status,
+        ...(canRequestHomePublish
+          ? { showOnHomeRequested: requestHomePublish }
+          : {}),
       }
 
       const res = isEdit
@@ -352,6 +369,29 @@ export function EventForm(props: Props) {
               <option value="ARCHIVED">Архив</option>
             </select>
           </div>
+          {canRequestHomePublish ? (
+            <div className="rounded-lg border bg-muted/30 p-4">
+              <label className="flex items-start gap-3 text-sm font-medium">
+                <input
+                  type="checkbox"
+                  className="mt-1"
+                  checked={requestHomePublish}
+                  onChange={(e) => setRequestHomePublish(e.target.checked)}
+                />
+                <span>
+                  Предложить для публикации на главной странице
+                  <span className="text-muted-foreground mt-1 block text-xs font-normal leading-relaxed">
+                    Мероприятие останется на странице филиала. В афише главной оно появится только после одобрения супер-админом.
+                  </span>
+                </span>
+              </label>
+              {init?.homePublishStatus ? (
+                <p className="text-muted-foreground mt-3 text-xs">
+                  Статус заявки: {init.homePublishStatus}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
         </CardContent>
         <CardFooter className="flex flex-wrap gap-3 border-t pt-4">
           <Button type="button" disabled={pending} onClick={save}>
