@@ -6,9 +6,12 @@ import { useMemo, useState } from "react"
 import { useLocale } from "@/components/i18n/locale-provider"
 import type { SimpleHeroData } from "@/lib/cms/simple-page/types"
 import {
+  formatEventCalendarMonthTitle,
   formatEventCardDate,
   formatEventFullDateTime,
+  formatEventLongDateFromYmd,
   formatEventShortDateTime,
+  formatEventYmd,
 } from "@/lib/events/format-dates"
 import { EVENT_POSTER_FALLBACK } from "@/lib/events/poster-fallback"
 import { eventPublicPath } from "@/lib/events/public-path"
@@ -45,23 +48,11 @@ export type NewsTeaser = {
 }
 
 function toLocalYMD(iso: string | null | undefined): string | null {
-  if (!iso) return null
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return null
-  const y = d.getFullYear()
-  const m = String(d.getMonth() + 1).padStart(2, "0")
-  const day = String(d.getDate()).padStart(2, "0")
-  return `${y}-${m}-${day}`
+  return formatEventYmd(iso)
 }
 
 function formatLongFromYMD(ymd: string, lang: AppLocale): string {
-  const [y, m, d] = ymd.split("-").map(Number)
-  const dt = new Date(y, m - 1, d)
-  return dt.toLocaleDateString(lang === "kz" ? "kk-KZ" : "ru-RU", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  })
+  return formatEventLongDateFromYmd(ymd, lang)
 }
 
 /** Пн = 0 … Вс = 6 */
@@ -167,12 +158,8 @@ export default function EventsPageClient({
 
   const cells = buildCalendarCells(viewMonth.y, viewMonth.m)
   const monthTitle = useMemo(() => {
-    const d = new Date(viewMonth.y, viewMonth.m, 1)
-    return d.toLocaleDateString(intlLocale, {
-      month: "long",
-      year: "numeric",
-    })
-  }, [viewMonth.y, viewMonth.m, intlLocale])
+    return formatEventCalendarMonthTitle(viewMonth.y, viewMonth.m, locale)
+  }, [viewMonth.y, viewMonth.m, locale])
 
   const wkShortLabels = useMemo(() => {
     return [0, 1, 2, 3, 4, 5, 6].map((i) => {

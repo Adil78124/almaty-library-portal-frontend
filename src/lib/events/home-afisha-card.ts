@@ -2,8 +2,8 @@ import type { AfishaItemManual } from "@/lib/cms/home/types"
 import { EVENT_POSTER_FALLBACK } from "@/lib/events/poster-fallback"
 import { eventPublicPath } from "@/lib/events/public-path"
 import {
-  eventDateLocale,
   formatEventMonthUpper,
+  getEventDateParts,
   parseEventDate,
 } from "@/lib/events/format-dates"
 import type { AppLocale } from "@/lib/i18n/app-locale"
@@ -33,7 +33,7 @@ export function formatAfishaDateParts(
   const kz = (rawTimeDisplayKz ?? "").trim()
   const td = lang === "kz" && kz ? kz : ru
   const iso = (startsAtIso ?? "").trim()
-  const starts = iso ? parseEventDate(iso) : null
+  const starts = iso ? getEventDateParts(iso) : null
   if (!starts) {
     const fallback =
       td ||
@@ -46,15 +46,11 @@ export function formatAfishaDateParts(
     }
   }
 
-  const locale = eventDateLocale(lang)
-  const day = String(starts.getDate()).padStart(2, "0")
-  const month = formatEventMonthUpper(starts, lang)
+  const day = String(starts.day).padStart(2, "0")
+  const month = formatEventMonthUpper(iso, lang)
   const time =
     extractAfishaTime(td) ||
-    starts.toLocaleTimeString(locale, {
-      hour: "2-digit",
-      minute: "2-digit",
-    })
+    `${String(starts.hour).padStart(2, "0")}:${String(starts.minute).padStart(2, "0")}`
   const metaLine = [month, time].filter(Boolean).join(" | ")
 
   return { day, month, time, metaLine }
@@ -95,7 +91,8 @@ export function eventToAfishaCard(e: {
   sourceLabelKz?: string | null
 }): AfishaItemManual {
   const starts = parseEventDate(e.startsAt)
-  const dayNum = starts ? String(starts.getDate()).padStart(2, "0") : "—"
+  const parts = getEventDateParts(e.startsAt)
+  const dayNum = parts ? String(parts.day).padStart(2, "0") : "—"
   const rawTimeDisplay = (e.timeDisplay ?? "").trim() || null
   const startsAtIso = starts ? starts.toISOString() : null
   const timeLine = formatAfishaTimeLine(
