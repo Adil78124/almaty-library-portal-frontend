@@ -14,7 +14,9 @@ export async function getAboutPublic() {
 }
 
 export async function getAboutSectionsRaw(): Promise<AboutSection[]> {
-  const defaults = getDefaultAboutSections()
+  const defaults =
+    normalizeAboutSectionsFromDb(getDefaultAboutSections()) ??
+    getDefaultAboutSections()
   const { sections } = await fetchBackendJson<{ page: string; sections: unknown | null }>(
     "/pages?page=about",
     { cache: "no-store" }

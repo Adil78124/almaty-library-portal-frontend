@@ -26,7 +26,6 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
 import {
   RepeatableListProvider,
   RepeatableEditorRow,
@@ -48,15 +47,14 @@ function AboutRepeatableToolbar() {
   )
 }
 
-const LABELS: Record<(typeof ABOUT_SECTION_ORDER)[number], string> = {
+const LABELS: Record<AboutSection["type"], string> = {
   hero: "1. Hero",
-  roleIntro: "2. Наша роль (две колонки)",
-  timeline: "3. История",
-  mission: "4. Миссия (сетка карточек)",
-  facts: "5. Цифры",
-  space: "6. Наше пространство",
-  quote: "7. Цитата и текст",
-  cta: "8. Призыв к действию",
+  director: "2. Директор библиотеки",
+  roleIntro: "3. Наша роль (две колонки)",
+  timeline: "4. История",
+  mission: "5. Миссия (сетка карточек)",
+  facts: "6. Цифры",
+  cta: "7. Призыв к действию",
 }
 
 type Props = {
@@ -114,7 +112,7 @@ export function AboutCmsEditor({ initialSections }: Props) {
             О библиотеке
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            Блоки в порядке публичной страницы. Сохранение отправляет все 8
+            Блоки в порядке публичной страницы. Сохранение отправляет все 7
             секций.
           </p>
         </div>
@@ -196,6 +194,79 @@ export function AboutCmsEditor({ initialSections }: Props) {
                     setAt(index, {
                       type: "hero",
                       data: { ...sec.data, lead: loc },
+                    })
+                  }
+                />
+              </>
+            ) : null}
+
+            {sec.type === "director" ? (
+              <>
+                <LocalizedTwinFields
+                  labelRu="Заголовок (RU)"
+                  labelKz="Заголовок (KZ)"
+                  value={sec.data.title}
+                  onChange={(loc) =>
+                    setAt(index, {
+                      type: "director",
+                      data: { ...sec.data, title: loc },
+                    })
+                  }
+                />
+                <LocalizedTwinFields
+                  labelRu="ФИО (RU)"
+                  labelKz="ФИО (KZ)"
+                  value={sec.data.name}
+                  onChange={(loc) =>
+                    setAt(index, {
+                      type: "director",
+                      data: { ...sec.data, name: loc },
+                    })
+                  }
+                />
+                <LocalizedTwinFields
+                  labelRu="Должность (RU)"
+                  labelKz="Должность (KZ)"
+                  value={sec.data.position}
+                  onChange={(loc) =>
+                    setAt(index, {
+                      type: "director",
+                      data: { ...sec.data, position: loc },
+                    })
+                  }
+                />
+                <LocalizedTwinFields
+                  labelRu="Текст (RU)"
+                  labelKz="Текст (KZ)"
+                  multiline
+                  value={sec.data.body}
+                  onChange={(loc) =>
+                    setAt(index, {
+                      type: "director",
+                      data: { ...sec.data, body: loc },
+                    })
+                  }
+                />
+                <AdminImageUrlField
+                  label="Фото директора"
+                  value={sec.data.imageUrl}
+                  onChange={(url) =>
+                    setAt(index, {
+                      type: "director",
+                      data: { ...sec.data, imageUrl: url },
+                    })
+                  }
+                  onUploadError={(msg) => setError(msg)}
+                  urlPlaceholder="URL фото или /placeholder.svg"
+                />
+                <LocalizedTwinFields
+                  labelRu="Alt фото (RU)"
+                  labelKz="Alt фото (KZ)"
+                  value={sec.data.imageAlt}
+                  onChange={(loc) =>
+                    setAt(index, {
+                      type: "director",
+                      data: { ...sec.data, imageAlt: loc },
                     })
                   }
                 />
@@ -565,151 +636,6 @@ export function AboutCmsEditor({ initialSections }: Props) {
                   Добавить
                 </Button>
               </div>
-            ) : null}
-
-            {sec.type === "space" ? (
-              <div className="space-y-3">
-                <LocalizedTwinFields
-                  labelRu="Заголовок (RU)"
-                  labelKz="Заголовок (KZ)"
-                  value={sec.data.title}
-                  onChange={(loc) =>
-                    setAt(index, {
-                      type: "space",
-                      data: { ...sec.data, title: loc },
-                    })
-                  }
-                />
-                <LocalizedTwinFields
-                  labelRu="Лид (RU)"
-                  labelKz="Лид (KZ)"
-                  multiline
-                  value={sec.data.lead}
-                  onChange={(loc) =>
-                    setAt(index, {
-                      type: "space",
-                      data: { ...sec.data, lead: loc },
-                    })
-                  }
-                />
-                <div className="max-h-[500px] space-y-2 overflow-y-auto pr-1 [scrollbar-gutter:stable]">
-                {sec.data.slides.map((sl, j) => (
-                  <RepeatableEditorRow
-                    key={`slide-${j}`}
-                    summary={
-                      <span className="break-words">
-                        {ruPrev(sl.caption) ||
-                          sl.imageUrl?.trim() ||
-                          `Слайд ${j + 1}`}
-                      </span>
-                    }
-                  >
-                    <div className="space-y-2">
-                    <AdminImageUrlField
-                      compact
-                      label="Изображение слайда"
-                      value={sl.imageUrl}
-                      onChange={(url) => {
-                        const slides = [...sec.data.slides]
-                        slides[j] = { ...sl, imageUrl: url }
-                        setAt(index, { type: "space", data: { ...sec.data, slides } })
-                      }}
-                      onUploadError={(msg) => setError(msg)}
-                      urlPlaceholder="URL изображения"
-                    />
-                    <LocalizedTwinFields
-                      labelRu="Alt (RU)"
-                      labelKz="Alt (KZ)"
-                      value={sl.imageAlt}
-                      onChange={(loc) => {
-                        const slides = [...sec.data.slides]
-                        slides[j] = { ...sl, imageAlt: loc }
-                        setAt(index, { type: "space", data: { ...sec.data, slides } })
-                      }}
-                    />
-                    <LocalizedTwinFields
-                      labelRu="Подпись (RU)"
-                      labelKz="Подпись (KZ)"
-                      value={sl.caption}
-                      onChange={(loc) => {
-                        const slides = [...sec.data.slides]
-                        slides[j] = { ...sl, caption: loc }
-                        setAt(index, { type: "space", data: { ...sec.data, slides } })
-                      }}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        if (!confirmListDelete("Удалить этот слайд?")) return
-                        setAt(index, {
-                          type: "space",
-                          data: {
-                            ...sec.data,
-                            slides: sec.data.slides.filter((_, k) => k !== j),
-                          },
-                        })
-                      }}
-                    >
-                      Удалить слайд
-                    </Button>
-                    </div>
-                  </RepeatableEditorRow>
-                ))}
-                </div>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  onClick={() =>
-                    setAt(index, {
-                      type: "space",
-                      data: {
-                        ...sec.data,
-                        slides: [
-                          ...sec.data.slides,
-                          {
-                            imageUrl: "",
-                            imageAlt: L("", ""),
-                            caption: L("", ""),
-                          },
-                        ],
-                      },
-                    })
-                  }
-                >
-                  Добавить слайд
-                </Button>
-              </div>
-            ) : null}
-
-            {sec.type === "quote" ? (
-              <>
-                <LocalizedTwinFields
-                  labelRu="Заголовок блока (RU)"
-                  labelKz="Заголовок блока (KZ)"
-                  value={sec.data.quote}
-                  onChange={(loc) =>
-                    setAt(index, {
-                      type: "quote",
-                      data: { ...sec.data, quote: loc },
-                    })
-                  }
-                />
-                <LocalizedTwinFields
-                  labelRu="Текст (RU)"
-                  labelKz="Текст (KZ)"
-                  multiline
-                  value={sec.data.body}
-                  onChange={(loc) =>
-                    setAt(index, {
-                      type: "quote",
-                      data: { ...sec.data, body: loc },
-                    })
-                  }
-                />
-              </>
             ) : null}
 
             {sec.type === "cta" ? (

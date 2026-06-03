@@ -10,6 +10,14 @@ export function resolvedAboutToPublicApi(data: ResolvedAbout) {
       title: data.hero.title,
       lead: data.hero.lead,
     },
+    director: {
+      title: data.director.title,
+      name: data.director.name,
+      position: data.director.position,
+      body: data.director.body,
+      imageUrl: data.director.imageUrl,
+      imageAlt: data.director.imageAlt,
+    },
     roleIntro: {
       kicker: data.roleIntro.kicker,
       title: data.roleIntro.title,
@@ -23,12 +31,6 @@ export function resolvedAboutToPublicApi(data: ResolvedAbout) {
     },
     mission: { cards: data.mission.cards },
     facts: { stats: data.facts.stats },
-    space: {
-      title: data.space.title,
-      lead: data.space.lead,
-      slides: data.space.slides,
-    },
-    quote: { quote: data.quote.quote, body: data.quote.body },
     cta: {
       title: data.cta.title,
       lead: data.cta.lead,

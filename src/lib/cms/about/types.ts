@@ -16,6 +16,15 @@ export type AboutRoleIntroData = {
   sideImageAlt: Localized
 }
 
+export type AboutDirectorData = {
+  title: Localized
+  name: Localized
+  position: Localized
+  body: Localized
+  imageUrl: string
+  imageAlt: Localized
+}
+
 export type AboutTimelineItem = {
   year: Localized
   title: Localized
@@ -44,23 +53,6 @@ export type AboutFactsData = {
   stats: AboutFactStat[]
 }
 
-export type AboutSpaceSlide = {
-  imageUrl: string
-  imageAlt: Localized
-  caption: Localized
-}
-
-export type AboutSpaceData = {
-  title: Localized
-  lead: Localized
-  slides: AboutSpaceSlide[]
-}
-
-export type AboutQuoteData = {
-  quote: Localized
-  body: Localized
-}
-
 export type AboutCtaData = {
   title: Localized
   lead: Localized
@@ -72,32 +64,29 @@ export type AboutCtaData = {
 
 export type AboutSection =
   | { type: "hero"; data: AboutHeroData }
+  | { type: "director"; data: AboutDirectorData }
   | { type: "roleIntro"; data: AboutRoleIntroData }
   | { type: "timeline"; data: AboutTimelineData }
   | { type: "mission"; data: AboutMissionData }
   | { type: "facts"; data: AboutFactsData }
-  | { type: "space"; data: AboutSpaceData }
-  | { type: "quote"; data: AboutQuoteData }
   | { type: "cta"; data: AboutCtaData }
 
 export const ABOUT_SECTION_ORDER = [
   "hero",
+  "director",
   "roleIntro",
   "timeline",
   "mission",
   "facts",
-  "space",
-  "quote",
   "cta",
 ] as const
 
 export type ResolvedAbout = {
   hero: AboutHeroData
+  director: AboutDirectorData
   roleIntro: AboutRoleIntroData
   timeline: AboutTimelineData
   mission: AboutMissionData
   facts: AboutFactsData
-  space: AboutSpaceData
-  quote: AboutQuoteData
   cta: AboutCtaData
 }

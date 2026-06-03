@@ -14,7 +14,7 @@ type Props = {
 function AboutPageSections({ data }: { data: ResolvedAbout }) {
   const { locale } = useLocale()
   const t = (v: Parameters<typeof pickLocalized>[0]) => pickLocalized(v, locale)
-  const { hero, roleIntro, timeline, mission, facts, space, quote, cta } = data
+  const { hero, director, roleIntro, timeline, mission, facts, cta } = data
 
   return (
     <>
@@ -39,6 +39,34 @@ function AboutPageSections({ data }: { data: ResolvedAbout }) {
           <p className="text-base sm:text-lg md:text-xl text-blue-50/90 max-w-2xl leading-relaxed break-words">
             {t(hero.lead)}
           </p>
+        </div>
+      </section>
+
+      <section className="py-16 sm:py-20 md:py-24 bg-surface-container-lowest overflow-x-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-w-0">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            <div>
+              <span className="text-sm font-bold tracking-widest text-secondary uppercase mb-4 block">
+                {t(director.position)}
+              </span>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-4 sm:mb-5 leading-tight break-words">
+                {t(director.title)}
+              </h2>
+              <h3 className="text-xl sm:text-2xl font-bold text-on-surface mb-6 break-words">
+                {t(director.name)}
+              </h3>
+              <p className="text-slate-600 text-lg leading-relaxed break-words">
+                {t(director.body)}
+              </p>
+            </div>
+            <div className="relative">
+              <img
+                alt={t(director.imageAlt)}
+                className="relative z-10 rounded-lg shadow-xl w-full h-[min(52vh,420px)] sm:h-[min(70vh,500px)] object-cover bg-surface-container"
+                src={director.imageUrl || "/placeholder.svg"}
+              />
+            </div>
+          </div>
         </div>
       </section>
 
@@ -162,71 +190,21 @@ function AboutPageSections({ data }: { data: ResolvedAbout }) {
         </div>
       </section>
 
-      <section className="py-16 sm:py-20 md:py-24 bg-surface-container-lowest overflow-x-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-w-0">
-          <div className="flex justify-between items-end mb-10 sm:mb-16">
-            <div className="min-w-0">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-3 sm:mb-4 break-words">
-                {t(space.title)}
-              </h2>
-              <p className="text-slate-600 max-w-xl break-words">{t(space.lead)}</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-            {space.slides.map((slide, idx) => (
-              <div
-                key={`${t(slide.caption)}-${idx}`}
-                className={`group relative overflow-hidden rounded-lg h-[min(70vh,520px)] md:h-[600px] ${
-                  idx === 1 ? "md:mt-12" : idx === 2 ? "md:-mt-6" : ""
-                }`}
-              >
-                <img
-                  alt={t(slide.imageAlt)}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  src={slide.imageUrl}
-                />
-                <div className="absolute bottom-0 inset-x-0 p-8 bg-gradient-to-t from-black/80 to-transparent">
-                  <h4 className="text-white text-xl font-bold">{t(slide.caption)}</h4>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 sm:py-20 md:py-24 bg-surface-container overflow-x-hidden">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center min-w-0">
-          <span
-            className="material-symbols-outlined text-6xl text-secondary/30 mb-8"
-            style={{ fontVariationSettings: "'FILL' 1" }}
-          >
-            format_quote
-          </span>
-          <blockquote className="text-xl sm:text-2xl md:text-3xl font-medium text-primary italic leading-snug mb-8 sm:mb-10 break-words px-1">
-            {t(quote.quote)}
-          </blockquote>
-          <div className="w-16 h-px bg-outline-variant mx-auto mb-10"></div>
-          <div className="text-slate-600 text-lg leading-relaxed space-y-6">
-            <p className="whitespace-pre-line">{t(quote.body)}</p>
-          </div>
-        </div>
-      </section>
-
       <section className="py-16 sm:py-20 md:py-24 bg-white overflow-x-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-w-0">
           <div className="bg-gradient-to-r from-primary to-secondary p-8 sm:p-12 md:p-16 rounded-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
-            <div className="relative z-10 text-center md:text-left md:flex items-center justify-between gap-12">
-              <div className="max-w-2xl mb-10 md:mb-0">
+            <div className="relative z-10 flex flex-col items-center gap-8 text-center xl:flex-row xl:items-center xl:justify-between xl:gap-12 xl:text-left">
+              <div className="max-w-2xl min-w-0 xl:pr-4">
                 <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 sm:mb-6 break-words">
                   {t(cta.title)}
                 </h2>
                 <p className="text-blue-100 text-base sm:text-lg break-words">{t(cta.lead)}</p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-4 shrink-0">
+              <div className="flex w-full max-w-full flex-col gap-4 sm:flex-row sm:flex-wrap sm:justify-center xl:w-auto xl:shrink-0 xl:justify-end">
                 <Link
                   href={cta.primaryHref}
-                  className="px-8 py-4 bg-tertiary-fixed text-on-tertiary-fixed font-bold rounded-md hover:shadow-lg transition-all active:scale-95 text-center"
+                  className="inline-flex max-w-full items-center justify-center rounded-md bg-tertiary-fixed px-6 py-4 text-center font-bold leading-tight text-on-tertiary-fixed transition-all hover:shadow-lg active:scale-95 sm:min-w-[12rem]"
                 >
                   {t(cta.primaryLabel)}
                 </Link>
@@ -235,7 +213,7 @@ function AboutPageSections({ data }: { data: ResolvedAbout }) {
                   {...(isExternalHref(cta.secondaryHref)
                     ? { target: "_blank", rel: "noopener noreferrer" }
                     : {})}
-                  className="px-8 py-4 border-2 border-white/30 text-white font-bold rounded-md hover:bg-white/10 transition-all active:scale-95 text-center"
+                  className="inline-flex max-w-full items-center justify-center rounded-md border-2 border-white/30 px-6 py-4 text-center font-bold leading-tight text-white transition-all hover:bg-white/10 active:scale-95 sm:min-w-[12rem]"
                 >
                   {t(cta.secondaryLabel)}
                 </a>

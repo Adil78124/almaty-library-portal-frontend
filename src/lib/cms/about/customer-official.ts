@@ -43,12 +43,6 @@ const HERO_IMG =
 const SIDE_IMG =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuCPMjXPq863e-sfwq53J9rdPtNlXcAOxxVTFOerRTIgvpLEX7OcOiTdjV7iNwmaLeEhznGtTWxe_ZwJU9SN3EXzeLrg-0H7JINblDlX3hKaeZbFr5svE_YnSQN6z77giH7QfUGXeVc7UuibubqOqZW1joq4SIO675-GjtMdcmdG89bjROAGMosV-51jDpedjQU69j9xq9Md0d3SGWpL0Fnm7_QiMr4-H6u40PJSDQPTUBnb-oFEynHE035oPlahcp0Ld8fE60XuWLsw"
 
-const SPACE_IMGS = [
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuDVyFnH5B799mG94hfEhlIpbFs0naywYhKS8h5kXA76DfY8fuAPZhs4TtaKOwJPmN7cx4UnnqAau_Ox4iT3gBxsa0lPyeb_L1zMTSLH2e_l4RBiRzI6M0-Po2wuy7drNR1c8H3cmDKz-41Jsvy0CueTZijOOgjnlazdorfVy5hqDl3hWMn4PF_XCTPkA4-cTpLo9fg_0j7OTt3aqtSEJ-vMJc6YEVtiZekOSv6wDMho5tSAozsq_1SRWXf_dl0fsK8Iksi9zSn2xoC",
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuDpa2tsvjuoKCMSnX8supb-_11FOhv7GDCSlARuE_U74po4iZ79799HRcrO1ZaIE_k8JTQGCDhNkIaeCp4xlgURIMVC1UDsovccN5i46Ksx-q4qXCIdZl5Odi9K0QlFJWe7MKg1TUB4DuLDpb6Th4E3ht0asOGf6RzzvrODN1fJJ0B4XOwBvP7uw4WTjKwX5LI9i1r9v5oLUe6fr9MBm6bjvFQ4M1tIg2SUuQz2Nrcc0JmVMZGQERG4VkRhDcAm064xC2I5zES5S0V_",
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuBExT9BKLmHszdiNkR4LSjehqhkfQqgYEks-ItiA97ZbuiBq1wzYgXsZBpQc9s1zXz78nZaaApEnLEZTWTIolrVBob9cumf-35zjCyUsjFzYvIXf5V_OJBIFICkOeR5MgHqFSahhrvpM76f6GI32PKVmSJNNvvVBnZg2bMUabchQJRxDvA70qsbK5Zo8xDj2G7ztUxq5py3egaiyKhbBe3V8X9K9pO_xzMwJ-e4njY_ctrUs9IIytasW5dX0TboJ3LU4-B_SqT_-7i7",
-] as const
-
 const INTRO_RU =
   "Алматинская областная универсальная библиотека — это современный культурно-информационный центр, обеспечивающий свободный доступ к знаниям, информации и культурному наследию. Библиотека обслуживает широкий круг пользователей, предоставляя печатные и электронные ресурсы, а также организуя культурно-просветительские мероприятия."
 
@@ -120,7 +114,7 @@ function deptCardsBilingual(): AboutSection {
 
 /** Одна страница «О библиотеке»: все тексты как { ru, kz }. */
 export function buildOfficialAboutSectionsBilingual(): AboutSection[] {
-  return [
+  const sections: AboutSection[] = [
     {
       type: "hero",
       data: {
@@ -132,6 +126,20 @@ export function buildOfficialAboutSectionsBilingual(): AboutSection[] {
         breadcrumbLabel: L("О библиотеке", "Кітапхана туралы"),
         title: L("О библиотеке", "Кітапхана туралы"),
         lead: L(INTRO_RU, INTRO_KK),
+      },
+    },
+    {
+      type: "director",
+      data: {
+        title: L("Директор библиотеки", "Кітапхана директоры"),
+        name: L("Тоқабаева Ғалия Сламбайқызы", "Тоқабаева Ғалия Сламбайқызы"),
+        position: L("Директор", "Директор"),
+        body: L(
+          "Директор библиотеки координирует развитие учреждения, работу с читателями и внедрение современных библиотечных сервисов.",
+          "Кітапхана директоры мекеменің дамуын, оқырмандармен жұмысты және заманауи кітапханалық қызметтерді үйлестіреді."
+        ),
+        imageUrl: "/placeholder.svg",
+        imageAlt: L("Директор библиотеки", "Кітапхана директоры"),
       },
     },
     {
@@ -188,46 +196,6 @@ export function buildOfficialAboutSectionsBilingual(): AboutSection[] {
       },
     },
     {
-      type: "space",
-      data: {
-        title: L("Наше пространство", "Біздің кеңістік"),
-        lead: L(
-          "Читальные залы, фондохранилище и зоны для работы с цифровыми ресурсами.",
-          "Оқу залдары, кітап қоры және сандық ресурстармен жұмыс аймақтары."
-        ),
-        slides: [
-          {
-            imageUrl: SPACE_IMGS[0],
-            imageAlt: L("Читальный зал", "Оқу залы"),
-            caption: L("Читальный зал", "Оқу залы"),
-          },
-          {
-            imageUrl: SPACE_IMGS[1],
-            imageAlt: L("Книжный фонд", "Кітап қоры"),
-            caption: L("Книжный фонд", "Кітап қоры"),
-          },
-          {
-            imageUrl: SPACE_IMGS[2],
-            imageAlt: L("Сервисы для читателей", "Оқырмандарға қызмет"),
-            caption: L(
-              "Обслуживание читателей",
-              "Оқырмандарға қызмет көрсету"
-            ),
-          },
-        ],
-      },
-    },
-    {
-      type: "quote",
-      data: {
-        quote: L("Руководство", "Басшылық"),
-        body: L(
-          "Директор: Тоқабаева Ғалия Сламбайқызы\n\nЗаместитель директора: Абдикерова Гуля Жалимханқызы",
-          "Директор: Тоқабаева Ғалия Сламбайқызы\n\nДиректордың орынбасары: Абдикерова Гуля Жалимханқызы"
-        ),
-      },
-    },
-    {
       type: "cta",
       data: {
         title: L(
@@ -245,4 +213,5 @@ export function buildOfficialAboutSectionsBilingual(): AboutSection[] {
       },
     },
   ]
+  return sections
 }

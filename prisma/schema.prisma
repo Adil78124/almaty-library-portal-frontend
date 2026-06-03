@@ -37,34 +37,34 @@ enum HomePublishStatus {
 /// Филиал библиотечной сети; админы привязаны к филиалу (кроме SUPER_ADMIN).
 /// Публичные страницы: /branches и /branches/[id] (id — cuid из БД).
 model Branch {
-  id           String        @id @default(cuid())
-  titleRu      String
-  titleKz      String?
-  type         BranchType
-  published    Boolean       @default(true)
-  isMainBranch Boolean       @default(false)
-  subtitle     String?
-  subtitleKz   String?
-  cityLabel    String?
-  cityLabelKz  String?
-  address      String?
-  addressKz    String?
-  phone        String?
-  email        String?
-  hours        String?
+  id                String            @id @default(cuid())
+  titleRu           String
+  titleKz           String?
+  type              BranchType
+  published         Boolean           @default(true)
+  isMainBranch      Boolean           @default(false)
+  subtitle          String?
+  subtitleKz        String?
+  cityLabel         String?
+  cityLabelKz       String?
+  address           String?
+  addressKz         String?
+  phone             String?
+  email             String?
+  hours             String?
   /// Полный текст о филиале (RU); на сайте — основной блок под медиа.
-  descriptionRu  String        @default("")
-  descriptionKz  String?
-  cardImageUrl String?
-  heroImageUrl String?
+  descriptionRu     String            @default("")
+  descriptionKz     String?
+  cardImageUrl      String?
+  heroImageUrl      String?
   /// JSON: [{ "label": "...", "url": "..." }, ...] — соцсети и ссылки филиала
-  socialLinksJson String?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  users        User[]
-  newsArticles NewsArticle[]
-  events       Event[]
-  pageVisits   PageVisit[]
+  socialLinksJson   String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  users             User[]
+  newsArticles      NewsArticle[]
+  events            Event[]
+  pageVisits        PageVisit[]
   visitorActivities VisitorActivity[]
 }
 
@@ -87,19 +87,19 @@ model User {
 model SiteSettings {
   id String @id @default("default")
 
-  orgNameShort    String
-  orgNameLong     String
-  orgNameShortKz  String?
-  orgNameLongKz   String?
+  orgNameShort   String
+  orgNameLong    String
+  orgNameShortKz String?
+  orgNameLongKz  String?
 
-  footerTagline String?
+  footerTagline   String?
   footerTaglineKz String?
-  address       String?
+  address         String?
   /// Мекенжай (қазақ тілі)
-  addressKz     String?
-  phone         String?
-  phoneSecondary String?
-  email         String?
+  addressKz       String?
+  phone           String?
+  phoneSecondary  String?
+  email           String?
 
   /// Санитарлық күн / санитарный день (қазақ және орыс тілінде)
   sanitaryDayRu String?
@@ -108,24 +108,24 @@ model SiteSettings {
   /// JSON: { monday: { isOpen, from?, to? }, ... sunday }
   workingHours Json?
 
-  copyrightLine String?
+  copyrightLine   String?
   copyrightLineKz String?
-  privacyUrl    String?
-  termsUrl      String?
+  privacyUrl      String?
+  termsUrl        String?
 
   /// JSON: [{ "label": "...", "url": "..." }, ...]
   socialLinksJson String?
 
   /// Сколько опубликованных новостей показывать на главной (источник — только NewsArticle).
-  homeNewsLimit         Int     @default(4)
-  homeNewsAutoRefresh   Boolean @default(true)
+  homeNewsLimit       Int     @default(4)
+  homeNewsAutoRefresh Boolean @default(true)
   /// Интервал polling на главной (сек). Если null при включённом автообновлении — используется 60.
-  homeNewsPollSeconds   Int?
+  homeNewsPollSeconds Int?
 
   /// Блок «Афиша» на главной: только опубликованные мероприятия с датой из таблицы Event.
-  homeEventsLimit         Int     @default(4)
-  homeEventsAutoRefresh   Boolean @default(true)
-  homeEventsPollSeconds   Int?
+  homeEventsLimit       Int     @default(4)
+  homeEventsAutoRefresh Boolean @default(true)
+  homeEventsPollSeconds Int?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -179,88 +179,88 @@ model NavItem {
 }
 
 model NewsArticle {
-  id            String         @id @default(cuid())
-  slug          String         @unique
-  titleRu       String
-  titleKz       String?
+  id                      String             @id @default(cuid())
+  slug                    String             @unique
+  titleRu                 String
+  titleKz                 String?
   /// Текст материала (лид + основной текст); абзацы через \n\n
-  descriptionRu String
-  descriptionKz String?
-  coverImageUrl String? /// URL обложки
-  publishedAt   DateTime? /// дата публикации на сайте
-  location      String? /// место / адрес события
-  locationKz    String?
-  curator       String? /// куратор или контакт
-  curatorKz     String?
-  status        PublishStatus  @default(DRAFT)
-  sortOrder     Int            @default(0)
-  showOnHomeRequested Boolean  @default(false)
-  homePublishStatus HomePublishStatus?
-  homePublishRequestedAt DateTime?
-  homePublishReviewedAt DateTime?
-  homePublishReviewedBy String?
+  descriptionRu           String
+  descriptionKz           String?
+  coverImageUrl           String? /// URL обложки
+  publishedAt             DateTime? /// дата публикации на сайте
+  location                String? /// место / адрес события
+  locationKz              String?
+  curator                 String? /// куратор или контакт
+  curatorKz               String?
+  status                  PublishStatus      @default(DRAFT)
+  sortOrder               Int                @default(0)
+  showOnHomeRequested     Boolean            @default(false)
+  homePublishStatus       HomePublishStatus?
+  homePublishRequestedAt  DateTime?
+  homePublishReviewedAt   DateTime?
+  homePublishReviewedBy   String?
   homePublishRejectReason String?
   /// null — материал уровня сети (только SUPER_ADMIN); иначе филиал-владелец.
-  branchId      String?
-  branch        Branch?        @relation(fields: [branchId], references: [id])
-  createdAt     DateTime       @default(now())
-  updatedAt   DateTime         @updatedAt
+  branchId                String?
+  branch                  Branch?            @relation(fields: [branchId], references: [id])
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
 
   @@index([homePublishStatus])
 }
 
 model Event {
-  id              String        @id @default(cuid())
-  slug            String        @unique
-  titleRu         String
-  titleKz         String?
-  descriptionRu   String        @default("")
-  descriptionKz   String?
-  posterUrl       String?
-  startsAt        DateTime?
+  id                      String             @id @default(cuid())
+  slug                    String             @unique
+  titleRu                 String
+  titleKz                 String?
+  descriptionRu           String             @default("")
+  descriptionKz           String?
+  posterUrl               String?
+  startsAt                DateTime?
   /// Отображаемое время, напр. «15:00» или «МАЯ | 15:00»
-  timeDisplay     String?
-  timeDisplayKz   String?
-  format          String?       /// Онлайн/Офлайн/Лекция/Встреча (произв. строка)
-  formatKz        String?
-  category        String?       /// Категория (произв. строка)
-  categoryKz      String?
-  location        String?       /// Место проведения (строка)
-  locationKz      String?
-  ctaLabel        String?
-  ctaLabelKz      String?
-  ctaHref         String?
-  featuredOnHome  Boolean       @default(false)
-  status          PublishStatus @default(DRAFT)
-  sortOrder       Int           @default(0)
-  showOnHomeRequested Boolean    @default(false)
-  homePublishStatus HomePublishStatus?
-  homePublishRequestedAt DateTime?
-  homePublishReviewedAt DateTime?
-  homePublishReviewedBy String?
+  timeDisplay             String?
+  timeDisplayKz           String?
+  format                  String? /// Онлайн/Офлайн/Лекция/Встреча (произв. строка)
+  formatKz                String?
+  category                String? /// Категория (произв. строка)
+  categoryKz              String?
+  location                String? /// Место проведения (строка)
+  locationKz              String?
+  ctaLabel                String?
+  ctaLabelKz              String?
+  ctaHref                 String?
+  featuredOnHome          Boolean            @default(false)
+  status                  PublishStatus      @default(DRAFT)
+  sortOrder               Int                @default(0)
+  showOnHomeRequested     Boolean            @default(false)
+  homePublishStatus       HomePublishStatus?
+  homePublishRequestedAt  DateTime?
+  homePublishReviewedAt   DateTime?
+  homePublishReviewedBy   String?
   homePublishRejectReason String?
-  branchId        String?
-  branch          Branch?       @relation(fields: [branchId], references: [id])
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  branchId                String?
+  branch                  Branch?            @relation(fields: [branchId], references: [id])
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
 
   @@index([homePublishStatus])
 }
 
 model DigitalLibraryItem {
-  id              String   @id @default(cuid())
-  titleRu         String
-  titleKz         String?
-  descriptionRu   String   @default("")
-  descriptionKz   String?
-  author          String
-  authorKz        String?
-  coverUrl     String?
-  resourceUrl  String?
-  showOnHome   Boolean  @default(false)
-  sortOrder    Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id            String   @id @default(cuid())
+  titleRu       String
+  titleKz       String?
+  descriptionRu String   @default("")
+  descriptionKz String?
+  author        String
+  authorKz      String?
+  coverUrl      String?
+  resourceUrl   String?
+  showOnHome    Boolean  @default(false)
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 /// Электронная библиотека: ресурсы для блока на главной и внешних ссылок.
@@ -295,17 +295,17 @@ model PopularBook {
 }
 
 model NewArrival {
-  id         String   @id @default(cuid())
-  title      String
-  titleKz    String?
-  author     String
-  authorKz   String?
-  coverUrl   String?
-  detailUrl  String?
-  sortOrder  Int      @default(0)
-  isActive   Boolean  @default(true)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        String   @id @default(cuid())
+  title     String
+  titleKz   String?
+  author    String
+  authorKz  String?
+  coverUrl  String?
+  detailUrl String?
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model LocalHistoryCard {
@@ -323,6 +323,16 @@ model LocalHistoryCard {
 }
 
 /// Сотрудники / руководители (страница «Структура библиотеки» и др.).
+model StaffSection {
+  id        String   @id @default(cuid())
+  titleRu   String
+  titleKz   String?
+  sortOrder Int      @default(0)
+  staff     Staff[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Staff {
   id String @id @default(cuid())
 
@@ -335,6 +345,7 @@ model Staff {
   birthDate DateTime?
 
   phone String?
+  email String?
 
   positionRu String?
   positionKz String?
@@ -346,23 +357,28 @@ model Staff {
   /// Путь в public (например, /structurpageimg/Name.jpeg) или URL
   imageUrl String?
 
-  sortOrder Int @default(0)
+  sortOrder Int     @default(0)
   isActive  Boolean @default(true)
+
+  sectionId String
+  section   StaffSection @relation(fields: [sectionId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([sectionId])
 }
 
 /// Слоты медиаблока главной: 0 — большой блок, 1–4 — сетка 2×2.
 model GalleryItem {
-  id          String   @id @default(cuid())
-  slot        Int      @unique
-  imageUrl    String
-  caption     String?
-  videoUrl    String?
-  sortOrder   Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  slot      Int      @unique
+  imageUrl  String
+  caption   String?
+  videoUrl  String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model PartnerLink {
@@ -410,12 +426,12 @@ model PageContent {
 }
 
 model PageVisit {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   path      String
   pageTitle String?
   section   String?
   branchId  String?
-  branch    Branch?  @relation(fields: [branchId], references: [id])
+  branch    Branch? @relation(fields: [branchId], references: [id])
 
   visitorId String
   sessionId String?
@@ -433,11 +449,11 @@ model PageVisit {
 }
 
 model VisitorActivity {
-  visitorId String @id
-  sessionId String?
-  path      String?
-  branchId  String?
-  branch    Branch? @relation(fields: [branchId], references: [id])
+  visitorId  String   @id
+  sessionId  String?
+  path       String?
+  branchId   String?
+  branch     Branch?  @relation(fields: [branchId], references: [id])
   lastSeenAt DateTime @default(now())
 
   @@index([lastSeenAt])

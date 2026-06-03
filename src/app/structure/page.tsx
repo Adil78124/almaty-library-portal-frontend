@@ -2,20 +2,20 @@ import Link from "next/link"
 
 import SiteFooter from "@/components/SiteFooter"
 import { BranchesNetworkBlock } from "@/components/structure/branches-network-block"
-import { StaffGrid, type StaffApiItem } from "@/components/structure/staff-grid"
+import { StaffGrid, type StaffSectionApiItem } from "@/components/structure/staff-grid"
 import { getBackendBaseUrl } from "@/lib/backend"
 import { getBranchesNetworkPublic } from "@/lib/cms/branches-network/public"
 import { getSimplePagePublic } from "@/lib/cms/simple-page/public"
 
 export const dynamic = "force-dynamic"
 
-async function getStaffPublic(): Promise<StaffApiItem[]> {
+async function getStaffPublic(): Promise<StaffSectionApiItem[]> {
   const backend = getBackendBaseUrl()
-  const res = await fetch(`${backend}/staff?activeOnly=1`, {
+  const res = await fetch(`${backend}/staff/sections?activeOnly=1`, {
     cache: "no-store",
   })
   if (!res.ok) return []
-  return (await res.json()) as StaffApiItem[]
+  return (await res.json()) as StaffSectionApiItem[]
 }
 
 export default async function StructurePage() {
@@ -57,7 +57,7 @@ export default async function StructurePage() {
         <section className="bg-surface px-4 sm:px-6 lg:px-8 py-14 sm:py-20">
           <div className="mx-auto max-w-7xl space-y-10 sm:space-y-12 min-w-0">
             <BranchesNetworkBlock network={network} />
-            <StaffGrid staff={staff} />
+            <StaffGrid sections={staff} />
           </div>
         </section>
       </main>

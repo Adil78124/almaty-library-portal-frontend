@@ -45,6 +45,45 @@ function normRoleIntro(data: Record<string, unknown>) {
   }
 }
 
+function normDirector(data: Record<string, unknown>) {
+  return {
+    title: anyToLocalized(data.title),
+    name: anyToLocalized(data.name),
+    position: anyToLocalized(data.position),
+    body: anyToLocalized(data.body),
+    imageUrl: String(data.imageUrl ?? "/placeholder.svg"),
+    imageAlt: anyToLocalized(data.imageAlt),
+  }
+}
+
+function normDirectorFromLegacyQuote(data: Record<string, unknown>) {
+  const quote = normQuote(data)
+  const directorLineRu =
+    quote.body.ru
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .find((line) => line.toLowerCase().startsWith("директор:")) ?? ""
+  const directorLineKz =
+    quote.body.kz
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .find((line) => line.toLowerCase().startsWith("директор:")) ?? ""
+  const nameRu = directorLineRu.replace(/^директор:\s*/i, "").trim()
+  const nameKz = directorLineKz.replace(/^директор:\s*/i, "").trim()
+
+  return {
+    title: L("Директор библиотеки", "Кітапхана директоры"),
+    name: L(nameRu || "Тоқабаева Ғалия Сламбайқызы", nameKz || nameRu),
+    position: L("Директор", "Директор"),
+    body: L(
+      "Директор библиотеки координирует развитие учреждения, работу с читателями и внедрение современных библиотечных сервисов.",
+      "Кітапхана директоры мекеменің дамуын, оқырмандармен жұмысты және заманауи кітапханалық қызметтерді үйлестіреді."
+    ),
+    imageUrl: "/placeholder.svg",
+    imageAlt: L("Директор библиотеки", "Кітапхана директоры"),
+  }
+}
+
 function normTimeline(data: Record<string, unknown>) {
   const itemsRaw = Array.isArray(data.items) ? data.items : []
   const items = itemsRaw.map((it) => {
@@ -87,23 +126,6 @@ function normFacts(data: Record<string, unknown>) {
   return { stats }
 }
 
-function normSpace(data: Record<string, unknown>) {
-  const slidesRaw = Array.isArray(data.slides) ? data.slides : []
-  const slides = slidesRaw.map((sl) => {
-    const o = sl as Record<string, unknown>
-    return {
-      imageUrl: String(o.imageUrl ?? ""),
-      imageAlt: anyToLocalized(o.imageAlt),
-      caption: anyToLocalized(o.caption),
-    }
-  })
-  return {
-    title: anyToLocalized(data.title),
-    lead: anyToLocalized(data.lead),
-    slides,
-  }
-}
-
 function normQuote(data: Record<string, unknown>) {
   return {
     quote: anyToLocalized(data.quote),
@@ -124,18 +146,34 @@ function normCta(data: Record<string, unknown>) {
 
 /** Приводит сырые секции из БД к типу с Localized (старые строки → { ru, kz: "" }). */
 export function normalizeAboutSectionsFromDb(raw: unknown): AboutSection[] | null {
-  if (!Array.isArray(raw) || raw.length !== ABOUT_SECTION_ORDER.length) {
+  if (!Array.isArray(raw)) {
     return null
   }
+  const byType = new Map<string, { type?: string; data?: unknown }>()
+  for (const item of raw) {
+    const sec = item as { type?: string; data?: unknown }
+    if (sec?.type) byType.set(sec.type, sec)
+  }
+
   const out: AboutSection[] = []
   for (let i = 0; i < ABOUT_SECTION_ORDER.length; i++) {
-    const sec = raw[i] as { type?: string; data?: unknown }
-    const type = sec?.type
+    const expectedType = ABOUT_SECTION_ORDER[i]
+    const sec = byType.get(expectedType)
+    if (!sec && expectedType !== "director") return null
     const data = (sec?.data ?? {}) as Record<string, unknown>
-    if (type !== ABOUT_SECTION_ORDER[i]) return null
-    switch (type) {
+    switch (expectedType) {
       case "hero":
         out.push({ type: "hero", data: normHero(data) })
+        break
+      case "director":
+        out.push({
+          type: "director",
+          data: sec
+            ? normDirector(data)
+            : normDirectorFromLegacyQuote(
+                (byType.get("quote")?.data ?? {}) as Record<string, unknown>
+              ),
+        })
         break
       case "roleIntro":
         out.push({ type: "roleIntro", data: normRoleIntro(data) })
@@ -148,12 +186,6 @@ export function normalizeAboutSectionsFromDb(raw: unknown): AboutSection[] | nul
         break
       case "facts":
         out.push({ type: "facts", data: normFacts(data) })
-        break
-      case "space":
-        out.push({ type: "space", data: normSpace(data) })
-        break
-      case "quote":
-        out.push({ type: "quote", data: normQuote(data) })
         break
       case "cta":
         out.push({ type: "cta", data: normCta(data) })

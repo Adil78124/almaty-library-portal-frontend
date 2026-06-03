@@ -20,22 +20,20 @@ export function resolveAboutSections(sections: unknown): ResolvedAbout {
   }) as AboutSection[]
 
   const heroS = pickSection(merged, "hero")!
+  const directorS = pickSection(merged, "director")!
   const roleS = pickSection(merged, "roleIntro")!
   const timelineS = pickSection(merged, "timeline")!
   const missionS = pickSection(merged, "mission")!
   const factsS = pickSection(merged, "facts")!
-  const spaceS = pickSection(merged, "space")!
-  const quoteS = pickSection(merged, "quote")!
   const ctaS = pickSection(merged, "cta")!
 
   return {
     hero: heroS.data,
+    director: directorS.data,
     roleIntro: roleS.data,
     timeline: timelineS.data,
     mission: missionS.data,
     facts: factsS.data,
-    space: spaceS.data,
-    quote: quoteS.data,
     cta: ctaS.data,
   }
 }

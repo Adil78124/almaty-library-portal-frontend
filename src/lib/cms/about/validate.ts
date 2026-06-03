@@ -21,6 +21,17 @@ const sectionSchema = z.discriminatedUnion("type", [
     }),
   }),
   z.object({
+    type: z.literal("director"),
+    data: z.object({
+      title: loc,
+      name: loc,
+      position: loc,
+      body: loc,
+      imageUrl: z.string(),
+      imageAlt: loc,
+    }),
+  }),
+  z.object({
     type: z.literal("roleIntro"),
     data: z.object({
       kicker: loc,
@@ -65,27 +76,6 @@ const sectionSchema = z.discriminatedUnion("type", [
           label: loc,
         })
       ),
-    }),
-  }),
-  z.object({
-    type: z.literal("space"),
-    data: z.object({
-      title: loc,
-      lead: loc,
-      slides: z.array(
-        z.object({
-          imageUrl: z.string(),
-          imageAlt: loc,
-          caption: loc,
-        })
-      ),
-    }),
-  }),
-  z.object({
-    type: z.literal("quote"),
-    data: z.object({
-      quote: loc,
-      body: loc,
     }),
   }),
   z.object({

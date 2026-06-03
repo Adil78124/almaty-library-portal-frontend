@@ -397,19 +397,47 @@ const configs: TableConfig[] = [
       )),
   },
   {
+    table: "StaffSection",
+    delegate: "staffSection",
+    primaryField: "id",
+    required: ["id", "titleRu"],
+    dateFields,
+    fields: [
+      "id",
+      "titleRu",
+      "titleKz",
+      "sortOrder",
+      "createdAt",
+      "updatedAt",
+    ],
+    findExisting: async (client, data) =>
+      (await findById(client, "staffSection", data)) ||
+      (await findFirstByWhere(
+        client,
+        "staffSection",
+        compositeWhere(data, ["titleRu", "sortOrder"])
+      )),
+  },
+  {
     table: "Staff",
     delegate: "staff",
     primaryField: "id",
     required: ["id", "slug", "fullNameRu", "branchRu"],
     boolFields: boolActiveFields,
     dateFields: [...dateFields, "birthDate"],
+    prepare: (data) => ({
+      ...data,
+      sectionId: data.sectionId || "staff-section-district-leaders",
+    }),
     fields: [
       "id",
       "slug",
+      "sectionId",
       "fullNameRu",
       "fullNameKz",
       "birthDate",
       "phone",
+      "email",
       "positionRu",
       "positionKz",
       "branchRu",
