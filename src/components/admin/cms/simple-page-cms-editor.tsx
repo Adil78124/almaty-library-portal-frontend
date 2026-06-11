@@ -75,7 +75,7 @@ export function SimplePageCmsEditor({ pageSlug, initialSections }: Props) {
   }
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-6">
+    <div className="flex w-full flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">
@@ -100,10 +100,9 @@ export function SimplePageCmsEditor({ pageSlug, initialSections }: Props) {
       ) : null}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">1. Hero / шапка</CardTitle>
+          <CardTitle className="text-lg">1. Шапка страницы</CardTitle>
           <CardDescription>
-            Фон, хлебные крошки, заголовок и лид — шапка публичной страницы на
-            сайте.
+            Фон, название страницы в навигации, заголовок и подзаголовок.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -159,7 +158,9 @@ export function SimplePageCmsEditor({ pageSlug, initialSections }: Props) {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Хлебные крошки (RU)</label>
+            <label className="text-sm font-medium">
+              Название страницы в навигации (RU)
+            </label>
             <Input
               value={hero.data.breadcrumbLabel}
               onChange={(e) =>
@@ -176,7 +177,9 @@ export function SimplePageCmsEditor({ pageSlug, initialSections }: Props) {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Хлебные крошки (KZ)</label>
+            <label className="text-sm font-medium">
+              Название страницы в навигации (KZ)
+            </label>
             <Input
               value={hero.data.breadcrumbLabelKz ?? ""}
               onChange={(e) =>
@@ -221,7 +224,7 @@ export function SimplePageCmsEditor({ pageSlug, initialSections }: Props) {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Лид (RU)</label>
+            <label className="text-sm font-medium">Подзаголовок (RU)</label>
             <Input
               value={hero.data.lead}
               onChange={(e) =>
@@ -235,7 +238,7 @@ export function SimplePageCmsEditor({ pageSlug, initialSections }: Props) {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Лид (KZ)</label>
+            <label className="text-sm font-medium">Подзаголовок (KZ)</label>
             <Input
               value={hero.data.leadKz ?? ""}
               onChange={(e) =>

@@ -106,7 +106,7 @@ export function BranchDetailPageClient({
                     {t(L("Контактная информация", "Байланыс ақпараты"))}
                   </h3>
                   <div className="space-y-6">
-                    {branch.address?.trim() ? (
+                    {branch.address?.trim() || branch.addressKz?.trim() ? (
                       <div className="flex gap-4">
                         <span className="material-symbols-outlined text-secondary">
                           location_on

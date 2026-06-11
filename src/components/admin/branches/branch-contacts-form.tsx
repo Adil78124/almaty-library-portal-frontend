@@ -15,15 +15,20 @@ import { requestRevalidate } from "@/services/revalidate"
 type BranchPayload = {
   id: string
   titleRu: string
+  titleKz: string | null
   subtitle: string | null
+  subtitleKz: string | null
   cityLabel: string | null
+  cityLabelKz: string | null
   cardImageUrl: string | null
   heroImageUrl: string | null
   address: string | null
+  addressKz: string | null
   phone: string | null
   email: string | null
   hours: string | null
   descriptionRu: string | null
+  descriptionKz: string | null
   socialLinksJson: string | null
 }
 
@@ -52,16 +57,22 @@ export function BranchContactsForm({ branchId }: { branchId: string }) {
   const toast = useAdminToast()
   const [loadError, setLoadError] = useState<string | null>(null)
   const [name, setName] = useState("")
+  const [nameKz, setNameKz] = useState("")
   const [subtitle, setSubtitle] = useState("")
+  const [subtitleKz, setSubtitleKz] = useState("")
   const [cityLabel, setCityLabel] = useState("")
+  const [cityLabelKz, setCityLabelKz] = useState("")
   const [heroImageUrl, setHeroImageUrl] = useState("")
   const [cardImageUrl, setCardImageUrl] = useState("")
   const [address, setAddress] = useState("")
+  const [addressKz, setAddressKz] = useState("")
   const [phone, setPhone] = useState("")
   const [email, setEmail] = useState("")
   const [hours, setHours] = useState("")
   const [intro, setIntro] = useState("")
   const [about, setAbout] = useState("")
+  const [introKz, setIntroKz] = useState("")
+  const [aboutKz, setAboutKz] = useState("")
   const [socialLinksJson, setSocialLinksJson] = useState("")
   const [pending, setPending] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -83,17 +94,24 @@ export function BranchContactsForm({ branchId }: { branchId: string }) {
           return
         }
         const description = splitBranchDescription(data.descriptionRu)
+        const descriptionKz = splitBranchDescription(data.descriptionKz)
         setName(data.titleRu ?? "")
+        setNameKz(data.titleKz ?? "")
         setSubtitle(data.subtitle ?? "")
+        setSubtitleKz(data.subtitleKz ?? "")
         setCityLabel(data.cityLabel ?? "")
+        setCityLabelKz(data.cityLabelKz ?? "")
         setHeroImageUrl(data.heroImageUrl?.trim() ?? "")
         setCardImageUrl(data.cardImageUrl?.trim() ?? "")
         setAddress(data.address ?? "")
+        setAddressKz(data.addressKz ?? "")
         setPhone(data.phone ?? "")
         setEmail(data.email ?? "")
         setHours(data.hours ?? "")
         setIntro(description.intro)
         setAbout(description.about)
+        setIntroKz(descriptionKz.intro)
+        setAboutKz(descriptionKz.about)
         setSocialLinksJson(data.socialLinksJson?.trim() ?? "")
       } catch {
         setLoadError("Ошибка сети при загрузке филиала")
@@ -114,15 +132,20 @@ export function BranchContactsForm({ branchId }: { branchId: string }) {
     try {
       const body: Record<string, string | null> = {
         titleRu: name.trim(),
+        titleKz: nameKz.trim() || null,
         subtitle: subtitle.trim() || null,
+        subtitleKz: subtitleKz.trim() || null,
         cityLabel: cityLabel.trim() || null,
+        cityLabelKz: cityLabelKz.trim() || null,
         heroImageUrl: heroImageUrl.trim() || null,
         cardImageUrl: cardImageUrl.trim() || null,
         address: address.trim() || null,
+        addressKz: addressKz.trim() || null,
         phone: phone.trim() || null,
         email: email.trim() || null,
         hours: hours.trim() || null,
         descriptionRu: joinBranchDescription(intro, about),
+        descriptionKz: joinBranchDescription(introKz, aboutKz) || null,
         socialLinksJson: socialLinksJson.trim() || null,
       }
       const res = await fetch(
@@ -162,7 +185,7 @@ export function BranchContactsForm({ branchId }: { branchId: string }) {
   }
 
   return (
-    <form onSubmit={(e) => void submit(e)} className="mx-auto max-w-2xl space-y-8">
+    <form onSubmit={(e) => void submit(e)} className="w-full space-y-8">
       {saveError && (
         <p className="text-destructive text-sm">{saveError}</p>
       )}
@@ -188,33 +211,63 @@ export function BranchContactsForm({ branchId }: { branchId: string }) {
           иконкой на карточке в каталоге. <strong>Фото шапки</strong> — фон
           hero; <strong>фото карточки</strong> — картинка в сетке /branches.
         </p>
-        <div className="space-y-2">
-          <Label htmlFor="c-name">Название филиала</Label>
-          <Input
-            id="c-name"
-            required
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Как на сайте"
-          />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="c-name-ru">Название филиала (RU)</Label>
+            <Input
+              id="c-name-ru"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Как на сайте"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="c-name-kz">Название филиала (KZ)</Label>
+            <Input
+              id="c-name-kz"
+              value={nameKz}
+              onChange={(e) => setNameKz(e.target.value)}
+            />
+          </div>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="c-subtitle">Подзаголовок в шапке (необязательно)</Label>
-          <Input
-            id="c-subtitle"
-            value={subtitle}
-            onChange={(e) => setSubtitle(e.target.value)}
-            placeholder="Короткая строка под названием"
-          />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="c-subtitle-ru">Подзаголовок в шапке (RU)</Label>
+            <Input
+              id="c-subtitle-ru"
+              value={subtitle}
+              onChange={(e) => setSubtitle(e.target.value)}
+              placeholder="Короткая строка под названием"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="c-subtitle-kz">Подзаголовок в шапке (KZ)</Label>
+            <Input
+              id="c-subtitle-kz"
+              value={subtitleKz}
+              onChange={(e) => setSubtitleKz(e.target.value)}
+            />
+          </div>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="c-city">Населённый пункт / район на карточке</Label>
-          <Input
-            id="c-city"
-            value={cityLabel}
-            onChange={(e) => setCityLabel(e.target.value)}
-            placeholder="например: Семей"
-          />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="c-city-ru">Населённый пункт / район (RU)</Label>
+            <Input
+              id="c-city-ru"
+              value={cityLabel}
+              onChange={(e) => setCityLabel(e.target.value)}
+              placeholder="например: Семей"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="c-city-kz">Населённый пункт / район (KZ)</Label>
+            <Input
+              id="c-city-kz"
+              value={cityLabelKz}
+              onChange={(e) => setCityLabelKz(e.target.value)}
+            />
+          </div>
         </div>
         <AdminImageUrlField
           id="c-hero"
@@ -225,7 +278,7 @@ export function BranchContactsForm({ branchId }: { branchId: string }) {
         />
         <AdminImageUrlField
           id="c-card"
-          label="Фото для карточки в каталоге /branches"
+          label="Фото карточки и основное фото на странице филиала"
           value={cardImageUrl}
           onChange={setCardImageUrl}
           onUploadError={(msg) => setSaveError(msg)}
@@ -234,14 +287,24 @@ export function BranchContactsForm({ branchId }: { branchId: string }) {
 
       <div className="space-y-4">
         <h2 className="text-base font-semibold tracking-tight">Контакты</h2>
-        <div className="space-y-2">
-          <Label htmlFor="c-address">Адрес</Label>
-          <Input
-            id="c-address"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            placeholder="Улица, дом, город"
-          />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="c-address-ru">Адрес (RU)</Label>
+            <Input
+              id="c-address-ru"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Улица, дом, город"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="c-address-kz">Адрес (KZ)</Label>
+            <Input
+              id="c-address-kz"
+              value={addressKz}
+              onChange={(e) => setAddressKz(e.target.value)}
+            />
+          </div>
         </div>
         <div className="space-y-2">
           <Label htmlFor="c-phone">Телефон</Label>
@@ -275,25 +338,47 @@ export function BranchContactsForm({ branchId }: { branchId: string }) {
 
       <div className="space-y-4">
         <h2 className="text-base font-semibold tracking-tight">Тексты на странице</h2>
-        <div className="space-y-2">
-          <Label htmlFor="c-intro">Вступительный текст</Label>
-          <textarea
-            id="c-intro"
-            className={textareaClass}
-            value={intro}
-            onChange={(e) => setIntro(e.target.value)}
-            placeholder="Короткий абзац под шапкой страницы филиала"
-          />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="c-intro-ru">Вступительный текст (RU)</Label>
+            <textarea
+              id="c-intro-ru"
+              className={textareaClass}
+              value={intro}
+              onChange={(e) => setIntro(e.target.value)}
+              placeholder="Короткий абзац под шапкой страницы филиала"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="c-intro-kz">Вступительный текст (KZ)</Label>
+            <textarea
+              id="c-intro-kz"
+              className={textareaClass}
+              value={introKz}
+              onChange={(e) => setIntroKz(e.target.value)}
+            />
+          </div>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="c-about">О филиале</Label>
-          <textarea
-            id="c-about"
-            className={cn(textareaClass, "min-h-[180px]")}
-            value={about}
-            onChange={(e) => setAbout(e.target.value)}
-            placeholder="Основной текст: абзацы разделяйте пустой строкой"
-          />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="c-about-ru">О филиале (RU)</Label>
+            <textarea
+              id="c-about-ru"
+              className={cn(textareaClass, "min-h-[180px]")}
+              value={about}
+              onChange={(e) => setAbout(e.target.value)}
+              placeholder="Основной текст: абзацы разделяйте пустой строкой"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="c-about-kz">О филиале (KZ)</Label>
+            <textarea
+              id="c-about-kz"
+              className={cn(textareaClass, "min-h-[180px]")}
+              value={aboutKz}
+              onChange={(e) => setAboutKz(e.target.value)}
+            />
+          </div>
         </div>
       </div>
 

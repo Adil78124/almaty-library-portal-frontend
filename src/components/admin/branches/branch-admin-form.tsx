@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import type { BranchType } from "@prisma/client"
@@ -8,8 +9,9 @@ import type { BranchRow } from "@/lib/branch-row"
 
 import { BranchSocialLinksEditor } from "@/components/admin/branches/branch-social-links-editor"
 import { BranchAdministratorManager } from "@/components/admin/branches/branch-administrator-manager"
+import { AdminImageUrlField } from "@/components/admin/admin-image-url-field"
 import { useAdminToast } from "@/components/admin/admin-toast"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
@@ -36,8 +38,11 @@ export function BranchAdminForm(props: Props) {
   const [published, setPublished] = useState(b?.published ?? true)
   const [isMainBranch, setIsMainBranch] = useState(b?.isMainBranch ?? false)
   const [subtitle, setSubtitle] = useState(b?.subtitle ?? "")
+  const [subtitleKz, setSubtitleKz] = useState(b?.subtitleKz ?? "")
   const [cityLabel, setCityLabel] = useState(b?.cityLabel ?? "")
+  const [cityLabelKz, setCityLabelKz] = useState(b?.cityLabelKz ?? "")
   const [address, setAddress] = useState(b?.address ?? "")
+  const [addressKz, setAddressKz] = useState(b?.addressKz ?? "")
   const [phone, setPhone] = useState(b?.phone ?? "")
   const [email, setEmail] = useState(b?.email ?? "")
   const [hours, setHours] = useState(b?.hours ?? "")
@@ -65,8 +70,11 @@ export function BranchAdminForm(props: Props) {
         published,
         isMainBranch,
         subtitle: subtitle.trim() || null,
+        subtitleKz: subtitleKz.trim() || null,
         cityLabel: cityLabel.trim() || null,
+        cityLabelKz: cityLabelKz.trim() || null,
         address: address.trim() || null,
+        addressKz: addressKz.trim() || null,
         phone: phone.trim() || null,
         email: email.trim() || null,
         hours: hours.trim() || null,
@@ -98,7 +106,7 @@ export function BranchAdminForm(props: Props) {
   }
 
   return (
-    <form onSubmit={(e) => void submit(e)} className="mx-auto max-w-2xl space-y-6">
+    <form onSubmit={(e) => void submit(e)} className="w-full space-y-6">
       {error && <p className="text-destructive text-sm">{error}</p>}
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -179,32 +187,60 @@ export function BranchAdminForm(props: Props) {
         </div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="b-sub">Краткое описание (подзаголовок)</Label>
-        <Input
-          id="b-sub"
-          value={subtitle}
-          onChange={(e) => setSubtitle(e.target.value)}
-          placeholder="Для карточки и шапки страницы филиала"
-        />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="b-sub-ru">Краткое описание (RU)</Label>
+          <Input
+            id="b-sub-ru"
+            value={subtitle}
+            onChange={(e) => setSubtitle(e.target.value)}
+            placeholder="Для карточки и шапки страницы филиала"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="b-sub-kz">Краткое описание (KZ)</Label>
+          <Input
+            id="b-sub-kz"
+            value={subtitleKz}
+            onChange={(e) => setSubtitleKz(e.target.value)}
+            placeholder="Филиал бетінің қысқаша сипаттамасы"
+          />
+        </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="b-city">Населённый пункт / район</Label>
+          <Label htmlFor="b-city-ru">Населённый пункт / район (RU)</Label>
           <Input
-            id="b-city"
+            id="b-city-ru"
             value={cityLabel}
             onChange={(e) => setCityLabel(e.target.value)}
             placeholder="напр. г. Конаев"
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="b-addr">Адрес</Label>
+          <Label htmlFor="b-city-kz">Населённый пункт / район (KZ)</Label>
           <Input
-            id="b-addr"
+            id="b-city-kz"
+            value={cityLabelKz}
+            onChange={(e) => setCityLabelKz(e.target.value)}
+            placeholder="мысалы: Қонаев қ."
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="b-addr-ru">Адрес (RU)</Label>
+          <Input
+            id="b-addr-ru"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="b-addr-kz">Адрес (KZ)</Label>
+          <Input
+            id="b-addr-kz"
+            value={addressKz}
+            onChange={(e) => setAddressKz(e.target.value)}
           />
         </div>
       </div>
@@ -247,28 +283,46 @@ export function BranchAdminForm(props: Props) {
       />
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="b-card-img">URL фото для карточки в списке</Label>
-          <Input
-            id="b-card-img"
-            value={cardImageUrl}
-            onChange={(e) => setCardImageUrl(e.target.value)}
-            placeholder="https://…"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="b-hero-img">URL фото шапки на странице филиала</Label>
-          <Input
-            id="b-hero-img"
-            value={heroImageUrl}
-            onChange={(e) => setHeroImageUrl(e.target.value)}
-            placeholder="https://…"
-          />
-        </div>
+        <AdminImageUrlField
+          id="b-card-img"
+          label="Фото карточки и основное фото на странице филиала"
+          value={cardImageUrl}
+          onChange={setCardImageUrl}
+          onUploadError={setError}
+        />
+        <AdminImageUrlField
+          id="b-hero-img"
+          label="Фото шапки на странице филиала"
+          value={heroImageUrl}
+          onChange={setHeroImageUrl}
+          onUploadError={setError}
+        />
       </div>
 
       {isEdit && b && (
         <>
+          <section className="space-y-3 rounded-xl border bg-card p-4 md:p-6">
+            <div>
+              <h2 className="text-lg font-semibold">Быстрый просмотр материалов</h2>
+              <p className="text-muted-foreground mt-1 text-sm">
+                Откройте новости или афишу только этого филиала.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href={`/admin/news?type=branches&branchId=${encodeURIComponent(b.id)}`}
+                className={buttonVariants({ variant: "outline" })}
+              >
+                Посмотреть новости филиала
+              </Link>
+              <Link
+                href={`/admin/events?type=branches&branchId=${encodeURIComponent(b.id)}`}
+                className={buttonVariants({ variant: "outline" })}
+              >
+                Посмотреть афишу филиала
+              </Link>
+            </div>
+          </section>
           <BranchAdministratorManager branchId={b.id} />
           <p className="text-muted-foreground text-xs">
             Ссылка на публичную страницу:{" "}

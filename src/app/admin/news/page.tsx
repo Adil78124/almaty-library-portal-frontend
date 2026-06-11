@@ -1,6 +1,7 @@
 import Link from "next/link"
 
 import { NewsDeleteButton } from "@/components/admin/news/news-delete-button"
+import { AdminBranchFilter } from "@/components/admin/admin-branch-filter"
 import { AdminContentScopeFilter } from "@/components/admin/content-scope-filter"
 import { buttonVariants } from "@/components/ui/button"
 import {
@@ -37,6 +38,9 @@ export default async function AdminNewsListPage({
   const scope = scopeFromSearchParams(
     Array.isArray(sp.type) ? sp.type[0] : sp.type
   )
+  const requestedBranchId = Array.isArray(sp.branchId)
+    ? sp.branchId[0]
+    : sp.branchId
 
   const session = await getAdminSession()
   const isSuper = session ? sessionIsSuperAdmin(session) : false
@@ -50,16 +54,29 @@ export default async function AdminNewsListPage({
       return { branchId: session.user.branchId }
     }
     if (!isSuper) return undefined
+    if (requestedBranchId) return { branchId: requestedBranchId }
     if (scope === "main") return { branchId: null }
     if (scope === "branches") return { branchId: { not: null } }
     return undefined
   })()
 
-  const [rows] = await Promise.all([
+  const [rows, selectedBranch, branches] = await Promise.all([
     prisma.newsArticle.findMany({
       where: branchScopedWhere,
       orderBy: [{ publishedAt: "desc" }, { updatedAt: "desc" }],
     }),
+    isSuper && requestedBranchId
+      ? prisma.branch.findUnique({
+          where: { id: requestedBranchId },
+          select: { titleRu: true },
+        })
+      : Promise.resolve(null),
+    isSuper
+      ? prisma.branch.findMany({
+          orderBy: { titleRu: "asc" },
+          select: { id: true, titleRu: true },
+        })
+      : Promise.resolve([]),
   ])
 
   return (
@@ -75,10 +92,16 @@ export default async function AdminNewsListPage({
         </div>
         <div className="flex flex-wrap items-center gap-3">
           {isSuper && (
-            <AdminContentScopeFilter
-              label="Показывать"
-              defaultValue="main"
-            />
+            <>
+              <AdminContentScopeFilter
+                label="Показывать"
+                defaultValue="main"
+              />
+              <AdminBranchFilter
+                branches={branches}
+                selectedBranchId={requestedBranchId}
+              />
+            </>
           )}
           <Link
             href="/admin/news/new"
@@ -88,6 +111,12 @@ export default async function AdminNewsListPage({
           </Link>
         </div>
       </div>
+
+      {selectedBranch ? (
+        <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 text-sm">
+          Выбран филиал: <strong>{selectedBranch.titleRu}</strong>
+        </div>
+      ) : null}
 
       <div className="rounded-xl border bg-card">
         <Table>
